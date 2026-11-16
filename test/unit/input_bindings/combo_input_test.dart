@@ -68,6 +68,70 @@ void main() {
     input.up(pointer);
   }
 
+  test(
+    'retains bounded monotonic stroke measurements without changing identity',
+    () {
+      fakeAsync((time) {
+        final matches = <ComboMatch>[];
+        final input = ComboInput(
+          catalog: catalog(),
+          clock: FakeInputClock(time),
+          onRuntimeMatch: matches.add,
+        );
+        stroke(input, time, InputButton.forward, 100);
+        expect(input.observations.single.downAt, Duration.zero);
+        expect(
+          input.observations.single.upAt,
+          const Duration(milliseconds: 100),
+        );
+        expect(input.observations.single.gapBefore, isNull);
+        time.elapse(const Duration(milliseconds: 250));
+        stroke(input, time, InputButton.backward, 700);
+        final match = matches.single;
+        expect(match.binding.profile, ProfileId.p2);
+        expect(match.observations.map((o) => o.stroke), [f, bh]);
+        expect(
+          match.observations.last.downAt,
+          const Duration(milliseconds: 350),
+        );
+        expect(
+          match.observations.last.upAt,
+          const Duration(milliseconds: 1050),
+        );
+        expect(
+          match.observations.last.gapBefore,
+          const Duration(milliseconds: 250),
+        );
+        expect(
+          match.observations.last.heldFor,
+          const Duration(milliseconds: 700),
+        );
+        expect(() => match.observations.clear(), throwsUnsupportedError);
+        expect(input.observations, isEmpty);
+        stroke(input, time, InputButton.forward);
+        input.cancel();
+        expect(input.observations, isEmpty);
+        input.dispose();
+      });
+    },
+  );
+
+  test('mismatch result retains only matched prefix observations', () {
+    fakeAsync((time) {
+      final matches = <ComboMatch>[];
+      final input = ComboInput(
+        catalog: catalog(),
+        clock: FakeInputClock(time),
+        onRuntimeMatch: matches.add,
+      );
+      stroke(input, time, InputButton.forward);
+      stroke(input, time, InputButton.pause);
+      expect(matches.single.observations.map((o) => o.stroke), [f]);
+      expect(input.observations, isEmpty);
+      input.dispose();
+    });
+  });
+
   test('599 ms is a tap; equality is a hold, emitted only once on release', () {
     fakeAsync((time) {
       final input = ComboInput(

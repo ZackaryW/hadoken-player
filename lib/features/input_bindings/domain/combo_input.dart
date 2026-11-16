@@ -19,10 +19,25 @@ final class StopwatchInputClock implements InputClock {
 
 enum InputMode { recording, practice, runtime }
 
+/// Ephemeral measurements for future timing-sensitive recognition.
+final class StrokeObservation {
+  final Stroke stroke;
+  final Duration downAt;
+  final Duration upAt;
+  final Duration? gapBefore;
+  const StrokeObservation(this.stroke, this.downAt, this.upAt, this.gapBefore);
+  Duration get heldFor => upAt - downAt;
+}
+
 final class ComboMatch {
   final ActionBinding binding;
   final Duration recognizedAt;
-  const ComboMatch(this.binding, this.recognizedAt);
+  final List<StrokeObservation> observations;
+  ComboMatch(
+    this.binding,
+    this.recognizedAt, [
+    Iterable<StrokeObservation> observations = const [],
+  ]) : observations = List.unmodifiable(observations);
 }
 
 /// One source of timing semantics for the recorder, practice and runtime pad.
@@ -36,6 +51,7 @@ final class ComboInput {
   InputMode _mode;
   final _contacts = <int>{};
   final _attempt = <Stroke>[];
+  final _observations = <StrokeObservation>[];
   final _draft = <Stroke>[];
   ActionBinding? _pending;
   InputButton? _button;
@@ -67,6 +83,7 @@ final class ComboInput {
   bool get holding => _holding;
   List<Stroke> get strokes =>
       List.unmodifiable(_mode == InputMode.recording ? _draft : _attempt);
+  List<StrokeObservation> get observations => List.unmodifiable(_observations);
   bool get waitingForContinuation => _gapDeadline != null;
 
   void setMode(InputMode mode) {
@@ -146,7 +163,9 @@ final class ComboInput {
       return;
     }
     if (_pointer != pointer || _button == null || _downAt == null) return;
-    final elapsed = clock.elapsed - _downAt!;
+    final upAt = clock.elapsed;
+    final downAt = _downAt!;
+    final elapsed = upAt - downAt;
     final stroke = Stroke(
       _button!,
       elapsed.inMicroseconds >= _catalog.timing.holdMs * 1000
@@ -161,13 +180,21 @@ final class ComboInput {
         _draft.add(stroke);
       }
     } else {
-      _recognize(stroke);
+      _recognize(
+        StrokeObservation(
+          stroke,
+          downAt,
+          upAt,
+          _observations.isEmpty ? null : downAt - _observations.last.upAt,
+        ),
+      );
     }
     _notify();
   }
 
-  void _recognize(Stroke stroke) {
-    _attempt.add(stroke);
+  void _recognize(StrokeObservation observation) {
+    _observations.add(observation);
+    _attempt.add(observation.stroke);
     final candidates = _catalog.bindings
         .where((b) => startsWithCombo(b.strokes, _attempt))
         .toList();
@@ -189,12 +216,15 @@ final class ComboInput {
   }
 
   void _finish(ActionBinding? binding) {
+    final observed = binding == null
+        ? const <StrokeObservation>[]
+        : _observations.take(binding.strokes.length).toList();
     _discardAttempt(); // No mismatching or consumed stroke is replayed.
     if (binding == null) {
       feedback = 'No matching combination.';
       return;
     }
-    final match = lastMatch = ComboMatch(binding, clock.elapsed);
+    final match = lastMatch = ComboMatch(binding, clock.elapsed, observed);
     feedback = '${binding.profile.label}: ${binding.action.label}';
     if (_mode == InputMode.runtime) onRuntimeMatch(match);
     if (_mode == InputMode.practice) onPracticeMatch?.call(match);
@@ -231,6 +261,7 @@ final class ComboInput {
   void _discardAttempt() {
     _stopGap();
     _attempt.clear();
+    _observations.clear();
     _pending = null;
   }
 
