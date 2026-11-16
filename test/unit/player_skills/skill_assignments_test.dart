@@ -109,7 +109,7 @@ void main() {
     expect(repo.catalog.values, isEmpty);
     expect(SkillId.values.length, 1);
     expect(skipRecoveryDuration, const Duration(seconds: 10));
-    expect(SkillId.skipRecovery.description, contains('10 seconds'));
+    expect(SkillId.skipRecovery.description, contains('10s'));
     await repo.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
     final reopened = await SkillAssignmentRepository.open(
       store,

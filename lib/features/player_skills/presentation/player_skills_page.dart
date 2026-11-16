@@ -153,10 +153,10 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
         context,
         title: definition.label,
         body: definition.details,
-        actionLabel: definition.triggers.contains(SkillTrigger.manualActivation)
+        actionLabel: definition.supports(SkillTrigger.manualActivation)
             ? 'Configure macro'
             : null,
-        onAction: definition.triggers.contains(SkillTrigger.manualActivation)
+        onAction: definition.supports(SkillTrigger.manualActivation)
             ? () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => SkillMacroPage(

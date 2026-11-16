@@ -26,7 +26,7 @@ final class SkillControls {
     return dispatcher.runOrdered(() async {
       final definition = policy.definitionFor(skill.key);
       if (definition == null ||
-          !definition.triggers.contains(SkillTrigger.manualActivation)) {
+          !definition.supports(SkillTrigger.manualActivation)) {
         throw const FormatException('This skill has no manual activation.');
       }
       if (draft != null && !assignments.catalog.has(profile, skill)) {
@@ -38,6 +38,8 @@ final class SkillControls {
 
   Future<void> setAssigned(ProfileId profile, SkillId skill, bool enabled) =>
       dispatcher.runOrdered(() async {
+        final denial = await policy.assignmentDenial(profile);
+        if (denial != null) throw SkillAssignmentLocked(denial);
         await policy.effects.retireDue(await policy.clock.now());
         final recovery = await policy.recoveryFor(profile);
         if (recovery != null) {
@@ -48,5 +50,13 @@ final class SkillControls {
           );
         }
         await assignments.setAssigned(profile, skill, enabled);
+        await policy.synchronize();
       });
+}
+
+final class SkillAssignmentLocked implements Exception {
+  final String message;
+  const SkillAssignmentLocked(this.message);
+  @override
+  String toString() => message;
 }

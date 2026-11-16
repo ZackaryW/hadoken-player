@@ -99,9 +99,21 @@ final class SkillCoordinator {
     required SkillContext context,
     SkillExecutionBudget? budget,
     bool allowPlayback = true,
+    bool transient = false,
   }) {
     if (_notifying) {
       return Future.error(StateError('Result callbacks cannot invoke skills.'));
+    }
+    if (transient) {
+      return _invoke(
+        definition,
+        runtime,
+        event,
+        origin,
+        context,
+        budget ?? SkillExecutionBudget(),
+        allowPlayback,
+      );
     }
     final key = _invocationKey(origin);
     return _invocations.putIfAbsent(
@@ -136,7 +148,8 @@ final class SkillCoordinator {
         error: 'Invalid skill invocation ownership.',
       );
     }
-    if (!definition.triggers.contains(event.trigger)) {
+    runtime.configureListeners(definition);
+    if (!definition.listeners.any((l) => l.trigger == event.trigger)) {
       return SkillInvocationOutcome(
         [],
         error: 'This skill does not support that trigger.',
@@ -151,7 +164,25 @@ final class SkillCoordinator {
     await effects.retireDue(context.elapsed);
     final SkillReaction reaction;
     try {
-      reaction = runtime.onEvent(event, context);
+      final matching = runtime.matchingListeners(event, context);
+      if (matching.isEmpty && event is SkillManualActivation) {
+        return SkillInvocationOutcome(
+          [],
+          error: 'This activation listener is inactive.',
+        );
+      }
+      final requests = <CapabilityRequest>[];
+      var changed = false;
+      for (final listener in matching) {
+        // A preceding callback may have disabled another listener.
+        if (!runtime.matchingListeners(event, context).contains(listener)) {
+          continue;
+        }
+        final result = runtime.onListener(listener.key, event, context);
+        requests.addAll(result.requests);
+        changed = changed || result.stateChanged;
+      }
+      reaction = SkillReaction(requests: requests, stateChanged: changed);
     } catch (_) {
       return SkillInvocationOutcome([], error: 'Skill reaction failed.');
     }

@@ -6,6 +6,9 @@ enum SkillTrigger {
   comboObserved,
   manualActivation,
   effectExpired,
+  equipped,
+  unequipped,
+  playbackObserved,
 }
 
 enum SkillFailureCleanup { retainApplied, revokeInvocationEffects }
@@ -72,6 +75,36 @@ sealed class SkillRuntimeEvent {
   final String id;
   SkillRuntimeEvent(String id) : id = requireIdentity(id);
   SkillTrigger get trigger;
+}
+
+final class SkillEquipped extends SkillRuntimeEvent {
+  SkillEquipped(super.id);
+  @override
+  SkillTrigger get trigger => SkillTrigger.equipped;
+}
+
+final class SkillUnequipped extends SkillRuntimeEvent {
+  SkillUnequipped(super.id);
+  @override
+  SkillTrigger get trigger => SkillTrigger.unequipped;
+}
+
+final class SkillPlaybackSnapshot {
+  final String? playId;
+  final Duration listened;
+  final bool playing;
+  const SkillPlaybackSnapshot({
+    this.playId,
+    this.listened = Duration.zero,
+    this.playing = false,
+  });
+}
+
+final class SkillPlaybackObserved extends SkillRuntimeEvent {
+  final SkillPlaybackSnapshot playback;
+  SkillPlaybackObserved(super.id, this.playback);
+  @override
+  SkillTrigger get trigger => SkillTrigger.playbackObserved;
 }
 
 final class SkillComboObserved extends SkillRuntimeEvent {

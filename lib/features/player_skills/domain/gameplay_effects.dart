@@ -107,7 +107,7 @@ final class GameplayEffects implements SkillCapabilityAdapter {
     if (request is ArmComboListener) {
       if (!(definitionFor(
             origin.skillKey,
-          )?.triggers.contains(SkillTrigger.comboObserved) ??
+          )?.supports(SkillTrigger.comboObserved) ??
           false)) {
         return reject('This skill does not declare a listening hook.');
       }

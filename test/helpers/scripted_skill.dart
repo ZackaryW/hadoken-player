@@ -22,7 +22,12 @@ final class ScriptedSkill extends SkillDefinition {
   @override
   String get description => 'Test-only skill definition.';
   @override
-  Set<SkillTrigger> get triggers => SkillTrigger.values.toSet();
+  Set<SkillTrigger> get triggers => const {
+    SkillTrigger.actionSucceeded,
+    SkillTrigger.comboObserved,
+    SkillTrigger.manualActivation,
+    SkillTrigger.effectExpired,
+  };
   @override
   SkillRuntime createRuntime() => runtime;
 }
