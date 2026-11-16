@@ -1,3 +1,4 @@
+import '../../player/domain/ports/skill_playback_port.dart';
 import 'dart:async';
 import 'package:troona/skills/registry.dart';
 import '../../profiles/domain/profile_catalog.dart';
@@ -59,6 +60,27 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   final _runtimeOwners = <SkillId, ProfileId>{};
   int _lifecycleSequence = 0;
   Future<SkillPlaybackSnapshot> Function()? playbackSnapshot;
+  StreamSubscription<void>? _playbackChanges;
+  bool _observationPending = false;
+
+  void bindPlaybackObservations(SkillPlaybackPort port) {
+    if (_playbackChanges != null) {
+      throw StateError('Playback observation already bound.');
+    }
+    playbackSnapshot = () async => port.skillPlayback;
+    _playbackChanges = port.skillPlaybackChanges.listen((_) {
+      if (_observationPending) return;
+      _observationPending = true;
+      unawaited(
+        _runOrdered(() async {
+          _observationPending = false;
+          await synchronize();
+        }).catchError((Object _) {
+          _lifecycleFailed = true;
+        }),
+      );
+    });
+  }
 
   Future<void> synchronize() async {
     final now = await clock.now();
@@ -816,6 +838,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   }
 
   Future<void> dispose() async {
+    await _playbackChanges?.cancel();
     await _sessionChanges?.cancel();
     await _effectChanges?.cancel();
     await effects.dispose();

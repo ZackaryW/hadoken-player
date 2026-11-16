@@ -8,7 +8,9 @@ final class _NativeLoopItem {
 
 /// Keeps a bounded current/next native window while exposing only the current
 /// materialized loop to ordinary player UI and the media notification.
-class LoopAudioAdapter extends JustAudioAdapter implements LoopQueuePort {
+class LoopAudioAdapter extends JustAudioAdapter
+    with _ListeningAudio
+    implements LoopQueuePort, SkillPlaybackPort {
   LoopQueue? _loops;
   final _tracks = <String, Track>{};
   List<String> _originalIds = [];
@@ -35,6 +37,22 @@ class LoopAudioAdapter extends JustAudioAdapter implements LoopQueuePort {
   Future<List<Track>> Function(String query, int limit)? searchSongs;
 
   LoopAudioAdapter({super.player, this.schedulePlanTimers = true});
+
+  @override
+  bool get listeningTransaction => _windowLoading;
+  @override
+  String? get listeningOccurrence {
+    final index = _player.currentIndex;
+    if (_loops == null ||
+        _stoppedAtEnd ||
+        index == null ||
+        index < 0 ||
+        index >= _window.length) {
+      return null;
+    }
+    final item = _window[index];
+    return '$sessionGeneration:${item.loop}:${item.occurrence.id}';
+  }
 
   Future<T> _orderedQueue<T>(Future<T> Function() operation) {
     final result = _queueTail.then((_) => operation());
@@ -250,6 +268,7 @@ class LoopAudioAdapter extends JustAudioAdapter implements LoopQueuePort {
       rethrow;
     } finally {
       _windowLoading = false;
+      _sampleListening(notify: true);
       if (!touchedSources) _onNativeIndex(_player.currentIndex);
       _schedulePlans();
     }
@@ -757,6 +776,7 @@ class LoopAudioAdapter extends JustAudioAdapter implements LoopQueuePort {
     _closing = true;
     _planTimer?.cancel();
     await _queueTail;
+    await _disposeListening();
     await _ended.close();
     await super.dispose();
   }

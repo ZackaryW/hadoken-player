@@ -1,3 +1,4 @@
+import '../../features/player/domain/ports/skill_playback_port.dart';
 import 'package:troona/features/player_skills/data/android_skill_clock.dart';
 import 'package:troona/features/player_skills/data/preferences_skill_store.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
@@ -257,6 +258,9 @@ Future<void> configureDependencies() async {
     dispose: (value) => value.dispose(),
   );
   skillPolicy.bindEffectiveBindings(effectiveBindings);
+  if (audioPort is SkillPlaybackPort) {
+    skillPolicy.bindPlaybackObservations(audioPort as SkillPlaybackPort);
+  }
   if (audioPort is LoopQueuePort) {
     skillPolicy.bindQueue(audioPort as LoopQueuePort);
   }

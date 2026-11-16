@@ -20,9 +20,12 @@ import 'package:troona/skills/skill.dart';
 import '../../domain/ports/skill_audio_effects_port.dart';
 import 'skill_mixer.dart';
 import 'noise_source.dart';
+import '../../domain/listening_clock.dart';
+import '../../domain/ports/skill_playback_port.dart';
 
 part 'loop_audio_adapter.dart';
 part 'mix_audio_adapter.dart';
+part 'listening_audio_adapter.dart';
 
 /// [AudioServicePort] implementation backed by the `just_audio` package.
 ///

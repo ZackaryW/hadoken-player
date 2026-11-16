@@ -3,6 +3,37 @@ import 'package:just_audio/just_audio.dart';
 import 'package:troona/features/library/domain/entities/track.dart';
 
 final class LoopPlayer implements AudioPlayer {
+  final states = StreamController<PlayerState>.broadcast(sync: true);
+  final discontinuities = StreamController<PositionDiscontinuity>.broadcast(
+    sync: true,
+  );
+  ProcessingState state = ProcessingState.ready;
+  void setProcessing(ProcessingState value) {
+    state = value;
+    processing.add(value);
+    states.add(playerState);
+  }
+
+  void repeatNaturally() {
+    final previous = PlaybackEvent(
+      currentIndex: index,
+      updatePosition: position,
+    );
+    position = Duration.zero;
+    discontinuities.add(
+      PositionDiscontinuity(
+        PositionDiscontinuityReason.autoAdvance,
+        previous,
+        PlaybackEvent(currentIndex: index, updatePosition: position),
+      ),
+    );
+  }
+
+  @override
+  Stream<PlayerState> get playerStateStream => states.stream;
+  @override
+  Stream<PositionDiscontinuity> get positionDiscontinuityStream =>
+      discontinuities.stream;
   final indices = StreamController<int?>.broadcast(sync: true);
   final processing = StreamController<ProcessingState>.broadcast(sync: true);
   List<Track> tracks = [];
@@ -28,7 +59,7 @@ final class LoopPlayer implements AudioPlayer {
   @override
   Duration? get duration => const Duration(minutes: 1);
   @override
-  PlayerState get playerState => PlayerState(playing, ProcessingState.ready);
+  PlayerState get playerState => PlayerState(playing, state);
   @override
   Stream<int?> get currentIndexStream => indices.stream;
   @override
@@ -41,7 +72,7 @@ final class LoopPlayer implements AudioPlayer {
     indices.add(value);
   }
 
-  void complete() => processing.add(ProcessingState.completed);
+  void complete() => setProcessing(ProcessingState.completed);
   @override
   Future<Duration?> setAudioSources(
     List<AudioSource> sources, {
@@ -101,13 +132,22 @@ final class LoopPlayer implements AudioPlayer {
   }
 
   @override
-  Future<void> play() async => playing = true;
+  Future<void> play() async {
+    playing = true;
+    states.add(playerState);
+  }
+
   @override
-  Future<void> pause() async => playing = false;
+  Future<void> pause() async {
+    playing = false;
+    states.add(playerState);
+  }
+
   @override
   Future<void> stop() async {
     playing = false;
     stops++;
+    states.add(playerState);
   }
 
   @override
@@ -122,6 +162,8 @@ final class LoopPlayer implements AudioPlayer {
     disposed = true;
     await indices.close();
     await processing.close();
+    await states.close();
+    await discontinuities.close();
   }
 
   @override
