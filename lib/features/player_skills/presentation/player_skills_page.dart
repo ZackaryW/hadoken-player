@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:troona/core/layout/app_layout.dart';
 import 'package:troona/core/theme/semantic/app_colors.dart';
@@ -11,6 +10,7 @@ import 'package:troona/shared/widgets/app_icon_button.dart';
 import 'package:troona/shared/widgets/glass_sliver_header.dart';
 import '../../profiles/domain/profile_catalog.dart';
 import '../domain/skill_catalog.dart';
+import '../domain/skill_assignments.dart';
 import '../domain/skill_policy.dart';
 import '../skill_controls.dart';
 
@@ -93,6 +93,8 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     });
     try {
       await controls.setAssigned(profile, SkillId.skipRecovery, enabled);
+    } on SkillAlreadyAssigned catch (error) {
+      if (mounted) setState(() => feedback = error.toString());
     } on SkillCooldown catch (error) {
       if (mounted) setState(() => feedback = error.toString());
     } catch (_) {
@@ -113,13 +115,17 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
       selected,
       SkillId.skipRecovery,
     );
-    final status = !assigned
-        ? 'Not assigned'
+    final owner = controls.assignments.catalog.ownerOf(SkillId.skipRecovery);
+    final ownedByAnother = owner != null && owner != selected;
+    final status = ownedByAnother
+        ? 'Owned by ${owner.label}'
+        : !assigned
+        ? 'Inactive'
         : remaining == null
         ? 'Checking…'
         : remaining! > Duration.zero
         ? 'Ready in ${remainingSeconds(remaining!)}s'
-        : 'Ready';
+        : 'Active';
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
@@ -160,60 +166,38 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: context.colors.bgSecondary,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                SkillId.skipRecovery.label,
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            AppIconButton(
-                              icon: AppIcons.skillDetails,
-                              tooltip: 'About Skip Recovery',
-                              size: 20,
-                              onPressed: () => showMessageDialog(
-                                context,
-                                title: SkillId.skipRecovery.label,
-                                body: SkillId.skipRecovery.description,
-                              ),
-                            ),
-                            Semantics(
-                              label:
-                                  'Assign Skip Recovery to ${selected.label}',
-                              child: CupertinoSwitch(
-                                key: const ValueKey('assign-skip-recovery'),
-                                value: assigned,
-                                activeTrackColor: context.colors.accent,
-                                onChanged: busy ? null : assign,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Semantics(
-                          liveRegion: true,
-                          child: Text(
-                            status,
-                            key: const ValueKey('skill-status'),
-                            style: TextStyle(
-                              color: context.colors.labelSecondary,
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final scale =
+                          MediaQuery.textScalerOf(context).scale(17) / 17;
+                      final columns =
+                          ((constraints.maxWidth + 12) / (160 * scale + 12))
+                              .floor()
+                              .clamp(1, 3);
+                      return GridView.count(
+                        key: const ValueKey('skill-grid'),
+                        crossAxisCount: columns,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _SkillTile(
+                            assigned: assigned,
+                            status: status,
+                            onTap: busy || ownedByAnother
+                                ? null
+                                : () => assign(!assigned),
+                            onDetails: () => showMessageDialog(
+                              context,
+                              title: SkillId.skipRecovery.label,
+                              body: SkillId.skipRecovery.description,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    },
                   ),
                   if (feedback != null)
                     Padding(
@@ -235,6 +219,121 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
                     ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkillTile extends StatelessWidget {
+  final bool assigned;
+  final String status;
+  final VoidCallback? onTap;
+  final VoidCallback onDetails;
+  const _SkillTile({
+    required this.assigned,
+    required this.status,
+    required this.onTap,
+    required this.onDetails,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final foreground = assigned ? colors.accent : colors.labelSecondary;
+    final radius = BorderRadius.circular(20);
+    return AnimatedContainer(
+      key: const ValueKey('skill-tile-surface'),
+      duration: const Duration(milliseconds: 180),
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        color: assigned
+            ? colors.accent.withValues(alpha: .14)
+            : colors.bgSecondary,
+        border: Border.all(
+          color: assigned
+              ? colors.accent.withValues(alpha: .7)
+              : colors.separatorOpaque,
+        ),
+        boxShadow: assigned
+            ? [
+                BoxShadow(
+                  color: colors.accent.withValues(alpha: .12),
+                  blurRadius: 16,
+                ),
+              ]
+            : [],
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Semantics(
+              label: SkillId.skipRecovery.label,
+              value: status,
+              toggled: assigned,
+              enabled: onTap != null,
+              button: true,
+              onTap: onTap,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  key: const ValueKey('assign-skip-recovery'),
+                  borderRadius: radius,
+                  onTap: onTap,
+                  excludeFromSemantics: true,
+                  child: ExcludeSemantics(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 24, 12, 12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            AppIcons.skipRecovery,
+                            size: 32,
+                            color: foreground,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            SkillId.skipRecovery.label,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 17,
+                              height: 1.1,
+                              fontWeight: FontWeight.w600,
+                              color: assigned
+                                  ? colors.labelPrimary
+                                  : colors.labelSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            status,
+                            key: const ValueKey('skill-status'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 1.2,
+                              color: foreground,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: AppIconButton(
+              icon: AppIcons.skillDetails,
+              tooltip: 'About Skip Recovery',
+              size: 18,
+              onPressed: onDetails,
             ),
           ),
         ],

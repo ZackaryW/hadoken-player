@@ -1,3 +1,4 @@
+import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/core/theme/app_theme.dart';
@@ -105,6 +106,70 @@ void main() {
     recognizedAt: Duration.zero,
   );
 
+  check('square tile lights up, turns gray and exposes exclusive owner state', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.binding.setSurfaceSize(const Size(411, 891));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await host(tester, PlayerSkillsPage(controls: controls));
+    final tile = find.byKey(const ValueKey('assign-skip-recovery'));
+    final surface = find.byKey(const ValueKey('skill-tile-surface'));
+    final size = tester.getSize(surface);
+    expect(size.width, closeTo(size.height, .01));
+    expect(size.width, lessThan(200));
+    BoxDecoration decoration() =>
+        tester.widget<AnimatedContainer>(surface).decoration! as BoxDecoration;
+    final gray = decoration().color;
+    expect(find.text('Inactive'), findsOneWidget);
+    await tap(tester, tile);
+    expect(decoration().color, isNot(gray));
+    expect(decoration().boxShadow, isNotEmpty);
+    expect(
+      tester
+          .getSemantics(find.bySemanticsLabel('Skip Recovery'))
+          .getSemanticsData()
+          .flagsCollection
+          .isToggled,
+      Tristate.isTrue,
+    );
+    semantics.dispose();
+    await tap(tester, find.text('P2'));
+    expect(find.text('Owned by P1'), findsOneWidget);
+    expect(decoration().color, gray);
+    expect(tester.widget<InkWell>(tile).onTap, isNull);
+    await tap(tester, tile);
+    expect(assignments.catalog.ownerOf(SkillId.skipRecovery), ProfileId.p1);
+    await tap(tester, find.byTooltip('About Skip Recovery'));
+    expect(find.text(SkillId.skipRecovery.description), findsOneWidget);
+    await tap(tester, find.text('Done'));
+    await tap(tester, find.text('P1'));
+    await tap(tester, tile);
+    expect(find.text('Inactive'), findsOneWidget);
+    expect(decoration().color, gray);
+    expect(decoration().boxShadow, isEmpty);
+    await tap(tester, find.text('P2'));
+    await tap(tester, tile);
+    expect(assignments.catalog.ownerOf(SkillId.skipRecovery), ProfileId.p2);
+  });
+
+  for (final scale in [1.0, 1.3, 2.0]) {
+    check('skill tiles fit 360x640 at $scale text scale', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
+      await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
+      expect(find.text('Owned by P2'), findsOneWidget);
+      final surface = find.byKey(const ValueKey('skill-tile-surface'));
+      final size = tester.getSize(surface);
+      expect(size.width, closeTo(size.height, .01));
+      await tap(tester, find.text('P2'));
+      await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
+      expect(find.text('Inactive'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   check(
     'focused skills page persists assignments and opens descriptions only on demand',
     (tester) async {
@@ -119,7 +184,7 @@ void main() {
         assignments.catalog.has(ProfileId.p2, SkillId.skipRecovery),
         isTrue,
       );
-      expect(find.text('Ready'), findsOneWidget);
+      expect(find.text('Active'), findsOneWidget);
       final reloaded = SkillAssignmentRepository.decode(store.document);
       expect(reloaded.has(ProfileId.p2, SkillId.skipRecovery), isTrue);
       await tap(tester, find.byTooltip('About Skip Recovery'));
@@ -150,7 +215,7 @@ void main() {
       clock.elapsed = const Duration(seconds: 12);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
-      expect(find.text('Ready'), findsOneWidget);
+      expect(find.text('Active'), findsOneWidget);
       expect(commands.calls.length, 1);
       await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
       expect(
@@ -174,7 +239,7 @@ void main() {
     expect(find.text('P2 · Skip Recovery · 4s remaining'), findsOneWidget);
     expect(commands.calls.length, 1);
   });
-  check('failed assignment shows feedback and retains switch state', (
+  check('failed assignment shows feedback and retains inactive tile state', (
     tester,
   ) async {
     store.fail = true;
