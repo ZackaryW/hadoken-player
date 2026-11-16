@@ -48,6 +48,13 @@ def main():
             event = json.loads(line.split('AUDIO_PROBE ', 1)[1])
             phases.append(event)
             print(json.dumps(event), flush=True)
+            if event['phase'] == 'request_system_pause':
+                subprocess.run(adb + ['shell', 'cmd', 'media_session', 'dispatch', 'pause'], check=True, capture_output=True)
+            if event['phase'] == 'request_call':
+                subprocess.run(adb + ['emu', 'gsm', 'call', '5551234'], check=True, capture_output=True)
+                subprocess.run(adb + ['emu', 'gsm', 'accept', '5551234'], check=True, capture_output=True)
+            if event['phase'] == 'end_call':
+                subprocess.run(adb + ['emu', 'gsm', 'cancel', '5551234'], check=True, capture_output=True)
             if event['phase'] == 'screen_off_mix':
                 subprocess.run(adb + ['shell', 'input', 'keyevent', '223'], check=True, capture_output=True)
                 power = subprocess.run(adb + ['shell', 'dumpsys', 'power'], check=True, capture_output=True, text=True).stdout
