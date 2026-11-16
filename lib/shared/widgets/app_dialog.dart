@@ -41,12 +41,22 @@ Future<void> showMessageDialog(
   BuildContext context, {
   required String title,
   required String body,
+  String? actionLabel,
+  VoidCallback? onAction,
 }) => _showAppDialog<void>(
   context,
   builder: (dialogContext) => _AppDialog(
     title: title,
     content: _DialogBody(body),
     actions: [
+      if (actionLabel != null && onAction != null)
+        _DialogAction(
+          label: actionLabel,
+          onPressed: () {
+            Navigator.pop(dialogContext);
+            onAction();
+          },
+        ),
       _DialogAction(
         label: context.l10n.actionDone,
         isDefault: true,

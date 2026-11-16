@@ -17,6 +17,7 @@ import 'package:troona/l10n/app_localizations.dart';
 import '../../helpers/skill_fakes.dart';
 import '../../helpers/roboto.dart';
 import '../../helpers/probe_skill.dart';
+import '../../helpers/manual_skill.dart';
 
 void main() {
   setUpAll(loadRoboto);
@@ -79,17 +80,44 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> drainServices(
+    WidgetTester tester,
+    Future<void> Function() operation,
+  ) async {
+    // Domain queues and subscription cancellation can straddle the widget's
+    // fake-time zone. Drive both schedulers instead of leaving teardown pending.
+    var done = false;
+    Object? failure;
+    operation().then(
+      (_) {
+        done = true;
+      },
+      onError: (Object error) {
+        failure = error;
+        done = true;
+      },
+    );
+    for (var i = 0; i < 100 && !done; i++) {
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    }
+    expect(done, isTrue, reason: 'Service operation did not settle.');
+    if (failure != null) throw failure!;
+  }
+
   void check(String title, Future<void> Function(WidgetTester) body) {
     testWidgets(title, (tester) async {
-      await initialize();
+      await drainServices(tester, initialize);
       try {
         await body(tester);
       } finally {
         await tester.pumpWidget(const SizedBox.shrink());
-        await dispatcher.dispose();
-        await policy.dispose();
-        await assignments.dispose();
-        await profiles.dispose();
+        await drainServices(tester, () async {
+          await dispatcher.dispose();
+          await policy.dispose();
+          await assignments.dispose();
+          await profiles.dispose();
+        });
         GlassTheme.overrideQuality(null);
       }
     });
@@ -99,6 +127,8 @@ void main() {
     await tester.ensureVisible(finder);
     await tester.tap(finder);
     await tester.pumpAndSettle();
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    await tester.pumpAndSettle();
   }
 
   PlayerActionRequest request(String id) => PlayerActionRequest(
@@ -107,11 +137,74 @@ void main() {
     recognizedAt: Duration.zero,
   );
 
+  for (final scale in [1.0, 2.0]) {
+    check(
+      'manual macro has a focused editor, conflicts and clearing at scale $scale',
+      (tester) async {
+        final definition = ManualTestSkill();
+        await drainServices(tester, () async {
+          await policy.dispose();
+          await dispatcher.dispose();
+          policy = SkillPolicy(
+            assignments: assignments,
+            clock: clock,
+            definitions: [definition],
+          );
+          dispatcher = PlayerActionDispatcher(
+            playback: commands,
+            catalog: () => profiles.catalog,
+            abilities: policy,
+          );
+          controls = SkillControls(
+            profiles: profiles,
+            assignments: assignments,
+            policy: policy,
+            dispatcher: dispatcher,
+          );
+          await controls.setAssigned(ProfileId.p1, definition.id, true);
+        });
+        await tester.binding.setSurfaceSize(const Size(360, 640));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
+        expect(find.text('Configure macro'), findsNothing);
+        await tap(tester, find.byTooltip('About Manual test'));
+        await tap(tester, find.text('Configure macro'));
+        expect(find.text('Activation macro'), findsWidgets);
+        expect(find.text('Not set'), findsOneWidget);
+        await tap(tester, find.byKey(const ValueKey('set-skill-macro')));
+        await tap(tester, find.byKey(const ValueKey('input-forward')));
+        await tap(tester, find.text('Save combo'));
+        expect(find.textContaining('Already assigned to P2'), findsOneWidget);
+        await tap(tester, find.text('Clear draft'));
+        await tap(tester, find.byKey(const ValueKey('input-pause')));
+        await tap(tester, find.text('Save combo'));
+        expect(
+          profiles.catalog.macroFor(ProfileId.p1, definition.id.key)!.strokes,
+          [const Stroke(InputButton.pause, StrokeKind.tap)],
+        );
+        expect(definition.runtime.events, isEmpty);
+        expect(commands.calls, isEmpty);
+        expect(find.text('Effort'), findsNothing);
+        expect(find.text('Hold threshold'), findsNothing);
+        await tap(tester, find.byKey(const ValueKey('clear-skill-macro')));
+        expect(profiles.catalog.macros, isEmpty);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  check('passive-only skill details have no macro editor', (tester) async {
+    await host(tester, PlayerSkillsPage(controls: controls));
+    await tap(tester, find.byTooltip('About Skip Recovery'));
+    expect(find.text('Configure macro'), findsNothing);
+    expect(find.byKey(const ValueKey('set-skill-macro')), findsNothing);
+  });
+
   check('registered definition supplies tile metadata and recovery feedback', (
     tester,
   ) async {
-    await policy.dispose();
-    await dispatcher.dispose();
+    await drainServices(tester, policy.dispose);
+    await drainServices(tester, dispatcher.dispose);
     final definition = ProbeSkill();
     policy = SkillPolicy(
       assignments: assignments,
@@ -304,15 +397,15 @@ void main() {
   check('unknown skills are visible and layout supports large text', (
     tester,
   ) async {
-    await assignments.dispose();
+    await drainServices(tester, assignments.dispose);
     store.document = '{"version":1,"profiles":{"p1":["unknown"]}}';
     assignments = await SkillAssignmentRepository.open(
       store,
       profileExists: (_) => true,
     );
     // Replace policy as a new process would, with the loaded assignments.
-    await policy.dispose();
-    await dispatcher.dispose();
+    await drainServices(tester, policy.dispose);
+    await drainServices(tester, dispatcher.dispose);
     policy = SkillPolicy(assignments: assignments, clock: clock);
     dispatcher = PlayerActionDispatcher(
       playback: commands,

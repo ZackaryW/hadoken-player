@@ -161,7 +161,8 @@ class _ProfilesPageState extends State<ProfilesPage> {
   Widget _bindingCard(ProfileCatalog catalog, PlayerAction action) {
     final binding = catalog.bindingFor(selected, action);
     final sharedPrefix =
-        binding != null && catalog.sharedPrefixes(binding).isNotEmpty;
+        binding != null &&
+        widget.controls.catalog.sharedPrefixes(binding).isNotEmpty;
     return Container(
       key: ValueKey('binding-${action.name}'),
       margin: const EdgeInsets.only(top: 8),

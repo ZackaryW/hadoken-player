@@ -60,7 +60,7 @@ final class ProfileRepository {
       if (!_legacyVersion(backup)) {
         throw StateError('No valid pre-migration backup.');
       }
-      final restored = decode(backup);
+      final restored = decode(backup).withRevision(_catalog.revision + 1);
       await _store.write(backup!);
       _catalog = restored;
       _changes.add(restored);
@@ -142,9 +142,7 @@ final class ProfileRepository {
 
   Future<void> _update(ProfileCatalog Function(ProfileCatalog) change) {
     final result = _tail.then((_) async {
-      final next = change(
-        _catalog,
-      ); // Validate against the latest committed catalog.
+      final next = change(_catalog).withRevision(_catalog.revision + 1);
       await _store.write(encode(next));
       _catalog = next;
       _changes.add(next);

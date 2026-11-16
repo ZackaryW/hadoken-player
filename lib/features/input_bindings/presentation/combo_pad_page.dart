@@ -34,12 +34,10 @@ class _ComboPadPageState extends State<ComboPadPage>
       },
       onPracticeMatch: (match) => setState(
         () => outcome =
-            'Practice · ${match.binding.profile.label}: ${match.binding.action.label}.',
+            'Practice · ${match.binding.profile.label}: ${match.binding.label}.',
       ),
     );
-    catalogSubscription = widget.controls.profiles.changes.listen(
-      input.replaceCatalog,
-    );
+    catalogSubscription = widget.controls.changes.listen(input.replaceCatalog);
     outcomeSubscription = widget.controls.dispatcher.outcomes.listen((event) {
       if (mounted) {
         setState(

@@ -17,6 +17,25 @@ final class SkillControls {
     required this.dispatcher,
   });
 
+  Future<void> setMacro(
+    ProfileId profile,
+    SkillId skill,
+    List<Stroke>? strokes,
+  ) {
+    final draft = strokes == null ? null : List<Stroke>.unmodifiable(strokes);
+    return dispatcher.runOrdered(() async {
+      final definition = policy.definitionFor(skill.key);
+      if (definition == null ||
+          !definition.triggers.contains(SkillTrigger.manualActivation)) {
+        throw const FormatException('This skill has no manual activation.');
+      }
+      if (draft != null && !assignments.catalog.has(profile, skill)) {
+        throw const FormatException('Equip this skill to record its macro.');
+      }
+      await profiles.setSkillMacro(profile, skill.key, draft);
+    });
+  }
+
   Future<void> setAssigned(ProfileId profile, SkillId skill, bool enabled) =>
       dispatcher.runOrdered(() async {
         await policy.effects.retireDue(await policy.clock.now());

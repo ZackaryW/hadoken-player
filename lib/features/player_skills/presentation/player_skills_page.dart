@@ -13,6 +13,7 @@ import 'package:troona/skills/registry.dart';
 import '../domain/skill_assignments.dart';
 import '../domain/skill_policy.dart';
 import '../skill_controls.dart';
+import 'skill_macro_page.dart';
 
 class PlayerSkillsPage extends StatefulWidget {
   final SkillControls controls;
@@ -151,6 +152,20 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
         context,
         title: definition.label,
         body: definition.description,
+        actionLabel: definition.triggers.contains(SkillTrigger.manualActivation)
+            ? 'Configure macro'
+            : null,
+        onAction: definition.triggers.contains(SkillTrigger.manualActivation)
+            ? () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SkillMacroPage(
+                    controls: controls,
+                    profile: selected,
+                    definition: definition,
+                  ),
+                ),
+              )
+            : null,
       ),
     );
   }

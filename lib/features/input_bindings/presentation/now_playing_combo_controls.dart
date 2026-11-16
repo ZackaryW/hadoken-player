@@ -97,7 +97,7 @@ class NowPlayingComboControlsState extends State<NowPlayingComboControls>
         if (mounted) setState(() {});
       },
     );
-    catalogSubscription = widget.controls.profiles.changes.listen((catalog) {
+    catalogSubscription = widget.controls.changes.listen((catalog) {
       outcome = null;
       input.replaceCatalog(catalog);
     });

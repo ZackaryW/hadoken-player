@@ -51,11 +51,11 @@ abstract class SkillDefinition {
 }
 
 abstract class SkillRuntime {
-  String? denialFor(SkillEvent event);
+  String? denialFor(SkillEvent event) => null;
 
   /// Called only after a successful action. Returns whether state changed.
-  bool recordSuccess(SkillEvent event);
-  Duration remaining(String playerId, Duration elapsed);
+  bool recordSuccess(SkillEvent event) => false;
+  Duration remaining(String playerId, Duration elapsed) => Duration.zero;
 
   SkillActionBlock? decide(
     SkillTarget target,

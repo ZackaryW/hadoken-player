@@ -9,13 +9,25 @@ import '../domain/profile_catalog.dart';
 class BindingRecorder extends StatefulWidget {
   final ProfileControls controls;
   final ProfileId profile;
-  final PlayerAction action;
+  final PlayerAction? action;
+  final String? macroLabel;
+  final Future<void> Function(List<Stroke>)? saveMacro;
   const BindingRecorder({
     super.key,
     required this.controls,
     required this.profile,
     required this.action,
-  });
+  }) : macroLabel = null,
+       saveMacro = null;
+  const BindingRecorder.macro({
+    super.key,
+    required this.controls,
+    required this.profile,
+    required String label,
+    required Future<void> Function(List<Stroke>) onSave,
+  }) : action = null,
+       macroLabel = label,
+       saveMacro = onSave;
   @override
   State<BindingRecorder> createState() => _BindingRecorderState();
 }
@@ -59,11 +71,16 @@ class _BindingRecorderState extends State<BindingRecorder>
     if (saving || input.strokes.isEmpty) return;
     setState(() => saving = true);
     try {
-      await widget.controls.profiles.setBinding(
-        widget.profile,
-        widget.action,
-        input.strokes,
-      );
+      final saveMacro = widget.saveMacro;
+      if (saveMacro != null) {
+        await saveMacro(input.strokes);
+      } else {
+        await widget.controls.profiles.setBinding(
+          widget.profile,
+          widget.action!,
+          input.strokes,
+        );
+      }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
@@ -91,7 +108,7 @@ class _BindingRecorderState extends State<BindingRecorder>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${widget.profile.label} · ${widget.action.label}',
+              '${widget.profile.label} · ${widget.macroLabel ?? widget.action!.label}',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),

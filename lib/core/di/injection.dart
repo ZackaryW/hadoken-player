@@ -4,6 +4,7 @@ import 'package:troona/features/player_skills/domain/skill_assignments.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/player_skills/skill_controls.dart';
 import 'package:troona/features/player/domain/ports/playback_session_lifecycle.dart';
+import 'package:troona/features/profiles/domain/effective_bindings.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
@@ -243,10 +244,19 @@ Future<void> configureDependencies() async {
     assignments: skillAssignments,
     clock: const AndroidSkillClock(),
   );
+  final effectiveBindings = EffectiveBindings(
+    profiles: profiles,
+    macroEnabled: skillPolicy.macroEnabled,
+    availabilityChanges: skillAssignments.changes.map((_) {}),
+  );
+  getIt.registerSingleton<EffectiveBindings>(
+    effectiveBindings,
+    dispose: (value) => value.dispose(),
+  );
   final actions = PlayerActionDispatcher(
     playback: PlaybackCommandsAdapter(audioPort),
     abilities: skillPolicy,
-    catalog: () => profiles.catalog,
+    catalog: () => effectiveBindings.catalog,
   );
   if (audioPort is PlaybackSessionLifecycle) {
     final lifecycle = audioPort as PlaybackSessionLifecycle;
@@ -266,7 +276,11 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<ProfileRepository>(profiles);
   getIt.registerSingleton<PlayerActionDispatcher>(actions);
   getIt.registerSingleton<ProfileControls>(
-    ProfileControls(profiles: profiles, dispatcher: actions),
+    ProfileControls(
+      profiles: profiles,
+      dispatcher: actions,
+      effective: effectiveBindings,
+    ),
   );
 
   // Configure the OS audio session (focus, becoming noisy) before any track

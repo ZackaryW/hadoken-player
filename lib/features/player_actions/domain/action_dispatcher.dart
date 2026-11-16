@@ -1,29 +1,38 @@
 import 'dart:async';
 import '../../profiles/domain/profile_catalog.dart';
-import 'package:troona/skills/effort.dart';
+import 'package:troona/skills/skill.dart';
+import '../../input_bindings/domain/combo_input.dart';
 
 enum ActionStatus { success, denied, noOp, failure }
 
 final class CommandResult {
   final ActionStatus status;
   final String message;
-  const CommandResult(this.status, this.message);
+  final List<CapabilityResult> effects;
+  const CommandResult(this.status, this.message, {this.effects = const []});
   bool get succeeded => status == ActionStatus.success;
 }
 
 final class PlayerActionRequest {
   final String requestId;
-  final ActionBinding binding;
+  final ExecutableBinding binding;
   final Duration recognizedAt;
   final Effort effort;
-  const PlayerActionRequest({
+  final int? catalogRevision;
+  final List<StrokeObservation> observations;
+  PlayerActionRequest({
     required this.requestId,
     required this.binding,
     required this.recognizedAt,
     this.effort = Effort.normal,
-  });
+    this.catalogRevision,
+    Iterable<StrokeObservation> observations = const [],
+  }) : observations = List.unmodifiable(observations);
   ProfileId get profile => binding.profile;
-  PlayerAction get action => binding.action;
+  PlayerAction? get action => switch (binding) {
+    ActionBinding(:final action) => action,
+    _ => null,
+  };
   String get bindingId => binding.id;
 }
 
@@ -49,6 +58,12 @@ abstract interface class PlayerAbilityPolicy {
 abstract interface class OrderedPlayerAbilityPolicy
     implements PlayerAbilityPolicy {
   void bindOrder(Future<T> Function<T>(Future<T> Function()) runOrdered);
+}
+
+abstract interface class ExecutablePlayerAbilityPolicy
+    implements OrderedPlayerAbilityPolicy {
+  Effort effortFor(ExecutableBinding binding);
+  Future<CommandResult> activate(PlayerActionRequest request);
 }
 
 final class AllowAllAbilities implements PlayerAbilityPolicy {
@@ -82,19 +97,30 @@ final class PlayerActionDispatcher {
 
   Stream<PlayerActionOutcome> get outcomes => _outcomes.stream;
 
+  Effort effortFor(ExecutableBinding binding) {
+    final policy = abilities;
+    return policy is ExecutablePlayerAbilityPolicy
+        ? policy.effortFor(binding)
+        : Effort.normal;
+  }
+
   Future<PlayerActionOutcome> dispatch(PlayerActionRequest request) {
     final previous = _requests[request.requestId];
     if (previous != null) return previous;
-    // Snapshot validity at arrival, not after earlier commands finish. Saved
-    // bindings are immutable, so a later edit cannot change this owner.
-    final saved = catalog().bindingFor(request.profile, request.action);
-    final valid =
-        saved?.id == request.bindingId &&
-        saved?.comboKey == request.binding.comboKey;
+    final arrival = catalog();
+    final revision = request.catalogRevision ?? arrival.revision;
+    bool validNow() {
+      final current = catalog();
+      final saved = current.executableById(request.bindingId);
+      return current.revision == revision &&
+          saved?.comboKey == request.binding.comboKey;
+    }
+
+    final validAtArrival = validNow();
     final result = runOrdered(() async {
       CommandResult result;
       try {
-        if (!valid) {
+        if (!validAtArrival || !validNow()) {
           result = const CommandResult(
             ActionStatus.denied,
             'This binding is no longer saved.',
@@ -108,8 +134,21 @@ final class PlayerActionDispatcher {
           final denial = await abilities.denialFor(request);
           if (denial != null) {
             result = CommandResult(ActionStatus.denied, denial);
+          } else if (!validNow()) {
+            result = const CommandResult(
+              ActionStatus.denied,
+              'This combination changed before execution.',
+            );
+          } else if (request.binding is SkillMacroBinding) {
+            final policy = abilities;
+            result = policy is ExecutablePlayerAbilityPolicy
+                ? await policy.activate(request)
+                : const CommandResult(
+                    ActionStatus.denied,
+                    'Skill activation is unavailable.',
+                  );
           } else {
-            result = await playback.execute(request.action);
+            result = await playback.execute(request.action!);
             if (result.succeeded) {
               try {
                 await abilities.recordSuccess(request, result);

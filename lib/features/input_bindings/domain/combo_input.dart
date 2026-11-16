@@ -30,13 +30,15 @@ final class StrokeObservation {
 }
 
 final class ComboMatch {
-  final ActionBinding binding;
+  final ExecutableBinding binding;
   final Duration recognizedAt;
   final List<StrokeObservation> observations;
+  final int catalogRevision;
   ComboMatch(
     this.binding,
     this.recognizedAt, [
     Iterable<StrokeObservation> observations = const [],
+    this.catalogRevision = 0,
   ]) : observations = List.unmodifiable(observations);
 }
 
@@ -53,7 +55,7 @@ final class ComboInput {
   final _attempt = <Stroke>[];
   final _observations = <StrokeObservation>[];
   final _draft = <Stroke>[];
-  ActionBinding? _pending;
+  ExecutableBinding? _pending;
   InputButton? _button;
   int? _pointer;
   Duration? _downAt;
@@ -195,7 +197,7 @@ final class ComboInput {
   void _recognize(StrokeObservation observation) {
     _observations.add(observation);
     _attempt.add(observation.stroke);
-    final candidates = _catalog.bindings
+    final candidates = _catalog.executableBindings
         .where((b) => startsWithCombo(b.strokes, _attempt))
         .toList();
     for (final binding in candidates) {
@@ -215,7 +217,7 @@ final class ComboInput {
     });
   }
 
-  void _finish(ActionBinding? binding) {
+  void _finish(ExecutableBinding? binding) {
     final observed = binding == null
         ? const <StrokeObservation>[]
         : _observations.take(binding.strokes.length).toList();
@@ -224,8 +226,13 @@ final class ComboInput {
       feedback = 'No matching combination.';
       return;
     }
-    final match = lastMatch = ComboMatch(binding, clock.elapsed, observed);
-    feedback = '${binding.profile.label}: ${binding.action.label}';
+    final match = lastMatch = ComboMatch(
+      binding,
+      clock.elapsed,
+      observed,
+      _catalog.revision,
+    );
+    feedback = '${binding.profile.label}: ${binding.label}';
     if (_mode == InputMode.runtime) onRuntimeMatch(match);
     if (_mode == InputMode.practice) onPracticeMatch?.call(match);
   }

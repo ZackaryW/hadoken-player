@@ -27,7 +27,7 @@ final class SkillRecovery {
 }
 
 /// Adapts app assignments/actions to independent skill runtimes.
-final class SkillPolicy implements OrderedPlayerAbilityPolicy {
+final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   final SkillAssignmentRepository assignments;
   final SkillClock clock;
   final List<SkillDefinition> definitions;
@@ -154,6 +154,117 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
 
   Stream<void> get changes => _changes.stream;
 
+  SkillDefinition? definitionFor(String key) {
+    for (final definition in definitions) {
+      if (definition.id.key == key) return definition;
+    }
+    return null;
+  }
+
+  bool macroEnabled(SkillMacroBinding macro) {
+    final definition = definitionFor(macro.skillKey);
+    return definition != null &&
+        definition.triggers.contains(SkillTrigger.manualActivation) &&
+        assignments.catalog.has(macro.profile, definition.id);
+  }
+
+  @override
+  Effort effortFor(ExecutableBinding binding) => binding is SkillMacroBinding
+      ? definitionFor(binding.skillKey)?.activationEffort ?? Effort.normal
+      : Effort.normal;
+
+  SkillTarget _target(PlayerActionRequest request) =>
+      request.binding is SkillMacroBinding
+      ? ActivationSkillTarget((request.binding as SkillMacroBinding).skillKey)
+      : PlaybackSkillTarget(_event(request, Duration.zero).action);
+
+  @override
+  Future<CommandResult> activate(PlayerActionRequest request) async {
+    final binding = request.binding;
+    if (binding is! SkillMacroBinding || !macroEnabled(binding)) {
+      return const CommandResult(
+        ActionStatus.denied,
+        'This skill is not equipped for this player.',
+      );
+    }
+    final definition = definitionFor(binding.skillKey)!;
+    final now = await clock.now();
+    final context = _context(
+      request.profile,
+      request.profile,
+      now,
+      effort: definition.activationEffort,
+    );
+    if (!context.support.containsAll(definition.requiredCapabilities)) {
+      return const CommandResult(
+        ActionStatus.denied,
+        'Required skill capabilities are unavailable.',
+      );
+    }
+    if (request.observations.isEmpty) {
+      return const CommandResult(
+        ActionStatus.denied,
+        'A recorded runtime combo is required.',
+      );
+    }
+    final observations = request.observations.map(
+      (o) => SkillStrokeObservation(
+        stroke: switch ((o.stroke.button, o.stroke.kind)) {
+          (InputButton.forward, StrokeKind.tap) => SkillStroke.forwardTap,
+          (InputButton.forward, StrokeKind.hold) => SkillStroke.forwardHold,
+          (InputButton.pause, StrokeKind.tap) => SkillStroke.pauseTap,
+          (InputButton.pause, StrokeKind.hold) => SkillStroke.pauseHold,
+          (InputButton.backward, StrokeKind.tap) => SkillStroke.backwardTap,
+          (InputButton.backward, StrokeKind.hold) => SkillStroke.backwardHold,
+        },
+        downAt: o.downAt,
+        upAt: o.upAt,
+        gapBefore: o.gapBefore ?? Duration.zero,
+      ),
+    );
+    final outcome = await coordinator.invokeWithinOrder(
+      definition: definition,
+      runtime: _runtimes[definition.id]!,
+      event: SkillManualActivation(request.requestId, observations),
+      origin: SkillOrigin(
+        owner: request.profile.name,
+        skillKey: definition.id.key,
+        invocationId: 'manual:${request.requestId}',
+        sessionId: _session,
+      ),
+      context: context,
+    );
+    if (outcome.stateChanged) _changes.add(null);
+    if (outcome.error != null) {
+      return CommandResult(
+        ActionStatus.failure,
+        outcome.error!,
+        effects: outcome.results,
+      );
+    }
+    final failed = outcome.results.where(
+      (r) =>
+          r.status == CapabilityStatus.failed ||
+          r.status == CapabilityStatus.denied ||
+          r.status == CapabilityStatus.unsupported,
+    );
+    if (failed.isNotEmpty) {
+      final result = failed.first;
+      return CommandResult(
+        result.status == CapabilityStatus.denied
+            ? ActionStatus.denied
+            : ActionStatus.failure,
+        result.reason,
+        effects: outcome.results,
+      );
+    }
+    return CommandResult(
+      ActionStatus.success,
+      '${definition.label} activated.',
+      effects: outcome.results,
+    );
+  }
+
   Future<Map<SkillId, Duration>> remainingBySkill(ProfileId profile) async {
     final now = await clock.now();
     return {
@@ -207,6 +318,7 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
       PlayerAction.seekForward => SkillAction.seekForward,
       PlayerAction.seekBackward => SkillAction.seekBackward,
       PlayerAction.stop => SkillAction.stop,
+      null => throw StateError('Skill activation is not a playback action.'),
     },
     elapsed: now,
   );
@@ -219,17 +331,23 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
     final now = await clock.now();
     await effects.retireDue(now);
     _requestSessions[request.requestId] = _session;
-    final event = _event(request, now);
+    final binding = request.binding;
+    if (binding is SkillMacroBinding && !macroEnabled(binding)) {
+      return 'This skill is not equipped for this player.';
+    }
+    final effort = binding is SkillMacroBinding
+        ? effortFor(binding)
+        : request.effort;
     SkillActionBlock? blocking;
     for (final definition in _assigned(request.profile)) {
       final runtime = _runtimes[definition.id]!;
       final denial = runtime.decide(
-        PlaybackSkillTarget(event.action),
-        _context(request.profile, request.profile, now, effort: request.effort),
+        _target(request),
+        _context(request.profile, request.profile, now, effort: effort),
         request.requestId,
       );
       if (denial != null &&
-          !request.effort.overcomes(denial.effort) &&
+          !effort.overcomes(denial.effort) &&
           (blocking == null || denial.effort.compareTo(blocking.effort) > 0)) {
         blocking = denial;
       }
@@ -242,7 +360,7 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
     PlayerActionRequest request,
     CommandResult result,
   ) async {
-    if (!result.succeeded) return;
+    if (!result.succeeded || request.binding is! ActionBinding) return;
     if (_requestSessions[request.requestId] case final session?
         when session != _session) {
       return;
@@ -279,8 +397,8 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
 
   Future<void> dispose() async {
     await _sessionChanges?.cancel();
-    await effects.dispose();
     await _effectChanges?.cancel();
+    await effects.dispose();
     await _changes.close();
   }
 }

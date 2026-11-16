@@ -129,6 +129,7 @@ final class ProfileCatalog {
   }
 
   final RecognitionTiming timing;
+  final int revision;
   final List<String> recoveryMessages;
 
   ProfileCatalog({
@@ -136,6 +137,7 @@ final class ProfileCatalog {
     required Iterable<ActionBinding> bindings,
     Iterable<SkillMacroBinding> macros = const [],
     required this.timing,
+    this.revision = 0,
     Iterable<String> recoveryMessages = const [],
   }) : names = Map.unmodifiable(names),
        bindings = List.unmodifiable(bindings),
@@ -167,6 +169,15 @@ final class ProfileCatalog {
     names: const {ProfileId.p1: 'P1'},
     bindings: const [],
     timing: RecognitionTiming(),
+  );
+
+  ProfileCatalog withRevision(int value) => ProfileCatalog(
+    names: names,
+    bindings: bindings,
+    macros: macros,
+    timing: timing,
+    recoveryMessages: recoveryMessages,
+    revision: value,
   );
 
   ActionBinding? bindingFor(ProfileId profile, PlayerAction action) {
