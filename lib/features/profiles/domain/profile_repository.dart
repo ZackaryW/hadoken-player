@@ -24,13 +24,35 @@ final class ProfileRepository {
   ProfileCatalog get catalog => _catalog;
   Stream<ProfileCatalog> get changes => _changes.stream;
 
-  Future<void> rename(ProfileId profile, String name) => _update(
-    (current) => ProfileCatalog(
+  Future<ProfileId> addProfile() async {
+    late ProfileId added;
+    await _update((current) {
+      final available = ProfileId.values.where(
+        (id) => !current.names.containsKey(id),
+      );
+      if (available.isEmpty) {
+        throw const FormatException('Maximum three profiles.');
+      }
+      added = available.first;
+      return ProfileCatalog(
+        names: {...current.names, added: added.label},
+        bindings: current.bindings,
+        timing: current.timing,
+      );
+    });
+    return added;
+  }
+
+  Future<void> rename(ProfileId profile, String name) => _update((current) {
+    if (!current.names.containsKey(profile)) {
+      throw const FormatException('Add this profile first.');
+    }
+    return ProfileCatalog(
       names: {...current.names, profile: name.trim()},
       bindings: current.bindings,
       timing: current.timing,
-    ),
-  );
+    );
+  });
 
   Future<void> setBinding(
     ProfileId profile,
@@ -41,8 +63,11 @@ final class ProfileRepository {
     final binding = strokes == null
         ? null
         : ActionBinding(profile, action, strokes);
-    return _update(
-      (current) => ProfileCatalog(
+    return _update((current) {
+      if (!current.names.containsKey(profile)) {
+        throw const FormatException('Add this profile first.');
+      }
+      return ProfileCatalog(
         names: current.names,
         bindings: [
           ...current.bindings.where(
@@ -51,8 +76,8 @@ final class ProfileRepository {
           ?binding,
         ],
         timing: current.timing,
-      ),
-    );
+      );
+    });
   }
 
   Future<void> setTiming(RecognitionTiming timing) => _update(
@@ -82,10 +107,10 @@ final class ProfileRepository {
   }
 
   static String encode(ProfileCatalog catalog) => jsonEncode({
-    'version': 1,
+    'version': 2,
     'timing': {'holdMs': catalog.timing.holdMs, 'gapMs': catalog.timing.gapMs},
     'profiles': [
-      for (final id in ProfileId.values)
+      for (final id in ProfileId.values.where(catalog.names.containsKey))
         {
           'id': id.name,
           'name': catalog.names[id],
@@ -110,7 +135,8 @@ final class ProfileRepository {
     var timing = empty.timing;
     try {
       final json = jsonDecode(document) as Map;
-      if (json['version'] != 1) {
+      final legacy = json['version'] == 1;
+      if (!legacy && json['version'] != 2) {
         throw const FormatException('Unsupported profile version.');
       }
       try {
@@ -138,8 +164,18 @@ final class ProfileRepository {
             continue;
           }
           final name = profile['name'];
-          if (name is String && name.trim().isNotEmpty) names[id] = name.trim();
           final entries = profile['bindings'] as Map;
+          final customName =
+              name is String &&
+              name.trim().isNotEmpty &&
+              name.trim() != id.label;
+          // Version 1 always wrote all three slots, including unused defaults.
+          if (legacy && id != ProfileId.p1 && !customName && entries.isEmpty) {
+            continue;
+          }
+          names[id] = name is String && name.trim().isNotEmpty
+              ? name.trim()
+              : id.label;
           for (final entry in entries.entries) {
             try {
               bindings.add(

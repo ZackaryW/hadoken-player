@@ -1,4 +1,10 @@
 import 'dart:async';
+import 'package:troona/features/input_bindings/domain/combo_input.dart';
+import 'package:troona/features/input_bindings/presentation/now_playing_combo_controls.dart';
+import 'package:troona/features/player_actions/profile_controls.dart';
+import 'package:troona/features/player_actions/domain/action_dispatcher.dart';
+import 'package:troona/features/profiles/domain/profile_catalog.dart';
+import 'package:troona/features/profiles/domain/profile_repository.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +38,33 @@ import 'package:troona/shared/widgets/app_bottom_nav_bar.dart';
 
 import '../../helpers/fake_player.dart';
 
+class _ComboCommands implements PlaybackCommands {
+  final actions = <PlayerAction>[];
+  @override
+  Future<CommandResult> execute(PlayerAction action) async {
+    actions.add(action);
+    return const CommandResult(ActionStatus.success, 'Skipped to next track.');
+  }
+}
+
+class _ProfilesStore implements ProfileDocumentStore {
+  @override
+  Future<String?> read() async => null;
+  @override
+  Future<void> write(String document) async {}
+}
+
+class _WidgetClock implements InputClock {
+  final DateTime Function() now;
+  late final start = now();
+  _WidgetClock(this.now);
+  @override
+  Duration get elapsed => now().difference(start);
+  @override
+  CancelInputTimer schedule(Duration delay, void Function() callback) =>
+      Timer(delay, callback).cancel;
+}
+
 /// No liked songs.
 final class _NoLikes implements LibraryRepository {
   @override
@@ -60,11 +93,13 @@ void main() {
   ];
 
   late FakeAudioPort port;
+  late _ComboCommands comboCommands;
 
   Future<void> pumpPage(
     WidgetTester tester, {
     required Size screen,
     required double textScale,
+    bool withProfiles = false,
   }) async {
     tester.view
       ..devicePixelRatio = 3
@@ -80,6 +115,31 @@ void main() {
     port = FakeAudioPort()
       ..queue = Queue.fromTracks(tracks, startIndex: 2)
       ..duration = const Duration(minutes: 3);
+    ProfileControls? profileControls;
+    if (withProfiles) {
+      final profiles = await ProfileRepository.open(_ProfilesStore());
+      await profiles.setBinding(ProfileId.p1, PlayerAction.nextTrack, [
+        const Stroke(InputButton.forward, StrokeKind.tap),
+      ]);
+      await profiles.addProfile();
+      await profiles.setBinding(ProfileId.p2, PlayerAction.nextTrack, [
+        const Stroke(InputButton.forward, StrokeKind.tap),
+        const Stroke(InputButton.backward, StrokeKind.hold),
+      ]);
+      final dispatcher = PlayerActionDispatcher(
+        playback: comboCommands = _ComboCommands(),
+        catalog: () => profiles.catalog,
+      );
+      profileControls = ProfileControls(
+        profiles: profiles,
+        dispatcher: dispatcher,
+        clock: _WidgetClock(tester.binding.clock.now),
+      );
+      addTearDown(() {
+        unawaited(dispatcher.dispose());
+        unawaited(profiles.dispose());
+      });
+    }
     final bloc = buildTestPlayerBloc(port, PlaybackSessionStore(prefs));
     final repo = _NoLikes();
     final likes = LikesCubit(
@@ -118,7 +178,10 @@ void main() {
           theme: AppTheme.dark,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const FullPlayerPage(morphFromMini: false),
+          home: FullPlayerPage(
+            morphFromMini: false,
+            profileControls: profileControls,
+          ),
         ),
       ),
     );
@@ -150,6 +213,83 @@ void main() {
       });
     }
   }
+
+  for (final screen in [const Size(360, 640), const Size(412, 915)]) {
+    for (final scale in [1.0, 2.0]) {
+      testWidgets('combo controls fit $screen at text x$scale', (tester) async {
+        await pumpPage(
+          tester,
+          screen: screen,
+          textScale: scale,
+          withProfiles: true,
+        );
+        expect(find.byTooltip('Player profiles and combos'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        await tester.tap(find.text('Combo'));
+        await tester.pump(const Duration(milliseconds: 250));
+        expect(find.byType(PlayerControls), findsNothing);
+        expect(find.byType(NowPlayingComboControls), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        final tabsTop = tester.getTopLeft(find.byType(AppBottomNavBar)).dy;
+        final combo = tester.getRect(find.byType(NowPlayingComboControls));
+        expect(combo.bottom, lessThanOrEqualTo(tabsTop));
+        expect(
+          tester.getRect(find.byType(PlayerModeSwitch)).bottom,
+          lessThanOrEqualTo(combo.top),
+        );
+        expect(find.byKey(const ValueKey('input-backward')), findsOneWidget);
+        await tester.tap(find.text('Player'));
+        await tester.pump(const Duration(milliseconds: 250));
+        expect(find.byType(PlayerControls), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  testWidgets(
+    'Now Playing distinguishes owners and cancels on mode or focus loss',
+    (tester) async {
+      await pumpPage(
+        tester,
+        screen: const Size(412, 915),
+        textScale: 1,
+        withProfiles: true,
+      );
+      await tester.tap(find.text('Combo'));
+      await tester.pump(const Duration(milliseconds: 250));
+      Future<void> stroke(String button, int milliseconds) async {
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byKey(ValueKey('input-$button'))),
+        );
+        await tester.pump(Duration(milliseconds: milliseconds));
+        await gesture.up();
+        await tester.pump();
+      }
+
+      final before = comboCommands.actions.length;
+      await stroke('forward', 80);
+      await tester.tap(find.text('Player'));
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(comboCommands.actions.length, before);
+      await tester.tap(find.text('Combo'));
+      await tester.pump(const Duration(milliseconds: 250));
+      await stroke('forward', 80);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(comboCommands.actions.length, before);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      await stroke('forward', 80);
+      await stroke('backward', 700);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(comboCommands.actions.length, before + 1);
+      expect(find.textContaining('P2 · Skipped'), findsOneWidget);
+      await stroke('forward', 80);
+      await tester.pump(const Duration(milliseconds: 550));
+      expect(comboCommands.actions.length, before + 2);
+      expect(find.textContaining('P1 · Skipped'), findsOneWidget);
+    },
+  );
 
   testWidgets('the ring keeps its full size on a tall screen', (tester) async {
     await pumpPage(tester, screen: const Size(412, 915), textScale: 1);

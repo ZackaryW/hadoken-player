@@ -34,7 +34,7 @@ class _ComboPadPageState extends State<ComboPadPage>
       },
       onPracticeMatch: (match) => setState(
         () => outcome =
-            'Practice · ${match.binding.profile.label}: ${match.binding.action.label}. Playback unchanged.',
+            'Practice · ${match.binding.profile.label}: ${match.binding.action.label}.',
       ),
     );
     catalogSubscription = widget.controls.profiles.changes.listen(
@@ -94,9 +94,6 @@ class _ComboPadPageState extends State<ComboPadPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'One shared pad. Your saved combination identifies P1, P2 or P3.',
-                  ),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 8,
@@ -124,9 +121,7 @@ class _ComboPadPageState extends State<ComboPadPage>
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    input.mode == InputMode.practice
-                        ? 'Practice only · music stays unchanged'
-                        : 'Live · matched combos control playback',
+                    input.mode == InputMode.practice ? 'Practice only' : 'Live',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 20),
@@ -137,9 +132,6 @@ class _ComboPadPageState extends State<ComboPadPage>
                     timing: widget.controls.profiles.catalog.timing,
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'Hold: ${widget.controls.profiles.catalog.timing.holdMs} ms · continuation: ${widget.controls.profiles.catalog.timing.gapMs} ms',
-                  ),
                   if (input.waitingForContinuation)
                     const Text('Waiting for a longer combo…'),
                   if (input.feedback != null)
@@ -161,15 +153,10 @@ class _ComboPadPageState extends State<ComboPadPage>
                     '● Tap   ━ Hold   → Next stroke',
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  const Text(
-                    'Release each button before the next press. A shorter shared prefix waits for the continuation window. Leaving this screen cancels unfinished input; background music continues.',
-                  ),
                   if (widget.controls.profiles.catalog.bindings.isEmpty)
                     const Padding(
                       padding: EdgeInsets.only(top: 16),
-                      child: Text(
-                        'No combos saved yet. Go back to Player profiles and use Set beside an action.',
-                      ),
+                      child: Text('No combos set'),
                     ),
                 ],
               ),

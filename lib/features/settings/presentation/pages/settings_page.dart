@@ -101,9 +101,20 @@ class _SettingsList extends StatelessWidget {
             SettingsTile.navigation(
               icon: AppIcons.profiles,
               iconColor: const Color(0xFF8B5CF6),
-              title: 'Player profiles and combos',
-              subtitle: 'P1–P3 · tap and hold bindings',
+              title: 'Player profiles',
               onTap: () => context.pushNamed(AppRoute.profiles),
+            ),
+            SettingsTile.navigation(
+              icon: AppIcons.comboTiming,
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Combo timing',
+              onTap: () => context.pushNamed(AppRoute.comboTiming),
+            ),
+            SettingsTile.navigation(
+              icon: AppIcons.comboPad,
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Combo pad',
+              onTap: () => context.pushNamed(AppRoute.comboPad),
             ),
           ],
         ),

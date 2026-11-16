@@ -69,13 +69,22 @@ class ComboStrip extends StatelessWidget {
 class ComboButtons extends StatelessWidget {
   final ComboInput input;
   final RecognitionTiming timing;
-  const ComboButtons({super.key, required this.input, required this.timing});
+  final bool playerStyle;
+  const ComboButtons({
+    super.key,
+    required this.input,
+    required this.timing,
+    this.playerStyle = false,
+  });
 
   @override
   Widget build(BuildContext context) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      for (final button in InputButton.values)
+      for (final button
+          in playerStyle
+              ? [InputButton.backward, InputButton.pause, InputButton.forward]
+              : InputButton.values)
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -92,49 +101,110 @@ class ComboButtons extends StatelessWidget {
                 onPointerUp: (event) => input.up(event.pointer),
                 onPointerCancel: (_) => input.cancel(),
                 child: ExcludeSemantics(
-                  child: Container(
-                    constraints: const BoxConstraints(minHeight: 104),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: input.pressedButton == button
-                          ? context.colors.accent.withValues(alpha: .35)
-                          : context.colors.bgSecondary,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: input.pressedButton == button
-                            ? context.colors.accent
-                            : context.colors.labelTertiary,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(buttonIcon(button), size: 28),
-                        const SizedBox(height: 6),
-                        Text(
-                          buttonLabel(button),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                  child: playerStyle
+                      ? _PlayerInputFace(
+                          button: button,
+                          pressed: input.pressedButton == button,
+                          holding: input.holding,
+                        )
+                      : Container(
+                          constraints: const BoxConstraints(minHeight: 104),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: input.pressedButton == button
+                                ? context.colors.accent.withValues(alpha: .35)
+                                : context.colors.bgSecondary,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: input.pressedButton == button
+                                  ? context.colors.accent
+                                  : context.colors.labelTertiary,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(buttonIcon(button), size: 28),
+                              const SizedBox(height: 6),
+                              Text(
+                                buttonLabel(button),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              if (input.pressedButton == button)
+                                Text(
+                                  input.holding ? 'HOLD' : 'TAP',
+                                  style: const TextStyle(fontSize: 11),
+                                ),
+                            ],
                           ),
                         ),
-                        if (input.pressedButton == button)
-                          Text(
-                            input.holding ? 'HOLD' : 'TAP',
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ),
           ),
         ),
+    ],
+  );
+}
+
+class _PlayerInputFace extends StatelessWidget {
+  final InputButton button;
+  final bool pressed;
+  final bool holding;
+  const _PlayerInputFace({
+    required this.button,
+    required this.pressed,
+    required this.holding,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: pressed
+              ? context.colors.accent
+              : Colors.white.withValues(alpha: .07),
+          border: Border.all(
+            color: pressed
+                ? context.colors.accent
+                : Colors.white.withValues(alpha: .20),
+          ),
+        ),
+        child: Icon(
+          buttonIcon(button),
+          size: 28,
+          color: pressed ? context.colors.accentForeground : Colors.white,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        buttonLabel(button),
+        style: TextStyle(fontSize: 11, color: context.colors.labelSecondary),
+      ),
+      SizedBox(
+        height: 18,
+        child: Text(
+          pressed ? (holding ? 'HOLD' : 'TAP') : '',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: context.colors.accent,
+          ),
+        ),
+      ),
     ],
   );
 }

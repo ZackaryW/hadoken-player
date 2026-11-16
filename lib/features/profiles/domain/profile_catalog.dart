@@ -110,13 +110,19 @@ final class ProfileCatalog {
   }) : names = Map.unmodifiable(names),
        bindings = List.unmodifiable(bindings),
        recoveryMessages = List.unmodifiable(recoveryMessages) {
-    if (names.length != 3 ||
-        ProfileId.values.any((id) => (names[id] ?? '').trim().isEmpty)) {
-      throw const FormatException('P1, P2 and P3 each need a name.');
+    if (!names.containsKey(ProfileId.p1) ||
+        names.length > 3 ||
+        names.values.any((name) => name.trim().isEmpty)) {
+      throw const FormatException(
+        'Add one to three named profiles, starting with P1.',
+      );
     }
     final combinations = <String, ActionBinding>{};
     final slots = <String>{};
     for (final binding in this.bindings) {
+      if (!names.containsKey(binding.profile)) {
+        throw const FormatException('Add this profile first.');
+      }
       final owner = combinations[binding.comboKey];
       if (owner != null) throw BindingConflict(owner);
       if (!slots.add(binding.id)) {
@@ -127,7 +133,7 @@ final class ProfileCatalog {
   }
 
   factory ProfileCatalog.empty() => ProfileCatalog(
-    names: {for (final id in ProfileId.values) id: id.label},
+    names: const {ProfileId.p1: 'P1'},
     bindings: const [],
     timing: RecognitionTiming(),
   );

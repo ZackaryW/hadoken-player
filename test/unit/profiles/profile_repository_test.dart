@@ -33,12 +33,8 @@ void main() {
   });
   tearDown(() => repository.dispose());
 
-  test('three stable slots, three buttons, two durations and six actions', () {
-    expect(repository.catalog.names, {
-      ProfileId.p1: 'P1',
-      ProfileId.p2: 'P2',
-      ProfileId.p3: 'P3',
-    });
+  test('starts with P1, three buttons, two durations and six actions', () {
+    expect(repository.catalog.names, {ProfileId.p1: 'P1'});
     expect(InputButton.values.length, 3);
     expect(StrokeKind.values.length, 2);
     expect(PlayerAction.values.length, 6);
@@ -48,6 +44,7 @@ void main() {
   test(
     'rename and bindings survive restart without changing identity',
     () async {
+      await repository.addProfile();
       await repository.rename(ProfileId.p2, '  Ken  ');
       await repository.setBinding(ProfileId.p2, PlayerAction.nextTrack, [
         forward,
@@ -60,7 +57,7 @@ void main() {
       expect(binding.profile, ProfileId.p2);
       expect(binding.action, PlayerAction.nextTrack);
       expect(binding.strokes, [forward, backHold]);
-      expect(jsonDecode(store.document!)['version'], 1);
+      expect(jsonDecode(store.document!)['version'], 2);
     },
   );
 
@@ -81,7 +78,7 @@ void main() {
       expect(store.document, before);
       expect(events, isEmpty);
       store.fail = false;
-      await repository.rename(ProfileId.p3, 'Chun-Li');
+      await repository.rename(ProfileId.p1, 'Ryu');
       expect(repository.catalog.names[ProfileId.p1], 'Ryu');
       expect(events.length, 1);
     },
@@ -90,6 +87,7 @@ void main() {
   test(
     'rejects identical complete combos across profiles and actions',
     () async {
+      await repository.addProfile();
       await repository.setBinding(ProfileId.p1, PlayerAction.nextTrack, [
         forward,
       ]);
@@ -112,6 +110,8 @@ void main() {
   test(
     'prefixes and tap versus hold are distinct, replacing frees old combo',
     () async {
+      await repository.addProfile();
+      await repository.addProfile();
       await repository.setBinding(ProfileId.p1, PlayerAction.nextTrack, [
         forward,
       ]);
@@ -143,6 +143,8 @@ void main() {
   test(
     'competing claims validate serially after the first write commits',
     () async {
+      await repository.addProfile();
+      store.writes = 0;
       store.gate = Completer<void>();
       final first = repository.setBinding(
         ProfileId.p1,
@@ -161,6 +163,88 @@ void main() {
       await rejection;
       expect(store.writes, 1);
       expect(repository.catalog.bindings.single.profile, ProfileId.p1);
+    },
+  );
+
+  test(
+    'competing adds persist two unique slots and enforce the limit',
+    () async {
+      final results = await Future.wait([
+        for (var i = 0; i < 3; i++)
+          repository.addProfile().then<Object>(
+            (id) => id,
+            onError: (Object e) => e,
+          ),
+      ]);
+      expect(results.take(2), [ProfileId.p2, ProfileId.p3]);
+      expect(results.last, isA<FormatException>());
+      expect(store.writes, 2);
+      final reopened = await ProfileRepository.open(store);
+      addTearDown(reopened.dispose);
+      expect(reopened.catalog.names.keys, ProfileId.values);
+    },
+  );
+
+  test('failed add does not publish or consume a slot', () async {
+    final events = <ProfileCatalog>[];
+    final sub = repository.changes.listen(events.add);
+    addTearDown(sub.cancel);
+    store.fail = true;
+    await expectLater(repository.addProfile(), throwsStateError);
+    expect(repository.catalog.names.keys, [ProfileId.p1]);
+    expect(store.document, isNull);
+    expect(events, isEmpty);
+    store.fail = false;
+    expect(await repository.addProfile(), ProfileId.p2);
+    expect(events.length, 1);
+  });
+
+  test('unadded profiles cannot be renamed, bound or cleared', () async {
+    await expectLater(
+      repository.rename(ProfileId.p2, 'Ken'),
+      throwsFormatException,
+    );
+    await expectLater(
+      repository.setBinding(ProfileId.p2, PlayerAction.stop, [forward]),
+      throwsFormatException,
+    );
+    await expectLater(
+      repository.setBinding(ProfileId.p2, PlayerAction.stop, null),
+      throwsFormatException,
+    );
+    expect(store.writes, 0);
+  });
+
+  test(
+    'legacy defaults disappear while configured players survive migration',
+    () {
+      final raw =
+          jsonDecode(
+                ProfileRepository.encode(
+                  ProfileCatalog(
+                    names: {for (final id in ProfileId.values) id: id.label},
+                    bindings: [],
+                    timing: RecognitionTiming(),
+                  ),
+                ),
+              )
+              as Map;
+      raw['version'] = 1;
+      expect(ProfileRepository.decode(jsonEncode(raw)).names.keys, [
+        ProfileId.p1,
+      ]);
+      raw['profiles'][1]['bindings'] = {
+        'nextTrack': [forward.toJson()],
+      };
+      raw['profiles'][2]['name'] = 'Chun-Li';
+      final migrated = ProfileRepository.decode(jsonEncode(raw));
+      expect(migrated.names.keys, ProfileId.values);
+      expect(migrated.bindings.single.profile, ProfileId.p2);
+      expect(migrated.names[ProfileId.p3], 'Chun-Li');
+      expect(
+        ProfileRepository.decode(ProfileRepository.encode(migrated)).names,
+        migrated.names,
+      );
     },
   );
 
@@ -224,7 +308,16 @@ void main() {
     'all duplicate members and invalid bindings disabled, valid data survives',
     () {
       final raw =
-          jsonDecode(ProfileRepository.encode(ProfileCatalog.empty())) as Map;
+          jsonDecode(
+                ProfileRepository.encode(
+                  ProfileCatalog(
+                    names: {for (final id in ProfileId.values) id: id.label},
+                    bindings: [],
+                    timing: RecognitionTiming(),
+                  ),
+                ),
+              )
+              as Map;
       final profiles = raw['profiles'] as List;
       profiles[0]['bindings'] = {
         'nextTrack': [forward.toJson()],

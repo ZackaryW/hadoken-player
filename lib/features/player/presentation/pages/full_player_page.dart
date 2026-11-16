@@ -1,4 +1,7 @@
 import 'dart:math' as math;
+import 'package:troona/core/router/app_router.dart';
+import 'package:troona/features/player_actions/profile_controls.dart';
+import 'package:troona/features/input_bindings/presentation/now_playing_combo_controls.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -31,7 +34,13 @@ import 'package:troona/shared/widgets/dynamic_background.dart';
 import 'package:troona/core/extensions/context_ext.dart';
 
 class FullPlayerPage extends StatefulWidget {
-  const FullPlayerPage({super.key, this.morphFromMini = true});
+  const FullPlayerPage({
+    super.key,
+    this.morphFromMini = true,
+    this.profileControls,
+  });
+
+  final ProfileControls? profileControls;
 
   static const routeName = '/player';
 
@@ -74,6 +83,14 @@ class _FullPlayerPageState extends State<FullPlayerPage>
   late final AnimationController _snapBack;
   late Animation<double> _snapAnim;
   double _dragOffset = 0;
+  bool _comboMode = false;
+  final _comboControlsKey = GlobalKey<NowPlayingComboControlsState>();
+
+  void _setComboMode(bool value) {
+    _comboControlsKey.currentState?.cancelPendingInput();
+    setState(() => _comboMode = value);
+  }
+
   Track? _lastResolvedTrack;
 
   /// Last queue shown by the carousel, kept while the next track loads so
@@ -362,6 +379,17 @@ class _FullPlayerPageState extends State<FullPlayerPage>
 
   @override
   Widget build(BuildContext context) {
+    final profiles =
+        widget.profileControls ??
+        (getIt.isRegistered<ProfileControls>()
+            ? getIt<ProfileControls>()
+            : null);
+    final controlsBlock =
+        _kControlsBlock +
+        (profiles == null ? 0 : PlayerModeSwitch.height + 8) +
+        (_comboMode
+            ? NowPlayingComboControls.height - PlayerControls.height
+            : 0);
     final safeBottom = MediaQuery.of(context).padding.bottom;
     // Bottom inset + nav bar (tabs only) + its 0.5 px glass border.
     final navBarReserve = safeBottom + 12 + AppSpacing.navBarHeight + 1;
@@ -377,12 +405,13 @@ class _FullPlayerPageState extends State<FullPlayerPage>
         canPop: true,
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) {
+            _comboControlsKey.currentState?.cancelPendingInput();
             getIt<PlaybackSessionStore>().setFullPlayerOpen(false);
           }
         },
         child: GestureDetector(
-          onVerticalDragUpdate: _onDragUpdate,
-          onVerticalDragEnd: _onDragEnd,
+          onVerticalDragUpdate: _comboMode ? null : _onDragUpdate,
+          onVerticalDragEnd: _comboMode ? null : _onDragEnd,
           child: Transform.translate(
             offset: Offset(0, _dragOffset),
             child: Opacity(
@@ -472,7 +501,7 @@ class _FullPlayerPageState extends State<FullPlayerPage>
                                             constraints: BoxConstraints(
                                               maxHeight: math.max(
                                                 0,
-                                                box.maxHeight - _kControlsBlock,
+                                                box.maxHeight - controlsBlock,
                                               ),
                                             ),
                                             child: _stageOf(stage, track),
@@ -487,8 +516,29 @@ class _FullPlayerPageState extends State<FullPlayerPage>
                                                 _fadeChrome(
                                                   const PlayerUtilityDock(),
                                                 ),
+                                                if (profiles != null)
+                                                  _fadeChrome(
+                                                    PlayerModeSwitch(
+                                                      combo: _comboMode,
+                                                      onChanged: _setComboMode,
+                                                      onProfiles: () async {
+                                                        // Unmount input before opening another route.
+                                                        _setComboMode(false);
+                                                        await context.pushNamed(
+                                                          AppRoute
+                                                              .playerProfiles,
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
                                                 _fadeChrome(
-                                                  const PlayerControls(),
+                                                  _comboMode && profiles != null
+                                                      ? NowPlayingComboControls(
+                                                          key:
+                                                              _comboControlsKey,
+                                                          controls: profiles,
+                                                        )
+                                                      : const PlayerControls(),
                                                 ),
                                               ],
                                             ),
@@ -520,6 +570,8 @@ class _FullPlayerPageState extends State<FullPlayerPage>
                                   currentTab: AppTab.player,
                                   showMiniPlayer: false,
                                   onTabChanged: (tab) {
+                                    _comboControlsKey.currentState
+                                        ?.cancelPendingInput();
                                     switch (tab) {
                                       case AppTab.home:
                                         _leaveFullPlayerTo(context, '/home');

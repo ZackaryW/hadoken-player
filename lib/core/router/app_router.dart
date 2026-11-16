@@ -32,6 +32,7 @@ import 'package:troona/features/settings/presentation/pages/settings_page.dart';
 import 'package:troona/shared/widgets/ambient_background.dart';
 import 'package:troona/shared/widgets/tab_reselect.dart';
 import 'package:troona/features/profiles/presentation/profiles_page.dart';
+import 'package:troona/features/profiles/presentation/combo_timing_page.dart';
 import 'package:troona/features/input_bindings/presentation/combo_pad_page.dart';
 import 'package:troona/features/player_actions/profile_controls.dart';
 
@@ -48,6 +49,8 @@ abstract class AppRoute {
   static const privacy = 'privacy';
   static const profiles = 'profiles';
   static const comboPad = 'combo-pad';
+  static const playerProfiles = 'player-profiles';
+  static const comboTiming = 'combo-timing';
   static const weeklyRecap = 'recap';
 
   static const albumDetail = 'album_detail';
@@ -164,21 +167,25 @@ final appRouter = GoRouter(
                     GoRoute(
                       path: AppRoute.profiles,
                       name: AppRoute.profiles,
-                      builder: (context, _) => _overTab(
-                        ProfilesPage(
-                          controls: getIt<ProfileControls>(),
-                          onOpenPad: () => context.pushNamed(AppRoute.comboPad),
+                      builder: (_, _) => _overTab(
+                        ProfilesPage(controls: getIt<ProfileControls>()),
+                      ),
+                    ),
+                    GoRoute(
+                      path: AppRoute.comboPad,
+                      name: AppRoute.comboPad,
+                      builder: (_, _) => _overTab(
+                        ComboPadPage(controls: getIt<ProfileControls>()),
+                      ),
+                    ),
+                    GoRoute(
+                      path: AppRoute.comboTiming,
+                      name: AppRoute.comboTiming,
+                      builder: (_, _) => _overTab(
+                        ComboTimingPage(
+                          repository: getIt<ProfileControls>().profiles,
                         ),
                       ),
-                      routes: [
-                        GoRoute(
-                          path: AppRoute.comboPad,
-                          name: AppRoute.comboPad,
-                          builder: (_, _) => _overTab(
-                            ComboPadPage(controls: getIt<ProfileControls>()),
-                          ),
-                        ),
-                      ],
                     ),
                     GoRoute(
                       path: AppRoute.privacy,
@@ -263,6 +270,14 @@ final appRouter = GoRouter(
     ),
 
     // ── Utility Routes ──────────────────────────────────────────────────────
+    // Full player lives above the tab shell. Keep its profile destination on
+    // this navigator too; pushing a second copy of the shell duplicates keys.
+    GoRoute(
+      path: '/player-profiles',
+      name: AppRoute.playerProfiles,
+      builder: (_, _) =>
+          _overTab(ProfilesPage(controls: getIt<ProfileControls>())),
+    ),
     GoRoute(
       path: AppRoute.permission,
       builder: (_, _) => const PermissionPage(),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:troona/core/layout/app_layout.dart';
 import 'package:troona/core/theme/semantic/app_colors.dart';
+import 'package:troona/core/theme/semantic/app_icons.dart';
+import 'package:troona/shared/widgets/app_icon_button.dart';
 import 'package:troona/shared/widgets/app_back_button.dart';
 import 'package:troona/shared/widgets/app_button.dart';
 import 'package:troona/shared/widgets/app_dialog.dart';
@@ -14,12 +16,7 @@ import 'binding_recorder.dart';
 
 class ProfilesPage extends StatefulWidget {
   final ProfileControls controls;
-  final VoidCallback onOpenPad;
-  const ProfilesPage({
-    super.key,
-    required this.controls,
-    required this.onOpenPad,
-  });
+  const ProfilesPage({super.key, required this.controls});
   @override
   State<ProfilesPage> createState() => _ProfilesPageState();
 }
@@ -27,7 +24,25 @@ class ProfilesPage extends StatefulWidget {
 class _ProfilesPageState extends State<ProfilesPage> {
   ProfileId selected = ProfileId.p1;
   String? feedback;
+  bool adding = false;
   ProfileRepository get repository => widget.controls.profiles;
+
+  Future<void> addProfile() async {
+    setState(() {
+      adding = true;
+      feedback = null;
+    });
+    try {
+      final id = await repository.addProfile();
+      if (mounted) setState(() => selected = id);
+    } catch (_) {
+      if (mounted) {
+        setState(() => feedback = 'Could not add profile. Try again.');
+      }
+    } finally {
+      if (mounted) setState(() => adding = false);
+    }
+  }
 
   Future<void> rename() async {
     final name = await showTextInputDialog(
@@ -81,15 +96,13 @@ class _ProfilesPageState extends State<ProfilesPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      'Your combo identifies your player. Each complete combo has one owner.',
-                    ),
-                    const SizedBox(height: 16),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        for (final id in ProfileId.values)
+                        for (final id in ProfileId.values.where(
+                          catalog.names.containsKey,
+                        ))
                           id == selected
                               ? AppButton.primary(
                                   id.label,
@@ -101,19 +114,27 @@ class _ProfilesPageState extends State<ProfilesPage> {
                                   onPressed: () =>
                                       setState(() => selected = id),
                                 ),
+                        if (catalog.names.length < 3)
+                          AppButton.secondary(
+                            'Add profile',
+                            onPressed: adding ? null : addProfile,
+                          ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      '${selected.label} · ${catalog.names[selected]}',
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: AppButton.text('Rename player', onPressed: rename),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            catalog.names[selected]!,
+                            style: const TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        AppButton.text('Rename', onPressed: rename),
+                      ],
                     ),
                     if (feedback != null)
                       Text(
@@ -127,30 +148,6 @@ class _ProfilesPageState extends State<ProfilesPage> {
                       ),
                     for (final action in PlayerAction.values)
                       _bindingCard(catalog, action),
-                    const SizedBox(height: 16),
-                    AppButton.primary(
-                      'Open combo pad',
-                      onPressed: widget.onOpenPad,
-                      expanded: true,
-                    ),
-                    const SizedBox(height: 20),
-                    TimingSettings(repository: repository),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'How to set a combo',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Choose P1, P2 or P3, then Set beside an action. Tap or hold Forward, Pause and Backward in order. Save one to five strokes. ● means tap; ━ means hold. Recording and Practice never control the music.',
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'A shorter shared prefix waits for the continuation window. Start the next press before the window ends; a hold can finish later. These buttons capture input only while this screen is active. Music continues in the background.',
-                    ),
                   ],
                 ),
               ),
@@ -163,9 +160,12 @@ class _ProfilesPageState extends State<ProfilesPage> {
 
   Widget _bindingCard(ProfileCatalog catalog, PlayerAction action) {
     final binding = catalog.bindingFor(selected, action);
+    final sharedPrefix =
+        binding != null && catalog.sharedPrefixes(binding).isNotEmpty;
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(14),
+      key: ValueKey('binding-${action.name}'),
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: context.colors.bgSecondary,
         borderRadius: BorderRadius.circular(18),
@@ -173,30 +173,27 @@ class _ProfilesPageState extends State<ProfilesPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            action.label,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 10),
-          ComboStrip(binding?.strokes ?? []),
-          if (binding != null && catalog.sharedPrefixes(binding).isNotEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Text(
-                'Shared prefix: the shorter combo waits for a continuation.',
-              ),
-            ),
-          Wrap(
-            spacing: 8,
+          Row(
             children: [
+              Expanded(
+                child: Text(
+                  action.label,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
               AppButton.text(
                 'Set',
+                size: AppButtonSize.small,
                 key: ValueKey('set-${action.name}'),
                 onPressed: () => record(action),
               ),
               if (binding != null)
                 AppButton.text(
                   'Clear',
+                  size: AppButtonSize.small,
                   key: ValueKey('clear-${action.name}'),
                   onPressed: () async {
                     try {
@@ -208,82 +205,30 @@ class _ProfilesPageState extends State<ProfilesPage> {
                 ),
             ],
           ),
+          if (binding != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 4),
+              child: Row(
+                children: [
+                  Flexible(child: ComboStrip(binding.strokes)),
+                  if (sharedPrefix)
+                    AppIconButton(
+                      key: ValueKey('prefix-${action.name}'),
+                      icon: AppIcons.bindingTiming,
+                      size: 18,
+                      tooltip: 'Shared prefix details',
+                      onPressed: () => showMessageDialog(
+                        context,
+                        title: 'Shared prefix',
+                        body:
+                            'The shorter combo waits up to ${catalog.timing.gapMs} ms for the next press.',
+                      ),
+                    ),
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
-}
-
-class TimingSettings extends StatefulWidget {
-  final ProfileRepository repository;
-  const TimingSettings({super.key, required this.repository});
-  @override
-  State<TimingSettings> createState() => _TimingSettingsState();
-}
-
-class _TimingSettingsState extends State<TimingSettings> {
-  late final hold = TextEditingController(
-    text: '${widget.repository.catalog.timing.holdMs}',
-  );
-  late final gap = TextEditingController(
-    text: '${widget.repository.catalog.timing.gapMs}',
-  );
-  String? feedback;
-  @override
-  void dispose() {
-    hold.dispose();
-    gap.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const Text(
-        'Shared timing',
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
-      const Text(
-        'Applies to all three players. Timing is not part of combo ownership.',
-      ),
-      TextField(
-        key: const ValueKey('hold-ms'),
-        controller: hold,
-        keyboardType: TextInputType.number,
-        decoration: const InputDecoration(labelText: 'Hold threshold (ms)'),
-      ),
-      TextField(
-        key: const ValueKey('gap-ms'),
-        controller: gap,
-        keyboardType: TextInputType.number,
-        decoration: const InputDecoration(
-          labelText: 'Continuation window (ms)',
-        ),
-      ),
-      AppButton.secondary(
-        'Save timing',
-        onPressed: () async {
-          try {
-            final timing = RecognitionTiming(
-              holdMs: int.parse(hold.text),
-              gapMs: int.parse(gap.text),
-            );
-            await widget.repository.setTiming(timing);
-            if (mounted) {
-              setState(() => feedback = 'Timing saved for all players.');
-            }
-          } catch (_) {
-            if (mounted) {
-              setState(
-                () => feedback =
-                    'Enter positive whole milliseconds. If saving failed, try again.',
-              );
-            }
-          }
-        },
-      ),
-      if (feedback != null) Text(feedback!),
-    ],
-  );
 }

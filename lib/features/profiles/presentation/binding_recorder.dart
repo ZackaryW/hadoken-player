@@ -95,9 +95,7 @@ class _BindingRecorderState extends State<BindingRecorder>
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap or hold the three buttons in order. Recording does not change playback.',
-            ),
+            const Text('● Tap   ━ Hold'),
             const SizedBox(height: 16),
             ComboStrip(input.strokes),
             const SizedBox(height: 8),
