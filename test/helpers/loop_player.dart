@@ -18,6 +18,10 @@ final class LoopPlayer implements AudioPlayer {
   @override
   double speed = 1;
   @override
+  double pitch = 1;
+  bool failDispose = false;
+  final sources = <AudioSource>[];
+  @override
   bool playing = false;
   @override
   Duration position = Duration.zero;
@@ -76,6 +80,27 @@ final class LoopPlayer implements AudioPlayer {
   @override
   Future<void> setSpeed(double speed) async => this.speed = speed;
   @override
+  Future<void> setPitch(double pitch) async => this.pitch = pitch;
+  @override
+  Future<Duration?> setAudioSource(
+    AudioSource source, {
+    bool preload = true,
+    int? initialIndex,
+    Duration? initialPosition,
+  }) async {
+    sources.add(source);
+    final gate = loadGate;
+    loadGate = null;
+    if (gate != null) await gate.future;
+    if (failNextLoad) {
+      failNextLoad = false;
+      throw StateError('load failed');
+    }
+    position = initialPosition ?? Duration.zero;
+    return duration;
+  }
+
+  @override
   Future<void> play() async => playing = true;
   @override
   Future<void> pause() async => playing = false;
@@ -93,6 +118,7 @@ final class LoopPlayer implements AudioPlayer {
 
   @override
   Future<void> dispose() async {
+    if (failDispose) throw StateError('dispose failed');
     disposed = true;
     await indices.close();
     await processing.close();

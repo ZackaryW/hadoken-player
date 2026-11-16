@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:troona/core/utils/app_logger.dart';
 import 'package:troona/features/player/domain/ports/audio_service_port.dart';
+import 'package:troona/features/player/domain/ports/skill_audio_effects_port.dart';
 import 'package:troona/features/settings/domain/entities/app_settings.dart';
 
 /// Centralises audio session configuration and interruption handling.
@@ -11,12 +12,14 @@ import 'package:troona/features/settings/domain/entities/app_settings.dart';
 /// before any track is loaded) so the OS knows Troona is a **music** app and
 /// can deliver focus/noisy callbacks to this service.
 final class AudioSessionService {
-  AudioSessionService(this._audio, this._settings);
+  AudioSessionService(this._audio, this._settings, {AudioSession? session})
+    : _providedSession = session;
 
   final AudioServicePort _audio;
   AppSettings _settings;
 
   late final AudioSession _session;
+  final AudioSession? _providedSession;
   StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
   StreamSubscription<void>? _noisySub;
   StreamSubscription<double>? _volumeSub;
@@ -28,7 +31,7 @@ final class AudioSessionService {
 
   /// Configure the shared audio session and register interruption handlers.
   Future<void> init() async {
-    _session = await AudioSession.instance;
+    _session = _providedSession ?? await AudioSession.instance;
     await _session.configure(AudioSessionConfiguration.music());
     _isInitialized = true;
 
@@ -64,7 +67,11 @@ final class AudioSessionService {
           if (!_isDucked) {
             _preDuckVolume = _currentVolume;
             _isDucked = true;
-            await _audio.setVolume(0.3);
+            if (_audio is AudioDuckingPort) {
+              await (_audio as AudioDuckingPort).setDuckGain(0.3);
+            } else {
+              await _audio.setVolume(0.3);
+            }
             appLogger.i(
               'AudioSessionService: duck start → volume 0.3 (was $_preDuckVolume)',
             );
@@ -83,7 +90,11 @@ final class AudioSessionService {
       switch (event.type) {
         case AudioInterruptionType.duck:
           if (_isDucked) {
-            await _audio.setVolume(_preDuckVolume);
+            if (_audio is AudioDuckingPort) {
+              await (_audio as AudioDuckingPort).setDuckGain(1);
+            } else {
+              await _audio.setVolume(_preDuckVolume);
+            }
             _isDucked = false;
             appLogger.i(
               'AudioSessionService: duck end → volume $_preDuckVolume',

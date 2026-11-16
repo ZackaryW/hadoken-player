@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:math' show Random;
 
 import 'package:dartz/dartz.dart';
@@ -16,8 +17,12 @@ import 'package:troona/features/player/domain/ports/playback_session_lifecycle.d
 import 'package:troona/features/player/domain/entities/loop_queue.dart';
 import 'package:troona/features/player/domain/ports/loop_queue_port.dart';
 import 'package:troona/skills/skill.dart';
+import '../../domain/ports/skill_audio_effects_port.dart';
+import 'skill_mixer.dart';
+import 'noise_source.dart';
 
 part 'loop_audio_adapter.dart';
+part 'mix_audio_adapter.dart';
 
 /// [AudioServicePort] implementation backed by the `just_audio` package.
 ///
@@ -62,7 +67,8 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   /// The user's volume; the player gets it times the fade's gain.
   double _volume = 1;
 
-  late final _fade = GainRamp((gain) => _player.setVolume(_volume * gain));
+  late final _fade = GainRamp(_applyGain);
+  Future<void> _applyGain(double gain) => _player.setVolume(_volume * gain);
 
   /// Whether playback should run. False as soon as a pause starts fading,
   /// so the status says "paused" at the tap, not once the fade is over.
@@ -628,7 +634,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   Future<Either<Failure, Unit>> setVolume(double volume) async {
     try {
       _volume = volume;
-      await _player.setVolume(volume * _fade.gain);
+      await _applyGain(_fade.gain);
       _volumeSubject.add(volume);
       return right(unit);
     } catch (e, st) {

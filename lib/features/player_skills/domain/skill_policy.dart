@@ -11,6 +11,8 @@ import 'combo_overrides.dart';
 import '../../profiles/domain/effective_bindings.dart';
 import '../../player/domain/ports/loop_queue_port.dart';
 import 'loop_queue_effects.dart';
+import '../../player/domain/ports/skill_audio_effects_port.dart';
+import 'skill_audio_effects.dart';
 import '../../input_bindings/domain/combo_input.dart';
 
 abstract interface class SkillClock {
@@ -141,6 +143,12 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
       queue,
       clock.now,
     );
+  }
+
+  void bindAudio(SkillAudioEffectsPort audio) {
+    if (audio.supportsAudioMix) {
+      coordinator.adapters[SkillCapability.audioMix] = SkillAudioEffects(audio);
+    }
   }
 
   @override

@@ -35,7 +35,7 @@ final class AudioServiceInitializer {
     required MediaLikeButton likeButton,
     required Future<ResumableSession> lastSession,
   }) async {
-    final adapter = LoopAudioAdapter();
+    final adapter = MixAudioAdapter();
 
     await AudioService.init(
       builder: () => AudioHandlerImpl(

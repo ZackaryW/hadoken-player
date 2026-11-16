@@ -261,6 +261,7 @@ Future<void> configureDependencies() async {
     skillPolicy.bindQueue(audioPort as LoopQueuePort);
   }
   if (audioPort is LoopAudioAdapter) {
+    if (audioPort is MixAudioAdapter) skillPolicy.bindAudio(audioPort);
     audioPort.canReadSong = const AndroidMediaAccess().canRead;
     audioPort.elapsedNow = const AndroidSkillClock().now;
     audioPort.resolveSong = (id) async =>
