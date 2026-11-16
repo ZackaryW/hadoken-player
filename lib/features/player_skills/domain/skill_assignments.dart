@@ -19,15 +19,20 @@ final class SkillAlreadyAssigned implements Exception {
 final class SkillAssignments {
   final Map<ProfileId, Set<String>> values;
   final List<String> recoveryMessages;
+  final Set<String> knownKeys;
   SkillAssignments(
     Map<ProfileId, Set<String>> values, [
     Iterable<String> messages = const [],
+    Iterable<String>? knownKeys,
   ]) : values = Map.unmodifiable(
          values.map(
            (id, skills) => MapEntry(id, Set<String>.unmodifiable(skills)),
          ),
        ),
-       recoveryMessages = List.unmodifiable(messages);
+       recoveryMessages = List.unmodifiable(messages),
+       knownKeys = Set.unmodifiable(
+         knownKeys ?? skillDefinitions.map((d) => d.id.key),
+       );
   bool has(ProfileId profile, SkillId skill) =>
       values[profile]?.contains(skill.key) ?? false;
   ProfileId? ownerOf(SkillId skill) {
@@ -38,26 +43,43 @@ final class SkillAssignments {
   }
 
   Iterable<String> unavailable(ProfileId profile) =>
-      (values[profile] ?? <String>{}).where(
-        (key) => !SkillId.values.any((id) => id.key == key),
-      );
+      (values[profile] ?? <String>{}).where((key) => !knownKeys.contains(key));
 }
 
 final class SkillAssignmentRepository {
   final SkillAssignmentStore _store;
   final bool Function(ProfileId) profileExists;
+  final List<SkillDefinition> definitions;
   SkillAssignments _catalog;
   final _changes = StreamController<SkillAssignments>.broadcast(sync: true);
   Future<void> _tail = Future.value();
-  SkillAssignmentRepository._(this._store, this.profileExists, this._catalog);
+  SkillAssignmentRepository._(
+    this._store,
+    this.profileExists,
+    this._catalog,
+    this.definitions,
+  );
   static Future<SkillAssignmentRepository> open(
     SkillAssignmentStore store, {
     required bool Function(ProfileId) profileExists,
-  }) async => SkillAssignmentRepository._(
-    store,
-    profileExists,
-    decode(await store.read(), profileExists: profileExists),
-  );
+    Iterable<SkillDefinition> definitions = skillDefinitions,
+  }) async {
+    final registered = List<SkillDefinition>.unmodifiable(definitions);
+    if (registered.map((d) => d.id).toSet().length != registered.length) {
+      throw ArgumentError('Duplicate skill identity.');
+    }
+    return SkillAssignmentRepository._(
+      store,
+      profileExists,
+      decode(
+        await store.read(),
+        profileExists: profileExists,
+        definitions: registered,
+      ),
+      registered,
+    );
+  }
+
   SkillAssignments get catalog => _catalog;
   Stream<SkillAssignments> get changes => _changes.stream;
 
@@ -67,6 +89,9 @@ final class SkillAssignmentRepository {
       if (!profileExists(profile)) {
         throw const FormatException('Add this profile first.');
       }
+      if (assigned && !definitions.any((d) => d.id == skill)) {
+        throw const FormatException('This skill is unavailable.');
+      }
       final owner = _catalog.ownerOf(skill);
       if (assigned && owner != null && owner != profile) {
         throw SkillAlreadyAssigned(skill, owner);
@@ -75,7 +100,11 @@ final class SkillAssignmentRepository {
       final selected = {...?values[profile]};
       assigned ? selected.add(skill.key) : selected.remove(skill.key);
       values[profile] = selected;
-      final next = SkillAssignments(values);
+      final next = SkillAssignments(
+        values,
+        const [],
+        definitions.map((d) => d.id.key),
+      );
       await _store.write(encode(next));
       _catalog = next;
       _changes.add(next);
@@ -94,8 +123,11 @@ final class SkillAssignmentRepository {
   static SkillAssignments decode(
     String? document, {
     bool Function(ProfileId)? profileExists,
+    Iterable<SkillDefinition> definitions = skillDefinitions,
   }) {
-    if (document == null) return SkillAssignments({});
+    final registered = definitions.toList();
+    final known = registered.map((d) => d.id.key).toList();
+    if (document == null) return SkillAssignments({}, const [], known);
     try {
       final raw = jsonDecode(document) as Map;
       if (raw['version'] != 1) throw const FormatException('Unknown version');
@@ -113,7 +145,8 @@ final class SkillAssignmentRepository {
           messages.add('An invalid skill assignment was ignored.');
         }
       }
-      for (final skill in SkillId.values) {
+      for (final definition in registered) {
+        final skill = definition.id;
         ProfileId? owner;
         for (final profile in ProfileId.values) {
           if (!(values[profile]?.contains(skill.key) ?? false)) continue;
@@ -122,14 +155,14 @@ final class SkillAssignmentRepository {
           } else {
             values[profile]!.remove(skill.key);
             messages.add(
-              '${skill.label} kept on ${owner.label}; duplicate on ${profile.label} removed.',
+              '${definition.label} kept on ${owner.label}; duplicate on ${profile.label} removed.',
             );
           }
         }
       }
-      return SkillAssignments(values, messages);
+      return SkillAssignments(values, messages, known);
     } catch (_) {
-      return SkillAssignments({}, ['Saved skills could not be read.']);
+      return SkillAssignments({}, ['Saved skills could not be read.'], known);
     }
   }
 

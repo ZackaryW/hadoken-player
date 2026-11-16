@@ -13,7 +13,20 @@ abstract interface class SkillCapabilityAdapter {
     CapabilityRequest request,
     SkillOrigin origin,
     SkillContext context,
+    SkillExecutionBudget budget,
   );
+}
+
+final class SkillExecutionBudget {
+  int _remaining;
+  SkillExecutionBudget({int limit = 64}) : _remaining = limit {
+    if (limit < 1 || limit > 64) throw ArgumentError.value(limit, 'limit');
+  }
+  bool consume() {
+    if (_remaining == 0) return false;
+    _remaining--;
+    return true;
+  }
 }
 
 final class SkillInvocationOutcome {
@@ -33,6 +46,7 @@ final class SkillCoordinator {
   final SkillOrder runOrdered;
   final EffectLedger effects;
   final Map<SkillCapability, SkillCapabilityAdapter> adapters;
+  final bool Function(SkillOrigin)? originIsActive;
   final _invocations =
       <(String, String, String, String), Future<SkillInvocationOutcome>>{};
   final _results = <(String, String, String, String), CapabilityResult>{};
@@ -41,6 +55,7 @@ final class SkillCoordinator {
   SkillCoordinator({
     required this.runOrdered,
     required this.effects,
+    this.originIsActive,
     Map<SkillCapability, SkillCapabilityAdapter> adapters = const {},
   }) : adapters = Map.of(adapters);
 
@@ -57,6 +72,8 @@ final class SkillCoordinator {
     required SkillRuntimeEvent event,
     required SkillOrigin origin,
     required SkillContext context,
+    SkillExecutionBudget? budget,
+    bool allowPlayback = true,
   }) {
     if (_notifying) {
       return Future.error(StateError('Result callbacks cannot invoke skills.'));
@@ -68,6 +85,8 @@ final class SkillCoordinator {
         event: event,
         origin: origin,
         context: context,
+        budget: budget,
+        allowPlayback: allowPlayback,
       ),
     );
   }
@@ -78,6 +97,8 @@ final class SkillCoordinator {
     required SkillRuntimeEvent event,
     required SkillOrigin origin,
     required SkillContext context,
+    SkillExecutionBudget? budget,
+    bool allowPlayback = true,
   }) {
     if (_notifying) {
       return Future.error(StateError('Result callbacks cannot invoke skills.'));
@@ -85,7 +106,15 @@ final class SkillCoordinator {
     final key = _invocationKey(origin);
     return _invocations.putIfAbsent(
       key,
-      () => _invoke(definition, runtime, event, origin, context),
+      () => _invoke(
+        definition,
+        runtime,
+        event,
+        origin,
+        context,
+        budget ?? SkillExecutionBudget(),
+        allowPlayback,
+      ),
     );
   }
 
@@ -95,6 +124,8 @@ final class SkillCoordinator {
     SkillRuntimeEvent event,
     SkillOrigin origin,
     SkillContext context,
+    SkillExecutionBudget budget,
+    bool allowPlayback,
   ) async {
     if (origin.owner != context.owner ||
         origin.sessionId != context.sessionId ||
@@ -133,7 +164,19 @@ final class SkillCoordinator {
         results.add(previous);
         continue;
       }
-      final result = await _apply(request, origin, context);
+      final result = !budget.consume()
+          ? CapabilityResult(
+              effectId: request.effectId,
+              status: CapabilityStatus.denied,
+              reason: 'Skill reaction budget exhausted.',
+            )
+          : !allowPlayback && request is ExecutePlayerAction
+          ? CapabilityResult(
+              effectId: request.effectId,
+              status: CapabilityStatus.denied,
+              reason: 'Generated success cannot recursively request playback.',
+            )
+          : await _apply(request, origin, context, budget);
       _results[key] = result;
       results.add(result);
       try {
@@ -169,6 +212,7 @@ final class SkillCoordinator {
     CapabilityRequest request,
     SkillOrigin origin,
     SkillContext context,
+    SkillExecutionBudget budget,
   ) async {
     CapabilityResult result(CapabilityStatus status, String reason) =>
         CapabilityResult(
@@ -187,12 +231,18 @@ final class SkillCoordinator {
               'Effect is owned by another skill or cleanup is pending.',
             );
     }
+    if (!(originIsActive?.call(origin) ?? true)) {
+      return result(
+        CapabilityStatus.denied,
+        'The skill source or session has ended.',
+      );
+    }
     final adapter = adapters[request.capability];
     if (adapter == null || !context.support.contains(request.capability)) {
       return result(CapabilityStatus.unsupported, 'Capability is unavailable.');
     }
     try {
-      final applied = await adapter.apply(request, origin, context);
+      final applied = await adapter.apply(request, origin, context, budget);
       final handle = applied.result.handle;
       final valid =
           applied.result.effectId == request.effectId &&

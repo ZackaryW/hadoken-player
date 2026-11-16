@@ -67,6 +67,7 @@ final class TestAdapter implements SkillCapabilityAdapter {
     CapabilityRequest request,
     SkillOrigin origin,
     SkillContext context,
+    SkillExecutionBudget budget,
   ) => body(request, origin, context);
 }
 
@@ -307,4 +308,54 @@ void main() {
     expect(reaction.stateChanged, isTrue);
     expect(runtime.successes.single.playerId, 'p1');
   });
+
+  test(
+    'one event budget spans reactions and cached effects do not reapply',
+    () async {
+      final budget = SkillExecutionBudget(limit: 2);
+      var applied = 0;
+      coordinator.adapters[SkillCapability.queueEdit] = TestAdapter((
+        request,
+        origin,
+        context,
+      ) async {
+        applied++;
+        return AppliedCapability(
+          CapabilityResult(
+            effectId: request.effectId,
+            status: CapabilityStatus.applied,
+          ),
+        );
+      });
+      final skill = ReactionSkill(
+        ReactionRuntime((id) => [edit('$id:1'), edit('$id:2')]),
+      );
+      Future<SkillInvocationOutcome> bounded(String id) => coordinator.invoke(
+        definition: skill,
+        runtime: skill.runtime,
+        origin: origin(id),
+        context: context(),
+        event: SkillActionSucceeded(
+          id,
+          const PlaybackSkillTarget(SkillAction.nextTrack),
+        ),
+        budget: budget,
+      );
+      expect(
+        (await bounded(
+          'first',
+        )).results.every((r) => r.status == CapabilityStatus.applied),
+        isTrue,
+      );
+      expect(
+        (await bounded(
+          'second',
+        )).results.every((r) => r.status == CapabilityStatus.denied),
+        isTrue,
+      );
+      await bounded('first');
+      expect(applied, 2);
+      expect(() => SkillExecutionBudget(limit: 65), throwsArgumentError);
+    },
+  );
 }

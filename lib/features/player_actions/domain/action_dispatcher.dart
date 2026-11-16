@@ -64,6 +64,11 @@ abstract interface class ExecutablePlayerAbilityPolicy
     implements OrderedPlayerAbilityPolicy {
   Effort effortFor(ExecutableBinding binding);
   Future<CommandResult> activate(PlayerActionRequest request);
+  void bindExecution(
+    PlaybackCommands playback,
+    ProfileCatalog Function() catalog,
+  );
+  Future<List<CapabilityResult>> observeInput(PlayerActionRequest request);
 }
 
 final class AllowAllAbilities implements PlayerAbilityPolicy {
@@ -93,6 +98,9 @@ final class PlayerActionDispatcher {
   }) {
     final policy = abilities;
     if (policy is OrderedPlayerAbilityPolicy) policy.bindOrder(runOrdered);
+    if (policy is ExecutablePlayerAbilityPolicy) {
+      policy.bindExecution(playback, catalog);
+    }
   }
 
   Stream<PlayerActionOutcome> get outcomes => _outcomes.stream;
@@ -119,6 +127,7 @@ final class PlayerActionDispatcher {
     final validAtArrival = validNow();
     final result = runOrdered(() async {
       CommandResult result;
+      final observedEffects = <CapabilityResult>[];
       try {
         if (!validAtArrival || !validNow()) {
           result = const CommandResult(
@@ -131,7 +140,13 @@ final class PlayerActionDispatcher {
             'Skill state could not be updated. Restart the player before more combo actions.',
           );
         } else {
-          final denial = await abilities.denialFor(request);
+          final policy = abilities;
+          if (policy is ExecutablePlayerAbilityPolicy) {
+            observedEffects.addAll(await policy.observeInput(request));
+          }
+          final denial = !validNow()
+              ? 'This combination changed before execution.'
+              : await abilities.denialFor(request);
           if (denial != null) {
             result = CommandResult(ActionStatus.denied, denial);
           } else if (!validNow()) {
@@ -168,6 +183,13 @@ final class PlayerActionDispatcher {
         result = const CommandResult(
           ActionStatus.failure,
           'The playback action failed.',
+        );
+      }
+      if (observedEffects.isNotEmpty) {
+        result = CommandResult(
+          result.status,
+          result.message,
+          effects: List.unmodifiable([...observedEffects, ...result.effects]),
         );
       }
       final outcome = PlayerActionOutcome(request, result);

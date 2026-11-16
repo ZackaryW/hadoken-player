@@ -7,11 +7,16 @@ export 'skill_context.dart';
 export 'effort.dart';
 
 /// Stable persisted identities. Behavior and metadata belong to definitions.
-enum SkillId {
-  skipRecovery('skip-recovery');
-
+final class SkillId {
+  static const skipRecovery = SkillId._('skip-recovery');
+  static const values = [skipRecovery];
   final String key;
-  const SkillId(this.key);
+  const SkillId._(this.key);
+  SkillId(String key) : key = requireIdentity(key);
+  @override
+  bool operator ==(Object other) => other is SkillId && key == other.key;
+  @override
+  int get hashCode => key.hashCode;
 }
 
 enum SkillAction {

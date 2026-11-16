@@ -5,6 +5,9 @@ import '../../player_actions/domain/action_dispatcher.dart';
 import 'skill_assignments.dart';
 import 'effect_ledger.dart';
 import 'skill_coordinator.dart';
+import 'gameplay_effects.dart';
+import 'skill_playback.dart';
+import '../../input_bindings/domain/combo_input.dart';
 
 abstract interface class SkillClock {
   Future<Duration> now();
@@ -35,6 +38,10 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   final _changes = StreamController<void>.broadcast(sync: true);
   late final EffectLedger effects;
   late final SkillCoordinator coordinator;
+  late final GameplayEffects gameplay;
+  ProfileCatalog Function()? _catalog;
+  PlaybackCommands? _playback;
+  final _budgets = <String, SkillExecutionBudget>{};
   SkillOrder? _order;
   Future<void> _localTail = Future.value();
   StreamSubscription<void>? _effectChanges;
@@ -65,8 +72,23 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
       runOrdered: _runOrdered,
       effects: effects,
       adapters: adapters,
+      originIsActive: (origin) {
+        final definition = definitionFor(origin.skillKey);
+        final owners = ProfileId.values.where((p) => p.name == origin.owner);
+        return !_lifecycleFailed &&
+            origin.sessionId == _session &&
+            definition != null &&
+            owners.isNotEmpty &&
+            assignments.catalog.has(owners.first, definition.id);
+      },
     );
     _effectChanges = effects.changes.listen((_) => _changes.add(null));
+    gameplay = GameplayEffects(ledger: effects, definitionFor: definitionFor);
+    coordinator.adapters.putIfAbsent(SkillCapability.listener, () => gameplay);
+    coordinator.adapters.putIfAbsent(
+      SkillCapability.restriction,
+      () => gameplay,
+    );
     effects.onExpired = (handles, now) async {
       for (final handle in handles) {
         if (handle.origin.sessionId != _session) continue;
@@ -100,6 +122,110 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
     _order = runOrdered;
   }
 
+  @override
+  void bindExecution(
+    PlaybackCommands playback,
+    ProfileCatalog Function() catalog,
+  ) {
+    _catalog = catalog;
+    _playback = playback;
+    coordinator.adapters.putIfAbsent(
+      SkillCapability.playbackAction,
+      () => SkillPlayback(_executeGenerated),
+    );
+  }
+
+  List<SkillStrokeObservation> _observations(
+    Iterable<StrokeObservation> observations,
+  ) => observations
+      .map(
+        (o) => SkillStrokeObservation(
+          stroke: switch ((o.stroke.button, o.stroke.kind)) {
+            (InputButton.forward, StrokeKind.tap) => SkillStroke.forwardTap,
+            (InputButton.forward, StrokeKind.hold) => SkillStroke.forwardHold,
+            (InputButton.pause, StrokeKind.tap) => SkillStroke.pauseTap,
+            (InputButton.pause, StrokeKind.hold) => SkillStroke.pauseHold,
+            (InputButton.backward, StrokeKind.tap) => SkillStroke.backwardTap,
+            (InputButton.backward, StrokeKind.hold) => SkillStroke.backwardHold,
+          },
+          downAt: o.downAt,
+          upAt: o.upAt,
+          gapBefore: o.gapBefore ?? Duration.zero,
+        ),
+      )
+      .toList();
+
+  @override
+  Future<List<CapabilityResult>> observeInput(
+    PlayerActionRequest request,
+  ) async {
+    final now = await clock.now();
+    await effects.retireDue(now);
+    final catalog = _catalog?.call();
+    if (request.observations.isEmpty ||
+        catalog == null ||
+        (request.catalogRevision != null &&
+            request.catalogRevision != catalog.revision) ||
+        catalog.executableById(request.bindingId)?.comboKey !=
+            request.binding.comboKey) {
+      return const [];
+    }
+    final observations = _observations(request.observations);
+    final combo = SkillCombo(observations.map((o) => o.stroke));
+    final snapshot = gameplay.matching(request.profile.name, combo, now);
+    final results = <CapabilityResult>[];
+    final budget = _budgets.putIfAbsent(
+      request.requestId,
+      SkillExecutionBudget.new,
+    );
+    for (final listener in snapshot) {
+      final current = await clock.now();
+      if (!effects.isEffective(listener.handle.id, current)) continue;
+      final definition = definitionFor(listener.handle.origin.skillKey);
+      final owner = ProfileId.values.byName(listener.handle.origin.owner);
+      if (definition == null ||
+          !assignments.catalog.has(owner, definition.id)) {
+        continue;
+      }
+      if (listener.declaration.once) await effects.revoke(listener.handle.id);
+      final outcome = await coordinator.invokeWithinOrder(
+        definition: definition,
+        runtime: _runtimes[definition.id]!,
+        event: SkillComboObserved(
+          request.requestId,
+          listenerKey: listener.declaration.listenerKey,
+          target: _target(request),
+          observations: observations,
+        ),
+        origin: SkillOrigin(
+          owner: owner.name,
+          skillKey: definition.id.key,
+          invocationId: 'listen:${listener.handle.id}:${request.requestId}',
+          sessionId: _session,
+        ),
+        context: _context(
+          owner,
+          request.profile,
+          current,
+          effort: request.effort,
+        ),
+        budget: budget,
+      );
+      results.addAll(outcome.results);
+      if (outcome.error != null) {
+        results.add(
+          CapabilityResult(
+            effectId: 'listener:${listener.handle.id}:${request.requestId}',
+            status: CapabilityStatus.failed,
+            reason: outcome.error!,
+          ),
+        );
+      }
+      if (outcome.stateChanged) _changes.add(null);
+    }
+    return List.unmodifiable(results);
+  }
+
   Future<T> _runOrdered<T>(Future<T> Function() operation) {
     final order = _order;
     if (order != null) return order(operation);
@@ -123,7 +249,9 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
       _session = next;
       unawaited(
         _runOrdered(() async {
-          await effects.endSession(previous);
+          if (!await effects.endSession(previous)) {
+            _lifecycleFailed = true;
+          }
           for (final definition in definitions) {
             _runtimes[definition.id] = definition.createRuntime();
           }
@@ -207,21 +335,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         'A recorded runtime combo is required.',
       );
     }
-    final observations = request.observations.map(
-      (o) => SkillStrokeObservation(
-        stroke: switch ((o.stroke.button, o.stroke.kind)) {
-          (InputButton.forward, StrokeKind.tap) => SkillStroke.forwardTap,
-          (InputButton.forward, StrokeKind.hold) => SkillStroke.forwardHold,
-          (InputButton.pause, StrokeKind.tap) => SkillStroke.pauseTap,
-          (InputButton.pause, StrokeKind.hold) => SkillStroke.pauseHold,
-          (InputButton.backward, StrokeKind.tap) => SkillStroke.backwardTap,
-          (InputButton.backward, StrokeKind.hold) => SkillStroke.backwardHold,
-        },
-        downAt: o.downAt,
-        upAt: o.upAt,
-        gapBefore: o.gapBefore ?? Duration.zero,
-      ),
-    );
+    final observations = _observations(request.observations);
     final outcome = await coordinator.invokeWithinOrder(
       definition: definition,
       runtime: _runtimes[definition.id]!,
@@ -233,6 +347,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         sessionId: _session,
       ),
       context: context,
+      budget: _budgets.putIfAbsent(request.requestId, SkillExecutionBudget.new),
     );
     if (outcome.stateChanged) _changes.add(null);
     if (outcome.error != null) {
@@ -338,13 +453,34 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
     final effort = binding is SkillMacroBinding
         ? effortFor(binding)
         : request.effort;
-    SkillActionBlock? blocking;
-    for (final definition in _assigned(request.profile)) {
+    return _blockFor(
+      request.profile,
+      _target(request),
+      effort,
+      now,
+      request.requestId,
+    )?.reason;
+  }
+
+  SkillActionBlock? _blockFor(
+    ProfileId actor,
+    SkillTarget target,
+    Effort effort,
+    Duration now,
+    String requestId,
+  ) {
+    SkillActionBlock? blocking = gameplay.restrictionFor(
+      actor.name,
+      target,
+      effort,
+      now,
+    );
+    for (final definition in _assigned(actor)) {
       final runtime = _runtimes[definition.id]!;
       final denial = runtime.decide(
-        _target(request),
-        _context(request.profile, request.profile, now, effort: effort),
-        request.requestId,
+        target,
+        _context(actor, actor, now, effort: effort),
+        requestId,
       );
       if (denial != null &&
           !effort.overcomes(denial.effort) &&
@@ -352,7 +488,80 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         blocking = denial;
       }
     }
-    return blocking?.reason;
+    return blocking;
+  }
+
+  Future<CapabilityResult> _executeGenerated(
+    ExecutePlayerAction request,
+    SkillOrigin origin,
+    SkillExecutionBudget budget,
+  ) async {
+    CapabilityResult result(CapabilityStatus status, String reason) =>
+        CapabilityResult(
+          effectId: request.effectId,
+          status: status,
+          reason: reason,
+        );
+    final now = await clock.now();
+    await effects.retireDue(now);
+    final definition = definitionFor(origin.skillKey);
+    final owners = ProfileId.values.where((p) => p.name == origin.owner);
+    final actors = ProfileId.values.where((p) => p.name == request.player);
+    if (_lifecycleFailed ||
+        origin.sessionId != _session ||
+        definition == null ||
+        owners.isEmpty ||
+        actors.isEmpty ||
+        !assignments.catalog.has(owners.first, definition.id) ||
+        !assignments.profileExists(actors.first)) {
+      return result(
+        CapabilityStatus.denied,
+        'The skill source or player is no longer available.',
+      );
+    }
+    final actor = actors.first;
+    final id =
+        'generated:${origin.sessionId}:${origin.owner}:${origin.skillKey}:${request.effectId}';
+    final block = _blockFor(
+      actor,
+      PlaybackSkillTarget(request.action),
+      request.effort,
+      now,
+      id,
+    );
+    if (block != null) return result(CapabilityStatus.denied, block.reason);
+    final playback = _playback;
+    if (playback == null) {
+      return result(CapabilityStatus.unsupported, 'Playback is unavailable.');
+    }
+    final action = PlayerAction.values.byName(request.action.name);
+    final outcome = await playback.execute(action);
+    if (!outcome.succeeded) {
+      return result(switch (outcome.status) {
+        ActionStatus.denied => CapabilityStatus.denied,
+        ActionStatus.noOp => CapabilityStatus.noOp,
+        _ => CapabilityStatus.failed,
+      }, outcome.message);
+    }
+    var message = outcome.message;
+    if (origin.sessionId == _session) {
+      try {
+        await _recordAttributedSuccess(
+          actor,
+          request.action,
+          id,
+          request.effort,
+          budget,
+          allowPlayback: false,
+        );
+      } catch (_) {
+        // The native effect happened. Preserve that fact and fail closed next time.
+        _lifecycleFailed = true;
+        message =
+            '$message Skill update failed; restart before more combo actions.';
+      }
+    }
+    return result(CapabilityStatus.applied, message);
   }
 
   @override
@@ -365,29 +574,41 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         when session != _session) {
       return;
     }
-    final event = _event(request, await clock.now());
+    await _recordAttributedSuccess(
+      request.profile,
+      _event(request, Duration.zero).action,
+      request.requestId,
+      request.effort,
+      _budgets.putIfAbsent(request.requestId, SkillExecutionBudget.new),
+      allowPlayback: true,
+    );
+  }
+
+  Future<void> _recordAttributedSuccess(
+    ProfileId actor,
+    SkillAction action,
+    String requestId,
+    Effort effort,
+    SkillExecutionBudget budget, {
+    required bool allowPlayback,
+  }) async {
+    final now = await clock.now();
     var changed = false;
-    for (final definition in _assigned(request.profile)) {
+    for (final definition in _assigned(actor)) {
       if (!definition.triggers.contains(SkillTrigger.actionSucceeded)) continue;
       final outcome = await coordinator.invokeWithinOrder(
         definition: definition,
         runtime: _runtimes[definition.id]!,
-        event: SkillActionSucceeded(
-          request.requestId,
-          PlaybackSkillTarget(event.action),
-        ),
+        event: SkillActionSucceeded(requestId, PlaybackSkillTarget(action)),
         origin: SkillOrigin(
-          owner: request.profile.name,
+          owner: actor.name,
           skillKey: definition.id.key,
-          invocationId: 'success:${request.requestId}',
+          invocationId: 'success:$requestId',
           sessionId: _session,
         ),
-        context: _context(
-          request.profile,
-          request.profile,
-          event.elapsed,
-          effort: request.effort,
-        ),
+        context: _context(actor, actor, now, effort: effort),
+        budget: budget,
+        allowPlayback: allowPlayback,
       );
       if (outcome.stateChanged) changed = true;
       if (outcome.error != null) throw StateError(outcome.error!);

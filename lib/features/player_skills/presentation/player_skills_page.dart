@@ -142,6 +142,7 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
       // Presentation-only glyph mapping; skill modules never import Flutter.
       icon: switch (definition.id) {
         SkillId.skipRecovery => AppIcons.skipRecovery,
+        _ => AppIcons.playerSkills,
       },
       assigned: assigned,
       status: status,
