@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/skills/registry.dart';
-import 'package:troona/skills/skip_recovery/skip_recovery.dart';
+import '../../helpers/recovery_skill.dart';
 
 SkillEvent event(
   String request,

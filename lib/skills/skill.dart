@@ -11,7 +11,9 @@ export 'listener.dart';
 /// Stable persisted identities. Behavior and metadata belong to definitions.
 final class SkillId {
   static const skipRecovery = SkillId._('skip-recovery');
-  static const values = [skipRecovery];
+  static const songCommitment = SkillId._('song-commitment');
+  static const forceSkip = SkillId._('force-skip');
+  static const values = [songCommitment, forceSkip];
   final String key;
   const SkillId._(this.key);
   SkillId(String key) : key = requireIdentity(key);

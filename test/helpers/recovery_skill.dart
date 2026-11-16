@@ -1,4 +1,6 @@
-import '../skill.dart';
+import 'package:troona/skills/skill.dart';
+
+// Test-only legacy behavior exercises generic cooldown integration.
 
 const skipRecoveryDuration = Duration(seconds: 10);
 

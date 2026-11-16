@@ -1,10 +1,11 @@
 import 'skill.dart';
-import 'skip_recovery/skip_recovery.dart';
+import 'song_commitment/song_commitment.dart';
+import 'force_skip/force_skip.dart';
 
 export 'skill.dart';
 
 /// Explicit registration of reviewed, code-defined skills. No dynamic loading.
-const skillDefinitions = <SkillDefinition>[SkipRecovery()];
+const skillDefinitions = <SkillDefinition>[SongCommitment(), ForceSkip()];
 
 extension SkillMetadata on SkillId {
   SkillDefinition get definition =>

@@ -68,14 +68,20 @@ final class SkillAssignmentRepository {
     if (registered.map((d) => d.id).toSet().length != registered.length) {
       throw ArgumentError('Duplicate skill identity.');
     }
+    final catalog = decode(
+      await store.read(),
+      profileExists: profileExists,
+      definitions: registered,
+    );
+    if (catalog.recoveryMessages.contains(
+      'Skip Recovery retired. Choose a new skill.',
+    )) {
+      await store.write(encode(catalog));
+    }
     return SkillAssignmentRepository._(
       store,
       profileExists,
-      decode(
-        await store.read(),
-        profileExists: profileExists,
-        definitions: registered,
-      ),
+      catalog,
       registered,
     );
   }
@@ -141,6 +147,10 @@ final class SkillAssignmentRepository {
             continue;
           }
           values[id] = (entry.value as List).cast<String>().toSet();
+          if (!known.contains('skip-recovery') &&
+              values[id]!.remove('skip-recovery')) {
+            messages.add('Skip Recovery retired. Choose a new skill.');
+          }
         } catch (_) {
           messages.add('An invalid skill assignment was ignored.');
         }

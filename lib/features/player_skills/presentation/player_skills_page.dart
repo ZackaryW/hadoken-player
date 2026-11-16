@@ -26,6 +26,7 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     with WidgetsBindingObserver {
   ProfileId selected = ProfileId.p1;
   Map<SkillId, Duration>? remaining;
+  Map<SkillId, String?> statuses = {};
   SkillId? cooldownSkill;
   String? feedback;
   bool busy = false;
@@ -49,10 +50,12 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     final version = ++revision;
     final profile = selected;
     try {
+      final liveStatus = await controls.policy.statuses(profile);
       final times = await controls.policy.remainingBySkill(profile);
       if (!mounted || version != revision) return;
       setState(() {
         remaining = times;
+        statuses = liveStatus;
         final cooldown = cooldownSkill;
         if (cooldown != null) {
           final left = times[cooldown] ?? Duration.zero;
@@ -104,6 +107,8 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
       await controls.setAssigned(profile, skill, enabled);
     } on SkillAlreadyAssigned catch (error) {
       if (mounted) setState(() => feedback = error.toString());
+    } on SkillAssignmentLocked catch (error) {
+      if (mounted) setState(() => feedback = error.message);
     } on SkillCooldown catch (error) {
       if (mounted) {
         setState(() {
@@ -136,12 +141,13 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
         ? 'Checking…'
         : left > Duration.zero
         ? 'Ready in ${remainingSeconds(left)}s'
-        : 'Active';
+        : statuses[definition.id] ?? 'Active';
     return _SkillTile(
       definition: definition,
       // Presentation-only glyph mapping; skill modules never import Flutter.
       icon: switch (definition.id) {
-        SkillId.skipRecovery => AppIcons.skipRecovery,
+        SkillId.songCommitment => AppIcons.songCommitment,
+        SkillId.forceSkip => AppIcons.forceSkip,
         _ => AppIcons.playerSkills,
       },
       assigned: assigned,

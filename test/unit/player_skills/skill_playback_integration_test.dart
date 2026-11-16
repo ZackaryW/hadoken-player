@@ -1,3 +1,4 @@
+import '../../helpers/recovery_skill.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/features/input_bindings/domain/combo_input.dart';
 import 'package:troona/features/player_actions/data/playback_commands_adapter.dart';
@@ -36,10 +37,15 @@ void main() {
       final assignments = await SkillAssignmentRepository.open(
         MemorySkills(),
         profileExists: (_) => true,
+        definitions: const [SkipRecovery()],
       );
       await assignments.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
       final clock = FakeSkillClock();
-      final policy = SkillPolicy(assignments: assignments, clock: clock);
+      final policy = SkillPolicy(
+        assignments: assignments,
+        clock: clock,
+        definitions: const [SkipRecovery()],
+      );
       final audio = CommandAudio()
         ..queue = Queue.fromTracks([
           for (var i = 0; i < 4; i++) testTrack('$i', durationMs: 30000),

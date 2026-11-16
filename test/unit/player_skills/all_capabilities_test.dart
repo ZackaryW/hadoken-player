@@ -283,7 +283,7 @@ void main() {
           [back],
         );
         await reopened.dispose();
-        expect(skillDefinitions.map((d) => d.id), [SkillId.skipRecovery]);
+        expect(skillDefinitions.map((d) => d.id), [SkillId.songCommitment, SkillId.forceSkip]);
       } finally {
         await policy.dispose();
         await effective.dispose();

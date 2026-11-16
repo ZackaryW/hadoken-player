@@ -13,7 +13,8 @@ import 'package:lucide_icons_flutter/lucide_icons_300.dart';
 /// 400, closer to SF Symbols. Eva gives the filled glyphs Lucide lacks.
 abstract final class AppIcons {
   static const IconData playerSkills = LucideIcons300.sparkles;
-  static const IconData skipRecovery = LucideIcons300.timerReset;
+  static const IconData songCommitment = LucideIcons300.lock;
+  static const IconData forceSkip = LucideIcons300.skipForward;
   static const IconData skillDetails = LucideIcons300.info;
   static const IconData bindingTiming = LucideIcons300.info;
   static const IconData comboTiming = LucideIcons300.timer;

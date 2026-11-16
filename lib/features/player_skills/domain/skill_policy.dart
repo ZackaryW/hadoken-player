@@ -574,6 +574,14 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         effects: outcome.results,
       );
     }
+    if (outcome.results.isNotEmpty &&
+        outcome.results.every((r) => r.status == CapabilityStatus.noOp)) {
+      return CommandResult(
+        ActionStatus.noOp,
+        outcome.results.first.reason,
+        effects: outcome.results,
+      );
+    }
     return CommandResult(
       ActionStatus.success,
       '${definition.label} activated.',

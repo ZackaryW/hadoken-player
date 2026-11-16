@@ -1,3 +1,4 @@
+import '../../helpers/recovery_skill.dart';
 import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,7 +31,7 @@ void main() {
   late SkillCommands commands;
   late MemorySkills store;
 
-  Future<void> initialize() async {
+  Future<void> initialize({bool production = false}) async {
     GlassTheme.overrideQuality(GlassQuality.off);
     profiles = await ProfileRepository.open(MemoryProfiles());
     await profiles.addProfile();
@@ -41,10 +42,15 @@ void main() {
     assignments = await SkillAssignmentRepository.open(
       store,
       profileExists: (id) => profiles.catalog.names.containsKey(id),
+      definitions: production ? skillDefinitions : const [SkipRecovery()],
     );
     clock = FakeSkillClock();
     commands = SkillCommands();
-    policy = SkillPolicy(assignments: assignments, clock: clock);
+    policy = SkillPolicy(
+      assignments: assignments,
+      clock: clock,
+      definitions: production ? skillDefinitions : const [SkipRecovery()],
+    );
     dispatcher = PlayerActionDispatcher(
       playback: commands,
       catalog: () => profiles.catalog,
@@ -105,9 +111,13 @@ void main() {
     if (failure != null) throw failure!;
   }
 
-  void check(String title, Future<void> Function(WidgetTester) body) {
+  void check(
+    String title,
+    Future<void> Function(WidgetTester) body, {
+    bool production = false,
+  }) {
     testWidgets(title, (tester) async {
-      await drainServices(tester, initialize);
+      await drainServices(tester, () => initialize(production: production));
       try {
         await body(tester);
       } finally {
@@ -193,6 +203,38 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+  }
+
+  for (final scale in [1.0, 2.0]) {
+    check('production tiles, effort details and song lock at scale $scale', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      policy.playbackSnapshot = () async => const SkillPlaybackSnapshot(
+        playId: 'song',
+        listened: Duration(seconds: 20),
+      );
+      await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
+      expect(find.text('Skip Recovery'), findsNothing);
+      expect(find.text('Song Commitment'), findsOneWidget);
+      expect(find.text('Force Skip'), findsOneWidget);
+      await tap(tester, find.byKey(const ValueKey('assign-song-commitment')));
+      expect(find.text('Song locked'), findsOneWidget);
+      await tap(tester, find.byKey(const ValueKey('assign-song-commitment')));
+      expect(find.textContaining('finish this song'), findsOneWidget);
+      await tap(tester, find.byTooltip('About Song Commitment'));
+      expect(find.textContaining('next (90)'), findsOneWidget);
+      expect(find.textContaining('previous (90)'), findsOneWidget);
+      expect(find.textContaining('seek forward (90)'), findsOneWidget);
+      expect(find.textContaining('seek back (90)'), findsOneWidget);
+      await tap(tester, find.text('Done'));
+      await tap(tester, find.byTooltip('About Force Skip'));
+      expect(find.textContaining('Activate (100)'), findsOneWidget);
+      expect(find.textContaining('next song (100)'), findsOneWidget);
+      expect(find.text('Configure macro'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, production: true);
   }
 
   check('passive-only skill details have no macro editor', (tester) async {
@@ -306,7 +348,7 @@ void main() {
     await tap(tester, tile);
     expect(assignments.catalog.ownerOf(SkillId.skipRecovery), ProfileId.p1);
     await tap(tester, find.byTooltip('About Skip Recovery'));
-    expect(find.text(SkillId.skipRecovery.description), findsOneWidget);
+    expect(find.text(const SkipRecovery().description), findsOneWidget);
     await tap(tester, find.text('Done'));
     await tap(tester, find.text('P1'));
     await tap(tester, tile);
@@ -344,7 +386,7 @@ void main() {
       expect(find.text('P3'), findsNothing);
       expect(find.text('Set'), findsNothing);
       expect(find.byType(TextField), findsNothing);
-      expect(find.text(SkillId.skipRecovery.description), findsNothing);
+      expect(find.text(const SkipRecovery().description), findsNothing);
       await tap(tester, find.text('P2'));
       await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
       expect(
@@ -352,10 +394,13 @@ void main() {
         isTrue,
       );
       expect(find.text('Active'), findsOneWidget);
-      final reloaded = SkillAssignmentRepository.decode(store.document);
+      final reloaded = SkillAssignmentRepository.decode(
+        store.document,
+        definitions: const [SkipRecovery()],
+      );
       expect(reloaded.has(ProfileId.p2, SkillId.skipRecovery), isTrue);
       await tap(tester, find.byTooltip('About Skip Recovery'));
-      expect(find.text(SkillId.skipRecovery.description), findsOneWidget);
+      expect(find.text(const SkipRecovery().description), findsOneWidget);
       await tap(tester, find.text('Done'));
     },
   );
@@ -426,11 +471,16 @@ void main() {
     assignments = await SkillAssignmentRepository.open(
       store,
       profileExists: (_) => true,
+      definitions: const [SkipRecovery()],
     );
     // Replace policy as a new process would, with the loaded assignments.
     await drainServices(tester, policy.dispose);
     await drainServices(tester, dispatcher.dispose);
-    policy = SkillPolicy(assignments: assignments, clock: clock);
+    policy = SkillPolicy(
+      assignments: assignments,
+      clock: clock,
+      definitions: const [SkipRecovery()],
+    );
     dispatcher = PlayerActionDispatcher(
       playback: commands,
       catalog: () => profiles.catalog,

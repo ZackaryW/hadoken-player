@@ -23,7 +23,7 @@ void main() {
   );
 
   test('effort belongs to each action, activation and block declaration', () {
-    expect(skillDefinitions.single.activationEffort, Effort.normal);
+    expect(skillDefinitions.first.activationEffort, Effort.normal);
     final context = SkillContext(
       sessionId: 's',
       owner: 'p1',

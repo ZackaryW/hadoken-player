@@ -37,12 +37,13 @@ void main() {
     await profiles.addProfile();
     await profiles.setBinding(ProfileId.p1, PlayerAction.nextTrack, [tap]);
     await profiles.setSkillMacro(ProfileId.p2, 'skip-recovery', [tap, hold]);
+    skill = ManualTestSkill();
     assignments = await SkillAssignmentRepository.open(
       MemorySkills(),
       profileExists: profiles.catalog.names.containsKey,
+      definitions: [skill],
     );
     await assignments.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
-    skill = ManualTestSkill();
     policy = SkillPolicy(
       assignments: assignments,
       clock: FakeSkillClock(),

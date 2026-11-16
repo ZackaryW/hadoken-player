@@ -1,3 +1,4 @@
+import '../../helpers/recovery_skill.dart';
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
@@ -45,11 +46,16 @@ void main() {
     assignments = await SkillAssignmentRepository.open(
       store,
       profileExists: profiles.catalog.names.containsKey,
+      definitions: const [SkipRecovery()],
     );
     await assignments.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
     clock = FakeSkillClock();
     commands = SkillCommands();
-    policy = SkillPolicy(assignments: assignments, clock: clock);
+    policy = SkillPolicy(
+      assignments: assignments,
+      clock: clock,
+      definitions: const [SkipRecovery()],
+    );
     dispatcher = PlayerActionDispatcher(
       playback: commands,
       catalog: () => profiles.catalog,
@@ -352,7 +358,11 @@ void main() {
       expect(await policy.remaining(ProfileId.p2), Duration.zero);
       expect(commands.calls.length, 1); // Expiration never replays.
       await dispatcher.dispatch(request(ProfileId.p2));
-      final fresh = SkillPolicy(assignments: assignments, clock: clock);
+      final fresh = SkillPolicy(
+        assignments: assignments,
+        clock: clock,
+        definitions: const [SkipRecovery()],
+      );
       expect(await fresh.remaining(ProfileId.p2), Duration.zero);
       expect(
         assignments.catalog.has(ProfileId.p2, SkillId.skipRecovery),
