@@ -175,20 +175,31 @@ void main() {
     },
   );
   test(
-    'independent deadlines and another player assignment remain editable',
+    'exclusive ownership cannot be transferred until owner recovery ends',
     () async {
       await dispatcher.dispatch(request(ProfileId.p2));
       clock.elapsed = const Duration(seconds: 3);
-      await controls.setAssigned(ProfileId.p1, SkillId.skipRecovery, true);
+      await expectLater(
+        controls.setAssigned(ProfileId.p1, SkillId.skipRecovery, true),
+        throwsA(isA<SkillAlreadyAssigned>()),
+      );
+      await expectLater(
+        controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, false),
+        throwsA(isA<SkillCooldown>()),
+      );
       await dispatcher.dispatch(request(ProfileId.p1));
       expect(await policy.remaining(ProfileId.p2), const Duration(seconds: 7));
-      expect(await policy.remaining(ProfileId.p1), const Duration(seconds: 10));
+      expect(await policy.remaining(ProfileId.p1), Duration.zero);
       clock.elapsed = const Duration(seconds: 10);
       await controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, false);
-      expect(await policy.remaining(ProfileId.p1), const Duration(seconds: 3));
+      await controls.setAssigned(ProfileId.p1, SkillId.skipRecovery, true);
+      await dispatcher.dispatch(request(ProfileId.p1));
+      expect(await policy.remaining(ProfileId.p1), const Duration(seconds: 10));
+      expect(assignments.catalog.ownerOf(SkillId.skipRecovery), ProfileId.p1);
     },
   );
   test('failed assignment does not poison ordered action processing', () async {
+    await controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, false);
     store.fail = true;
     await expectLater(
       controls.setAssigned(ProfileId.p1, SkillId.skipRecovery, true),

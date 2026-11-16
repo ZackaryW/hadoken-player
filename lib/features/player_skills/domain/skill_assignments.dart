@@ -8,6 +8,14 @@ abstract interface class SkillAssignmentStore {
   Future<void> write(String document);
 }
 
+final class SkillAlreadyAssigned implements Exception {
+  final SkillId skill;
+  final ProfileId owner;
+  const SkillAlreadyAssigned(this.skill, this.owner);
+  @override
+  String toString() => '${skill.label} belongs to ${owner.label}.';
+}
+
 final class SkillAssignments {
   final Map<ProfileId, Set<String>> values;
   final List<String> recoveryMessages;
@@ -22,6 +30,13 @@ final class SkillAssignments {
        recoveryMessages = List.unmodifiable(messages);
   bool has(ProfileId profile, SkillId skill) =>
       values[profile]?.contains(skill.key) ?? false;
+  ProfileId? ownerOf(SkillId skill) {
+    for (final profile in ProfileId.values) {
+      if (has(profile, skill)) return profile;
+    }
+    return null;
+  }
+
   Iterable<String> unavailable(ProfileId profile) =>
       (values[profile] ?? <String>{}).where(
         (key) => !SkillId.values.any((id) => id.key == key),
@@ -41,7 +56,7 @@ final class SkillAssignmentRepository {
   }) async => SkillAssignmentRepository._(
     store,
     profileExists,
-    decode(await store.read()),
+    decode(await store.read(), profileExists: profileExists),
   );
   SkillAssignments get catalog => _catalog;
   Stream<SkillAssignments> get changes => _changes.stream;
@@ -51,6 +66,10 @@ final class SkillAssignmentRepository {
     final result = _tail.then((_) async {
       if (!profileExists(profile)) {
         throw const FormatException('Add this profile first.');
+      }
+      final owner = _catalog.ownerOf(skill);
+      if (assigned && owner != null && owner != profile) {
+        throw SkillAlreadyAssigned(skill, owner);
       }
       final values = {..._catalog.values};
       final selected = {...?values[profile]};
@@ -72,7 +91,10 @@ final class SkillAssignmentRepository {
         entry.key.name: entry.value.toList(),
     },
   });
-  static SkillAssignments decode(String? document) {
+  static SkillAssignments decode(
+    String? document, {
+    bool Function(ProfileId)? profileExists,
+  }) {
     if (document == null) return SkillAssignments({});
     try {
       final raw = jsonDecode(document) as Map;
@@ -82,9 +104,27 @@ final class SkillAssignmentRepository {
       for (final entry in (raw['profiles'] as Map).entries) {
         try {
           final id = ProfileId.values.byName(entry.key as String);
+          if (profileExists != null && !profileExists(id)) {
+            messages.add('Skills for an unadded profile were ignored.');
+            continue;
+          }
           values[id] = (entry.value as List).cast<String>().toSet();
         } catch (_) {
           messages.add('An invalid skill assignment was ignored.');
+        }
+      }
+      for (final skill in SkillId.values) {
+        ProfileId? owner;
+        for (final profile in ProfileId.values) {
+          if (!(values[profile]?.contains(skill.key) ?? false)) continue;
+          if (owner == null) {
+            owner = profile;
+          } else {
+            values[profile]!.remove(skill.key);
+            messages.add(
+              '${skill.label} kept on ${owner.label}; duplicate on ${profile.label} removed.',
+            );
+          }
         }
       }
       return SkillAssignments(values, messages);
