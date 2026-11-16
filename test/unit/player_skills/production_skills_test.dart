@@ -268,7 +268,7 @@ void main() {
         '{"version":1,"profiles":{"p1":["skip-recovery","future"]}}',
       );
       expect(decoded.values[ProfileId.p1], {'future'});
-      expect(decoded.recoveryMessages.single, contains('retired'));
+      expect(decoded.recoveryMessages, isEmpty);
       final store = MemorySkills()
         ..document =
             '{"version":1,"profiles":{"p1":["skip-recovery","future"]}}';
@@ -277,6 +277,7 @@ void main() {
         profileExists: (_) => true,
       );
       expect(store.document, isNot(contains('skip-recovery')));
+      expect(migrated.catalog.recoveryMessages, isEmpty);
       expect(migrated.catalog.unavailable(ProfileId.p1), ['future']);
       await migrated.dispose();
       expect(skillDefinitions.map((s) => s.id), [

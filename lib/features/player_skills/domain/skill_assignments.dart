@@ -20,10 +20,12 @@ final class SkillAssignments {
   final Map<ProfileId, Set<String>> values;
   final List<String> recoveryMessages;
   final Set<String> knownKeys;
+  final bool _needsMigration;
   SkillAssignments(
     Map<ProfileId, Set<String>> values, [
     Iterable<String> messages = const [],
     Iterable<String>? knownKeys,
+    this._needsMigration = false,
   ]) : values = Map.unmodifiable(
          values.map(
            (id, skills) => MapEntry(id, Set<String>.unmodifiable(skills)),
@@ -73,9 +75,7 @@ final class SkillAssignmentRepository {
       profileExists: profileExists,
       definitions: registered,
     );
-    if (catalog.recoveryMessages.contains(
-      'Skip Recovery retired. Choose a new skill.',
-    )) {
+    if (catalog._needsMigration) {
       await store.write(encode(catalog));
     }
     return SkillAssignmentRepository._(
@@ -139,6 +139,7 @@ final class SkillAssignmentRepository {
       if (raw['version'] != 1) throw const FormatException('Unknown version');
       final values = <ProfileId, Set<String>>{};
       final messages = <String>[];
+      var needsMigration = false;
       for (final entry in (raw['profiles'] as Map).entries) {
         try {
           final id = ProfileId.values.byName(entry.key as String);
@@ -149,7 +150,7 @@ final class SkillAssignmentRepository {
           values[id] = (entry.value as List).cast<String>().toSet();
           if (!known.contains('skip-recovery') &&
               values[id]!.remove('skip-recovery')) {
-            messages.add('Skip Recovery retired. Choose a new skill.');
+            needsMigration = true;
           }
         } catch (_) {
           messages.add('An invalid skill assignment was ignored.');
@@ -170,7 +171,7 @@ final class SkillAssignmentRepository {
           }
         }
       }
-      return SkillAssignments(values, messages, known);
+      return SkillAssignments(values, messages, known, needsMigration);
     } catch (_) {
       return SkillAssignments({}, ['Saved skills could not be read.'], known);
     }

@@ -26,7 +26,7 @@ Each added profile SHALL store a set of selected known skill identities, initial
 
 #### Scenario: Retire the demonstration assignment
 - **WHEN** saved data contains skip-recovery and unrelated unknown identities
-- **THEN** the retired assignment is removed with feedback, unknown identities and all profile bindings are preserved, and neither new skill is silently equipped
+- **THEN** the retired assignment is removed silently without a migration notice, unknown identities and all profile bindings are preserved, and neither new skill is silently equipped
 
 ### Requirement: Atomic skill evaluation
 Skill eligibility, playback execution and successful-action state updates SHALL participate in the same ordered action-processing flow. A following request SHALL observe the previous request's completed skill effects.
