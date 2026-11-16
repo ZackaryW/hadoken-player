@@ -253,6 +253,7 @@ Future<void> configureDependencies() async {
     effectiveBindings,
     dispose: (value) => value.dispose(),
   );
+  skillPolicy.bindEffectiveBindings(effectiveBindings);
   final actions = PlayerActionDispatcher(
     playback: PlaybackCommandsAdapter(audioPort),
     abilities: skillPolicy,

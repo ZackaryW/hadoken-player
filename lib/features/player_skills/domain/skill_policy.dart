@@ -7,6 +7,8 @@ import 'effect_ledger.dart';
 import 'skill_coordinator.dart';
 import 'gameplay_effects.dart';
 import 'skill_playback.dart';
+import 'combo_overrides.dart';
+import '../../profiles/domain/effective_bindings.dart';
 import '../../input_bindings/domain/combo_input.dart';
 
 abstract interface class SkillClock {
@@ -120,6 +122,14 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   @override
   void bindOrder(SkillOrder runOrdered) {
     _order = runOrdered;
+  }
+
+  void bindEffectiveBindings(EffectiveBindings bindings) {
+    bindings.elapsedNow = clock.now;
+    coordinator.adapters[SkillCapability.comboOverride] = ComboOverrides(
+      bindings,
+      (key) => definitionFor(key)?.label ?? key,
+    );
   }
 
   @override
@@ -278,6 +288,17 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         .where(assignments.profileExists)
         .map((p) => p.name),
     support: coordinator.adapters.keys,
+    bindingRevision: _catalog?.call().revision ?? 0,
+    bindings: [
+      for (final binding
+          in _catalog?.call().executableBindings ?? <ExecutableBinding>[])
+        SkillBindingView(binding.profile.name, switch (binding) {
+          ActionBinding(:final action) => PlaybackSkillTarget(
+            SkillAction.values.byName(action.name),
+          ),
+          SkillMacroBinding(:final skillKey) => ActivationSkillTarget(skillKey),
+        }, SkillCombo(binding.strokes.map(skillStroke))),
+    ],
   );
 
   Stream<void> get changes => _changes.stream;

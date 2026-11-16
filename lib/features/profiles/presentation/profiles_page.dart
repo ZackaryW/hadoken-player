@@ -12,6 +12,7 @@ import '../../input_bindings/presentation/combo_widgets.dart';
 import '../../player_actions/profile_controls.dart';
 import '../domain/profile_catalog.dart';
 import '../domain/profile_repository.dart';
+import '../domain/effective_bindings.dart';
 import 'binding_recorder.dart';
 
 class ProfilesPage extends StatefulWidget {
@@ -73,8 +74,8 @@ class _ProfilesPageState extends State<ProfilesPage> {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<ProfileCatalog>(
-    stream: repository.changes,
-    initialData: repository.catalog,
+    stream: widget.controls.changes,
+    initialData: widget.controls.catalog,
     builder: (context, snapshot) {
       final catalog = snapshot.data!;
       return Scaffold(
@@ -160,6 +161,8 @@ class _ProfilesPageState extends State<ProfilesPage> {
 
   Widget _bindingCard(ProfileCatalog catalog, PlayerAction action) {
     final binding = catalog.bindingFor(selected, action);
+    final saved = repository.catalog.bindingFor(selected, action);
+    final temporary = widget.controls.effective?.temporaryFor(selected, action);
     final sharedPrefix =
         binding != null &&
         widget.controls.catalog.sharedPrefixes(binding).isNotEmpty;
@@ -191,7 +194,7 @@ class _ProfilesPageState extends State<ProfilesPage> {
                 key: ValueKey('set-${action.name}'),
                 onPressed: () => record(action),
               ),
-              if (binding != null)
+              if (saved != null)
                 AppButton.text(
                   'Clear',
                   size: AppButtonSize.small,
@@ -228,7 +231,52 @@ class _ProfilesPageState extends State<ProfilesPage> {
                 ],
               ),
             ),
+          if (temporary != null)
+            AppButton.text(
+              'Temporary',
+              key: ValueKey('temporary-${action.name}'),
+              size: AppButtonSize.small,
+              onPressed: () => _showTemporary(temporary),
+            ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showTemporary(TemporaryBinding temporary) async {
+    final remaining = await widget.controls.effective!.remaining(temporary);
+    if (!mounted) return;
+    final saved = repository.catalog.bindingFor(
+      temporary.binding.profile,
+      temporary.binding.action,
+    );
+    await showGlassBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (_) => SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Temporary combo',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${temporary.handle.origin.owner.toUpperCase()} · ${temporary.source}',
+            ),
+            Text('${(remaining.inMilliseconds / 1000).ceil()}s remaining'),
+            const SizedBox(height: 16),
+            const Text('Saved combo'),
+            const SizedBox(height: 8),
+            if (saved != null)
+              ComboStrip(saved.strokes)
+            else
+              const Text('Not set'),
+          ],
+        ),
       ),
     );
   }

@@ -21,6 +21,9 @@ final class ProfileRepository {
   ProfileCatalog _catalog;
   final _changes = StreamController<ProfileCatalog>.broadcast(sync: true);
   Future<void> _tail = Future.value();
+  final Set<void Function(ProfileCatalog)> validators = {};
+  ProfileCatalog? _pending;
+  ProfileCatalog? get pendingCatalog => _pending;
 
   ProfileRepository._(this._store, this._catalog);
 
@@ -61,7 +64,15 @@ final class ProfileRepository {
         throw StateError('No valid pre-migration backup.');
       }
       final restored = decode(backup).withRevision(_catalog.revision + 1);
-      await _store.write(backup!);
+      for (final validate in validators) {
+        validate(restored);
+      }
+      _pending = restored;
+      try {
+        await _store.write(backup!);
+      } finally {
+        _pending = null;
+      }
       _catalog = restored;
       _changes.add(restored);
     });
@@ -143,7 +154,15 @@ final class ProfileRepository {
   Future<void> _update(ProfileCatalog Function(ProfileCatalog) change) {
     final result = _tail.then((_) async {
       final next = change(_catalog).withRevision(_catalog.revision + 1);
-      await _store.write(encode(next));
+      for (final validate in validators) {
+        validate(next);
+      }
+      _pending = next;
+      try {
+        await _store.write(encode(next));
+      } finally {
+        _pending = null;
+      }
       _catalog = next;
       _changes.add(next);
     });

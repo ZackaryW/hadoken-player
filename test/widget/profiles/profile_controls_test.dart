@@ -15,6 +15,9 @@ import 'package:troona/features/profiles/presentation/combo_timing_page.dart';
 import 'package:troona/l10n/app_localizations.dart';
 import 'package:troona/shared/widgets/app_button.dart';
 import '../../helpers/roboto.dart';
+import 'package:troona/features/profiles/domain/effective_bindings.dart';
+import 'package:troona/features/player_skills/domain/effect_ledger.dart';
+import 'package:troona/skills/skill.dart';
 
 class WidgetClock implements InputClock {
   final DateTime Function() now;
@@ -433,6 +436,85 @@ void main() {
   }
 
   for (final scale in [1.3, 2.0]) {
+    controlsTest(
+      'temporary combo details and timed restoration fit text scale $scale',
+      (tester) async {
+        await initialize(tester);
+        await tester.binding.setSurfaceSize(const Size(360, 640));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+        await repository.setBinding(ProfileId.p1, PlayerAction.nextTrack, [
+          const Stroke(InputButton.forward, StrokeKind.tap),
+        ]);
+        final effective = EffectiveBindings(
+          profiles: repository,
+          macroEnabled: (_) => false,
+        )..elapsedNow = (() async => controls.clock.elapsed);
+        controls = ProfileControls(
+          profiles: repository,
+          dispatcher: controls.dispatcher,
+          clock: controls.clock,
+          effective: effective,
+        );
+        final ledger = EffectLedger(
+          now: () async => controls.clock.elapsed,
+          runOrdered: controls.dispatcher.runOrdered,
+        );
+        final handle = EffectHandle(
+          id: 'temporary',
+          origin: SkillOrigin(
+            owner: 'p2',
+            skillKey: 'twist',
+            invocationId: 'one',
+            sessionId: 'test',
+          ),
+          deadline: const Duration(seconds: 5),
+        );
+        effective.applyOverrides(
+          [
+            ActionBinding(ProfileId.p1, PlayerAction.nextTrack, [
+              const Stroke(InputButton.backward, StrokeKind.hold),
+            ]),
+          ],
+          handle,
+          'Twist',
+        );
+        ledger.register(
+          handle,
+          () async => effective.removeOverrides(handle.id),
+          Duration.zero,
+        );
+        try {
+          await host(tester, ProfilesPage(controls: controls), scale: scale);
+          await tester.pumpAndSettle();
+          expect(find.bySemanticsLabel('Backward hold'), findsOneWidget);
+          expect(find.textContaining('remaining'), findsNothing);
+          await tapVisible(tester, find.text('Temporary'));
+          expect(find.text('P2 · Twist'), findsOneWidget);
+          expect(find.text('Saved combo'), findsOneWidget);
+          expect(find.bySemanticsLabel('Forward tap'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+          Navigator.of(tester.element(find.text('Temporary combo'))).pop();
+          await tester.pumpAndSettle();
+          await tester.pump(const Duration(seconds: 5));
+          await tester.pumpAndSettle();
+          expect(find.text('Temporary'), findsNothing);
+          expect(find.bySemanticsLabel('Forward tap'), findsOneWidget);
+          expect(find.bySemanticsLabel('Backward hold'), findsNothing);
+          expect(tester.takeException(), isNull);
+        } finally {
+          await ledger.dispose();
+          await tester.pumpWidget(const SizedBox.shrink());
+          var disposed = false;
+          final disposal = effective.dispose().then((_) => disposed = true);
+          for (var i = 0; i < 100 && !disposed; i++) {
+            await tester.pump();
+            await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+          }
+          expect(disposed, isTrue);
+          await disposal;
+        }
+      },
+    );
     controlsTest(
       'profiles, recorder and pad fit 360x640 at text scale $scale',
       (tester) async {
