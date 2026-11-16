@@ -49,8 +49,9 @@ final class SkillAssignmentRepository {
   /// UI mutations must enter the dispatcher queue through SkillControls.
   Future<void> setAssigned(ProfileId profile, SkillId skill, bool assigned) {
     final result = _tail.then((_) async {
-      if (!profileExists(profile))
+      if (!profileExists(profile)) {
         throw const FormatException('Add this profile first.');
+      }
       final values = {..._catalog.values};
       final selected = {...?values[profile]};
       assigned ? selected.add(skill.key) : selected.remove(skill.key);

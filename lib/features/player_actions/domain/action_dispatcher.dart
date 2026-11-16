@@ -80,7 +80,7 @@ final class PlayerActionDispatcher {
     final valid =
         saved?.id == request.bindingId &&
         saved?.comboKey == request.binding.comboKey;
-    final result = _tail.then((_) async {
+    final result = runOrdered(() async {
       CommandResult result;
       try {
         if (!valid) {
@@ -126,6 +126,13 @@ final class PlayerActionDispatcher {
     });
     _requests[request.requestId] =
         result; // Includes denied/no-op/failure results.
+    return result;
+  }
+
+  /// Skill assignment mutations use the same queue as check/playback/success.
+  /// Operations must not recursively enqueue and await another operation.
+  Future<T> runOrdered<T>(Future<T> Function() operation) {
+    final result = _tail.then((_) => operation());
     _tail = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
     return result;
   }

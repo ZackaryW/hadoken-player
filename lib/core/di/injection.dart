@@ -1,3 +1,8 @@
+import 'package:troona/features/player_skills/data/android_skill_clock.dart';
+import 'package:troona/features/player_skills/data/preferences_skill_store.dart';
+import 'package:troona/features/player_skills/domain/skill_assignments.dart';
+import 'package:troona/features/player_skills/domain/skill_policy.dart';
+import 'package:troona/features/player_skills/skill_controls.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
@@ -229,9 +234,26 @@ Future<void> configureDependencies() async {
   );
   getIt.registerSingleton<AudioServicePort>(audioPort);
   final profiles = await ProfileRepository.open(PreferencesProfileStore());
+  final skillAssignments = await SkillAssignmentRepository.open(
+    PreferencesSkillStore(),
+    profileExists: (id) => profiles.catalog.names.containsKey(id),
+  );
+  final skillPolicy = SkillPolicy(
+    assignments: skillAssignments,
+    clock: const AndroidSkillClock(),
+  );
   final actions = PlayerActionDispatcher(
     playback: PlaybackCommandsAdapter(audioPort),
+    abilities: skillPolicy,
     catalog: () => profiles.catalog,
+  );
+  getIt.registerSingleton<SkillControls>(
+    SkillControls(
+      profiles: profiles,
+      assignments: skillAssignments,
+      policy: skillPolicy,
+      dispatcher: actions,
+    ),
   );
   getIt.registerSingleton<ProfileRepository>(profiles);
   getIt.registerSingleton<PlayerActionDispatcher>(actions);
