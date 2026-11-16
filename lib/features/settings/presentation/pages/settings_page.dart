@@ -105,6 +105,12 @@ class _SettingsList extends StatelessWidget {
               onTap: () => context.pushNamed(AppRoute.profiles),
             ),
             SettingsTile.navigation(
+              icon: AppIcons.playerSkills,
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Player skills',
+              onTap: () => context.pushNamed(AppRoute.playerSkills),
+            ),
+            SettingsTile.navigation(
               icon: AppIcons.comboTiming,
               iconColor: const Color(0xFF8B5CF6),
               title: 'Combo timing',

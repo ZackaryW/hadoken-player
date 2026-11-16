@@ -42,7 +42,7 @@ final class SkillPolicy implements PlayerAbilityPolicy {
     }
     final left = await remaining(request.profile);
     return left > Duration.zero
-        ? SkillCooldown(request.profile, left).toString()
+        ? 'Skip Recovery · ${remainingSeconds(left)}s remaining'
         : null;
   }
 

@@ -75,7 +75,7 @@ void main() {
     clock.elapsed = const Duration(seconds: 5);
     final denied = await dispatcher.dispatch(request(ProfileId.p2));
     expect(denied.result.status, ActionStatus.denied);
-    expect(denied.result.message, contains('P2 · Skip Recovery · 5s'));
+    expect(denied.result.message, contains('Skip Recovery · 5s'));
     expect(
       (await dispatcher.dispatch(request(ProfileId.p1))).result.succeeded,
       isTrue,

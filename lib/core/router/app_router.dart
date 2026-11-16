@@ -1,3 +1,5 @@
+import 'package:troona/features/player_skills/skill_controls.dart';
+import 'package:troona/features/player_skills/presentation/player_skills_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +53,7 @@ abstract class AppRoute {
   static const comboPad = 'combo-pad';
   static const playerProfiles = 'player-profiles';
   static const comboTiming = 'combo-timing';
+  static const playerSkills = 'player-skills';
   static const weeklyRecap = 'recap';
 
   static const albumDetail = 'album_detail';
@@ -176,6 +179,13 @@ final appRouter = GoRouter(
                       name: AppRoute.comboPad,
                       builder: (_, _) => _overTab(
                         ComboPadPage(controls: getIt<ProfileControls>()),
+                      ),
+                    ),
+                    GoRoute(
+                      path: AppRoute.playerSkills,
+                      name: AppRoute.playerSkills,
+                      builder: (_, _) => _overTab(
+                        PlayerSkillsPage(controls: getIt<SkillControls>()),
                       ),
                     ),
                     GoRoute(
