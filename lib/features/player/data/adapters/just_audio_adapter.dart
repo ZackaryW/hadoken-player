@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' show Random;
 
 import 'package:dartz/dartz.dart';
 import 'package:just_audio/just_audio.dart';
@@ -12,6 +13,11 @@ import 'package:troona/features/player/domain/entities/queue.dart';
 import 'package:troona/features/player/domain/entities/repeat_mode.dart';
 import 'package:troona/features/player/domain/ports/audio_service_port.dart';
 import 'package:troona/features/player/domain/ports/playback_session_lifecycle.dart';
+import 'package:troona/features/player/domain/entities/loop_queue.dart';
+import 'package:troona/features/player/domain/ports/loop_queue_port.dart';
+import 'package:troona/skills/skill.dart';
+
+part 'loop_audio_adapter.dart';
 
 /// [AudioServicePort] implementation backed by the `just_audio` package.
 ///
@@ -91,17 +97,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   void _initStreams() {
     // Mirror the player's current index into the domain queue so that
     // auto-advance (gapless playback) keeps _currentQueue in sync.
-    _player.currentIndexStream.listen((index) {
-      // While sources load, just_audio first re-emits the *previous* index
-      // against the new sequence: mapped onto the new queue it would name a
-      // track that is not playing. The loaded queue already has its index.
-      if (_loadsInFlight > 0) return;
-      final queue = _currentQueue;
-      // Out of range: a late index of the playlist being replaced.
-      if (queue == null || index == null) return;
-      if (index >= queue.playbackTracks.length) return;
-      _updateQueue(queue.copyWith(currentIndex: index));
-    });
+    _player.currentIndexStream.listen(_onNativeIndex);
 
     // At the end of the queue just_audio completes but keeps `playing` true
     // until told to pause: the status would stay "playing", and a seek back
@@ -112,6 +108,18 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
 
     _volume = _player.volume;
     _volumeSubject.add(_volume);
+  }
+
+  void _onNativeIndex(int? index) {
+    // While sources load, just_audio first re-emits the *previous* index
+    // against the new sequence: mapped onto the new queue it would name a
+    // track that is not playing. The loaded queue already has its index.
+    if (_loadsInFlight > 0) return;
+    final queue = _currentQueue;
+    // Out of range: a late index of the playlist being replaced.
+    if (queue == null || index == null) return;
+    if (index >= queue.playbackTracks.length) return;
+    _updateQueue(queue.copyWith(currentIndex: index));
   }
 
   void _onQueueCompleted() {

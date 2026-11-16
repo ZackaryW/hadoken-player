@@ -27,7 +27,13 @@ final class LoopEditResult {
   final CapabilityStatus status;
   final String reason;
   final int revision;
-  const LoopEditResult(this.status, this.reason, this.revision);
+  final Duration? deadline;
+  const LoopEditResult(
+    this.status,
+    this.reason,
+    this.revision, {
+    this.deadline,
+  });
 }
 
 final class _LoopPlan {
@@ -88,6 +94,9 @@ final class LoopQueue {
   LoopSnapshot get current =>
       LoopSnapshot(sessionId, ordinal, revision, _current);
   int get planCount => _plans.length;
+  Duration? get nextDeadline => _plans.isEmpty
+      ? null
+      : _plans.map((p) => p.deadline).reduce((a, b) => a < b ? a : b);
   bool containsPlan(String id) => _plans.any((p) => p.id == id);
 
   static void _validateOccurrences(List<LoopOccurrence> items) {
@@ -229,11 +238,13 @@ final class LoopQueue {
     }
     _usedIds.addAll(inserted);
     revision++;
-    return result(
+    return LoopEditResult(
       CapabilityStatus.applied,
       skipped.isEmpty
           ? 'Queue edit applied.'
           : 'Queue edit applied; ${skipped.length} missing occurrences skipped.',
+      revision,
+      deadline: selector is CurrentLoop ? null : elapsed + request.lifetime!,
     );
   }
 

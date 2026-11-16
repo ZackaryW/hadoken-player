@@ -378,13 +378,22 @@ final class CapabilityResult {
   final String reason;
   final int? appliedRevision;
   final EffectHandle? handle;
+  final List<SongReference> songs;
   CapabilityResult({
     required String effectId,
     required this.status,
     this.reason = '',
     this.appliedRevision,
     this.handle,
-  }) : effectId = requireIdentity(effectId) {
+    Iterable<SongReference> songs = const [],
+  }) : effectId = requireIdentity(effectId),
+       songs = List.unmodifiable(songs) {
+    if (this.songs.length > 200 ||
+        (status != CapabilityStatus.applied && this.songs.isNotEmpty)) {
+      throw ArgumentError(
+        'Only applied catalog queries return up to 200 songs.',
+      );
+    }
     if (appliedRevision != null && appliedRevision! < 0) {
       throw ArgumentError('Invalid revision.');
     }
@@ -393,4 +402,16 @@ final class CapabilityResult {
       throw ArgumentError('Only an applied effect has a handle or revision.');
     }
   }
+}
+
+final class FindSongs extends CapabilityRequest {
+  final String query;
+  final int limit;
+  FindSongs(super.effectId, {this.query = '', this.limit = 50}) {
+    if (query.length > 200 || limit < 1 || limit > 200) {
+      throw ArgumentError('Invalid song query bounds.');
+    }
+  }
+  @override
+  SkillCapability get capability => SkillCapability.queueEdit;
 }

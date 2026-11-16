@@ -4,6 +4,9 @@ import 'package:troona/features/player_skills/domain/skill_assignments.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/player_skills/skill_controls.dart';
 import 'package:troona/features/player/domain/ports/playback_session_lifecycle.dart';
+import 'package:troona/features/player/domain/ports/loop_queue_port.dart';
+import 'package:troona/features/player/data/adapters/just_audio_adapter.dart';
+import 'package:troona/features/player/data/adapters/android_media_access.dart';
 import 'package:troona/features/profiles/domain/effective_bindings.dart';
 import 'dart:async';
 import 'dart:io';
@@ -254,6 +257,22 @@ Future<void> configureDependencies() async {
     dispose: (value) => value.dispose(),
   );
   skillPolicy.bindEffectiveBindings(effectiveBindings);
+  if (audioPort is LoopQueuePort) {
+    skillPolicy.bindQueue(audioPort as LoopQueuePort);
+  }
+  if (audioPort is LoopAudioAdapter) {
+    audioPort.canReadSong = const AndroidMediaAccess().canRead;
+    audioPort.elapsedNow = const AndroidSkillClock().now;
+    audioPort.resolveSong = (id) async =>
+        (await getIt<LibraryRepository>().getTracksByIds([
+          id,
+        ])).fold((failure) => throw failure, (tracks) => tracks.firstOrNull);
+    audioPort.searchSongs = (query, limit) async =>
+        (await getIt<LibraryRepository>().searchTracks(query)).fold(
+          (failure) => throw failure,
+          (tracks) => tracks.take(limit).toList(),
+        );
+  }
   final actions = PlayerActionDispatcher(
     playback: PlaybackCommandsAdapter(audioPort),
     abilities: skillPolicy,

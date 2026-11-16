@@ -1,0 +1,103 @@
+import 'dart:async';
+import 'package:just_audio/just_audio.dart';
+import 'package:troona/features/library/domain/entities/track.dart';
+
+final class LoopPlayer implements AudioPlayer {
+  final indices = StreamController<int?>.broadcast(sync: true);
+  final processing = StreamController<ProcessingState>.broadcast(sync: true);
+  List<Track> tracks = [];
+  final loads = <List<String>>[];
+  Completer<void>? loadGate;
+  bool failNextLoad = false;
+  bool disposed = false;
+  int stops = 0;
+  int? index = 0;
+  LoopMode mode = LoopMode.off;
+  @override
+  double volume = 1;
+  @override
+  double speed = 1;
+  @override
+  bool playing = false;
+  @override
+  Duration position = Duration.zero;
+  @override
+  Duration? get duration => const Duration(minutes: 1);
+  @override
+  PlayerState get playerState => PlayerState(playing, ProcessingState.ready);
+  @override
+  Stream<int?> get currentIndexStream => indices.stream;
+  @override
+  Stream<ProcessingState> get processingStateStream => processing.stream;
+  @override
+  int? get currentIndex => index;
+  void advance(int value) {
+    index = value;
+    position = Duration.zero;
+    indices.add(value);
+  }
+
+  void complete() => processing.add(ProcessingState.completed);
+  @override
+  Future<Duration?> setAudioSources(
+    List<AudioSource> sources, {
+    bool preload = true,
+    int? initialIndex,
+    Duration? initialPosition,
+    ShuffleOrder? shuffleOrder,
+  }) async {
+    final gate = loadGate;
+    loadGate = null;
+    if (gate != null) await gate.future;
+    if (failNextLoad) {
+      failNextLoad = false;
+      throw StateError('load failed');
+    }
+    tracks = sources
+        .map((s) => (s as IndexedAudioSource).tag as Track)
+        .toList();
+    loads.add(tracks.map((t) => t.id).toList());
+    position = initialPosition ?? Duration.zero;
+    advance(initialIndex ?? 0);
+    position = initialPosition ?? Duration.zero;
+    return duration;
+  }
+
+  @override
+  Future<void> removeAudioSourceRange(int start, int end) async =>
+      tracks.removeRange(start, end);
+  @override
+  Future<void> addAudioSources(List<AudioSource> sources) async =>
+      tracks.addAll(sources.map((s) => (s as IndexedAudioSource).tag as Track));
+  @override
+  Future<void> setLoopMode(LoopMode mode) async => this.mode = mode;
+  @override
+  Future<void> setVolume(double volume) async => this.volume = volume;
+  @override
+  Future<void> setSpeed(double speed) async => this.speed = speed;
+  @override
+  Future<void> play() async => playing = true;
+  @override
+  Future<void> pause() async => playing = false;
+  @override
+  Future<void> stop() async {
+    playing = false;
+    stops++;
+  }
+
+  @override
+  Future<void> seek(Duration? position, {int? index}) async {
+    if (index != null) advance(index);
+    this.position = position ?? Duration.zero;
+  }
+
+  @override
+  Future<void> dispose() async {
+    disposed = true;
+    await indices.close();
+    await processing.close();
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}

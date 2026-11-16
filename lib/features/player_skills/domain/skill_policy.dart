@@ -9,6 +9,8 @@ import 'gameplay_effects.dart';
 import 'skill_playback.dart';
 import 'combo_overrides.dart';
 import '../../profiles/domain/effective_bindings.dart';
+import '../../player/domain/ports/loop_queue_port.dart';
+import 'loop_queue_effects.dart';
 import '../../input_bindings/domain/combo_input.dart';
 
 abstract interface class SkillClock {
@@ -43,6 +45,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   late final GameplayEffects gameplay;
   ProfileCatalog Function()? _catalog;
   PlaybackCommands? _playback;
+  LoopQueuePort? _queue;
   final _budgets = <String, SkillExecutionBudget>{};
   SkillOrder? _order;
   Future<void> _localTail = Future.value();
@@ -129,6 +132,14 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
     coordinator.adapters[SkillCapability.comboOverride] = ComboOverrides(
       bindings,
       (key) => definitionFor(key)?.label ?? key,
+    );
+  }
+
+  void bindQueue(LoopQueuePort queue) {
+    _queue = queue;
+    coordinator.adapters[SkillCapability.queueEdit] = LoopQueueEffects(
+      queue,
+      clock.now,
     );
   }
 
@@ -288,6 +299,13 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         .where(assignments.profileExists)
         .map((p) => p.name),
     support: coordinator.adapters.keys,
+    loop: _queue?.currentLoop?.ordinal ?? 0,
+    queueRevision: _queue?.currentLoop?.revision ?? 0,
+    queue: [
+      for (final item in _queue?.currentLoop?.occurrences ?? [])
+        SkillQueueOccurrence(item.id, item.song),
+    ],
+    songs: _queue?.currentLoop?.occurrences.map((o) => o.song).toSet() ?? {},
     bindingRevision: _catalog?.call().revision ?? 0,
     bindings: [
       for (final binding
