@@ -19,6 +19,7 @@ final class SkillControls {
 
   Future<void> setAssigned(ProfileId profile, SkillId skill, bool enabled) =>
       dispatcher.runOrdered(() async {
+        await policy.effects.retireDue(await policy.clock.now());
         final recovery = await policy.recoveryFor(profile);
         if (recovery != null) {
           throw SkillCooldown(

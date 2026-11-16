@@ -1,7 +1,7 @@
 import 'package:troona/skills/skill.dart';
 
 /// Replaces a registered definition to prove consumers use its contract.
-final class ProbeSkill implements SkillDefinition {
+final class ProbeSkill extends SkillDefinition {
   final runtime = ProbeSkillRuntime();
   @override
   SkillId get id => SkillId.skipRecovery;
@@ -15,7 +15,7 @@ final class ProbeSkill implements SkillDefinition {
   SkillRuntime createRuntime() => runtime;
 }
 
-final class ProbeSkillRuntime implements SkillRuntime {
+final class ProbeSkillRuntime extends SkillRuntime {
   final checks = <SkillEvent>[];
   final successes = <SkillEvent>[];
   String? denial;

@@ -3,6 +3,7 @@ import 'package:troona/features/player_skills/data/preferences_skill_store.dart'
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/player_skills/skill_controls.dart';
+import 'package:troona/features/player/domain/ports/playback_session_lifecycle.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' show PlatformDispatcher;
@@ -247,6 +248,13 @@ Future<void> configureDependencies() async {
     abilities: skillPolicy,
     catalog: () => profiles.catalog,
   );
+  if (audioPort is PlaybackSessionLifecycle) {
+    final lifecycle = audioPort as PlaybackSessionLifecycle;
+    skillPolicy.observeSessions(
+      lifecycle.sessionGenerations,
+      lifecycle.sessionGeneration,
+    );
+  }
   getIt.registerSingleton<SkillControls>(
     SkillControls(
       profiles: profiles,

@@ -132,6 +132,11 @@ final class _FakeAudioPlayer implements AudioPlayer {
   @override
   Future<void> setSpeed(double speed) async {}
   @override
+  Future<void> stop() async {
+    playing = false;
+  }
+
+  @override
   Future<void> dispose() async {}
 
   @override
@@ -215,6 +220,34 @@ void main() {
 
     expect(playing, ['d']);
   });
+
+  test(
+    'only replacements and stop advance the skill session generation',
+    () async {
+      await setUpAdapter(queue: [a, b]);
+      final initial = adapter.sessionGeneration;
+      final observed = <int>[];
+      final subscription = adapter.sessionGenerations.listen(observed.add);
+      await adapter.setShuffleEnabled(true);
+      await adapter.setRepeatMode(RepeatMode.all);
+      expect(adapter.sessionGeneration, initial);
+      await adapter.playTrack(c);
+      expect(adapter.sessionGeneration, initial + 1);
+      await adapter.restoreQueue(
+        Queue.fromTracks([a, b]),
+        position: Duration.zero,
+        play: false,
+        volume: 1,
+        speed: 1,
+      );
+      expect(adapter.sessionGeneration, initial + 2);
+      await adapter.stop();
+      expect(adapter.sessionGeneration, initial + 3);
+      await pumpEventQueue();
+      expect(observed, [initial, initial + 1, initial + 2, initial + 3]);
+      await subscription.cancel();
+    },
+  );
 
   test('shuffling keeps the current track, even for a moment', () async {
     await setUpAdapter(queue: tracks, start: 2);

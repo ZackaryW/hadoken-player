@@ -43,6 +43,11 @@ abstract interface class PlayerAbilityPolicy {
   Future<void> recordSuccess(PlayerActionRequest request, CommandResult result);
 }
 
+abstract interface class OrderedPlayerAbilityPolicy
+    implements PlayerAbilityPolicy {
+  void bindOrder(Future<T> Function<T>(Future<T> Function()) runOrdered);
+}
+
 final class AllowAllAbilities implements PlayerAbilityPolicy {
   const AllowAllAbilities();
   @override
@@ -67,7 +72,10 @@ final class PlayerActionDispatcher {
     required this.playback,
     required this.catalog,
     this.abilities = const AllowAllAbilities(),
-  });
+  }) {
+    final policy = abilities;
+    if (policy is OrderedPlayerAbilityPolicy) policy.bindOrder(runOrdered);
+  }
 
   Stream<PlayerActionOutcome> get outcomes => _outcomes.stream;
 

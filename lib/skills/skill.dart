@@ -1,3 +1,9 @@
+import 'capabilities/capability.dart';
+import 'skill_context.dart';
+
+export 'capabilities/capability.dart';
+export 'skill_context.dart';
+
 /// Stable persisted identities. Behavior and metadata belong to definitions.
 enum SkillId {
   skipRecovery('skip-recovery');
@@ -29,20 +35,55 @@ final class SkillEvent {
   });
 }
 
-abstract interface class SkillDefinition {
+abstract class SkillDefinition {
+  const SkillDefinition();
   SkillId get id;
   String get label;
   String get summary;
   String get description;
   SkillRuntime createRuntime();
+  Set<SkillTrigger> get triggers => const {SkillTrigger.actionSucceeded};
+  Set<SkillCapability> get requiredCapabilities => const {};
+  SkillFailureCleanup get failureCleanup => SkillFailureCleanup.retainApplied;
 }
 
-abstract interface class SkillRuntime {
+abstract class SkillRuntime {
   String? denialFor(SkillEvent event);
 
   /// Called only after a successful action. Returns whether state changed.
   bool recordSuccess(SkillEvent event);
   Duration remaining(String playerId, Duration elapsed);
+
+  String? decide(SkillTarget target, SkillContext context, String requestId) =>
+      target is PlaybackSkillTarget
+      ? denialFor(
+          SkillEvent(
+            requestId: requestId,
+            playerId: context.actor ?? context.owner,
+            action: target.action,
+            elapsed: context.elapsed,
+          ),
+        )
+      : null;
+
+  SkillReaction onEvent(SkillRuntimeEvent event, SkillContext context) {
+    if (event is SkillActionSucceeded) {
+      return SkillReaction(
+        stateChanged: recordSuccess(
+          SkillEvent(
+            requestId: event.id,
+            playerId: context.actor ?? context.owner,
+            action: event.target.action,
+            elapsed: context.elapsed,
+          ),
+        ),
+      );
+    }
+    return SkillReaction.none;
+  }
+
+  /// Results are notifications, never another reaction-producing input.
+  void onCapabilityResult(CapabilityResult result, SkillContext context) {}
 }
 
 int remainingSeconds(Duration value) =>

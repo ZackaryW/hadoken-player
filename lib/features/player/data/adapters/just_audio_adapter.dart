@@ -11,6 +11,7 @@ import 'package:troona/features/player/domain/entities/playback_state.dart';
 import 'package:troona/features/player/domain/entities/queue.dart';
 import 'package:troona/features/player/domain/entities/repeat_mode.dart';
 import 'package:troona/features/player/domain/ports/audio_service_port.dart';
+import 'package:troona/features/player/domain/ports/playback_session_lifecycle.dart';
 
 /// [AudioServicePort] implementation backed by the `just_audio` package.
 ///
@@ -37,8 +38,14 @@ import 'package:troona/features/player/domain/ports/audio_service_port.dart';
 /// track change by the user fades out briefly, then in. Auto-advance stays
 /// gapless. The fade is a gain applied on top of the user's volume, so it
 /// never shows on the volume stream or in the saved session.
-class JustAudioAdapter implements AudioServicePort {
+class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   final AudioPlayer _player;
+  final _sessionGenerations = BehaviorSubject<int>.seeded(0);
+  @override
+  int get sessionGeneration => _sessionGenerations.value;
+  @override
+  Stream<int> get sessionGenerations => _sessionGenerations.stream;
+  void _replaceSession() => _sessionGenerations.add(sessionGeneration + 1);
 
   /// Fade at play, resume and pause, and fade-in after a track change.
   static const fadeDuration = AudioServicePort.pauseFade;
@@ -197,6 +204,7 @@ class JustAudioAdapter implements AudioServicePort {
         );
       }
       // Single-track playback: a one-item queue.
+      _replaceSession();
       return await _loadQueue(
         Queue.single(track),
         () => _player.setAudioSources([_toAudioSource(track)]),
@@ -318,6 +326,7 @@ class JustAudioAdapter implements AudioServicePort {
       );
 
       // Load sources in playback order (already shuffled if needed).
+      _replaceSession();
       return await _loadQueue(
         newQueue,
         () => _player.setAudioSources(
@@ -348,6 +357,7 @@ class JustAudioAdapter implements AudioServicePort {
 
       final nextVolume = volume.clamp(0.0, 1.0);
       final nextSpeed = speed.clamp(0.5, 2.0);
+      _replaceSession();
 
       final loaded = await _loadQueue(
         queue,
@@ -630,6 +640,7 @@ class JustAudioAdapter implements AudioServicePort {
 
   @override
   Future<void> stop() {
+    _replaceSession();
     _playIntent.add(false);
     _fade.stop();
     return _player.stop();
@@ -637,6 +648,8 @@ class JustAudioAdapter implements AudioServicePort {
 
   @override
   Future<void> dispose() async {
+    _replaceSession();
+    await _sessionGenerations.close();
     _fade.stop();
     await _playIntent.close();
     await _queueSubject.close();

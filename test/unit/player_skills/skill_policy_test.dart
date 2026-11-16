@@ -9,6 +9,7 @@ import 'package:troona/features/profiles/domain/profile_catalog.dart';
 import 'package:troona/features/profiles/domain/profile_repository.dart';
 import '../../helpers/skill_fakes.dart';
 import '../../helpers/probe_skill.dart';
+import 'package:troona/skills/skill.dart';
 
 void main() {
   late ProfileRepository profiles;
@@ -68,6 +69,70 @@ void main() {
     await profiles.dispose();
   });
 
+  test('live effects lock assignment; expired cleanup permits edits', () async {
+    var cleaned = 0;
+    final handle = EffectHandle(
+      id: 'effect',
+      deadline: const Duration(seconds: 5),
+      origin: SkillOrigin(
+        owner: 'p2',
+        skillKey: 'skip-recovery',
+        invocationId: 'call',
+        sessionId: 'playback-0',
+      ),
+    );
+    policy.effects.register(handle, () async {
+      cleaned++;
+    }, Duration.zero);
+    await expectLater(
+      controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, false),
+      throwsA(isA<SkillCooldown>()),
+    );
+    clock.elapsed = const Duration(seconds: 5);
+    await controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, false);
+    expect(cleaned, 1);
+    expect(
+      assignments.catalog.has(ProfileId.p2, SkillId.skipRecovery),
+      isFalse,
+    );
+  });
+
+  test(
+    'session replacement revokes effects and old success cannot affect new session',
+    () async {
+      final generations = StreamController<int>.broadcast(sync: true);
+      policy.observeSessions(generations.stream, 0);
+      var cleaned = 0;
+      policy.effects.register(
+        EffectHandle(
+          id: 'effect',
+          deadline: const Duration(seconds: 5),
+          origin: SkillOrigin(
+            owner: 'p2',
+            skillKey: 'skip-recovery',
+            invocationId: 'call',
+            sessionId: 'playback-0',
+          ),
+        ),
+        () async {
+          cleaned++;
+        },
+        Duration.zero,
+      );
+      commands.gate = Completer<void>();
+      final pending = dispatcher.dispatch(request(ProfileId.p2));
+      await Future<void>.delayed(Duration.zero);
+      generations.add(1);
+      commands.gate!.complete();
+      final result = await pending;
+      await dispatcher.runOrdered(() async {});
+      expect(result.result.succeeded, isTrue);
+      expect(cleaned, 1);
+      expect(await policy.remaining(ProfileId.p2), Duration.zero);
+      await generations.close();
+    },
+  );
+
   test('owner cooldown, other players/actions and exact deadline', () async {
     expect(
       (await dispatcher.dispatch(request(ProfileId.p2))).result.status,
@@ -113,11 +178,9 @@ void main() {
       for (final action in PlayerAction.values) {
         final event = PlayerActionRequest(
           requestId: action.name,
-          binding: ActionBinding(
-            ProfileId.p2,
-            action,
-            const [Stroke(InputButton.forward, StrokeKind.tap)],
-          ),
+          binding: ActionBinding(ProfileId.p2, action, const [
+            Stroke(InputButton.forward, StrokeKind.tap),
+          ]),
           recognizedAt: Duration.zero,
         );
         await adapter.denialFor(event);

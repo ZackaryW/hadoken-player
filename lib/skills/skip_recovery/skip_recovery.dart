@@ -2,7 +2,7 @@ import '../skill.dart';
 
 const skipRecoveryDuration = Duration(seconds: 10);
 
-final class SkipRecovery implements SkillDefinition {
+final class SkipRecovery extends SkillDefinition {
   const SkipRecovery();
   @override
   SkillId get id => SkillId.skipRecovery;
@@ -17,7 +17,7 @@ final class SkipRecovery implements SkillDefinition {
   SkillRuntime createRuntime() => _SkipRecoveryRuntime(this);
 }
 
-final class _SkipRecoveryRuntime implements SkillRuntime {
+final class _SkipRecoveryRuntime extends SkillRuntime {
   final SkipRecovery definition;
   final _deadlines = <String, Duration>{};
   final _recorded = <String>{};
