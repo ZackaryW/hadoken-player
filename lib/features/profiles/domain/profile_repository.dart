@@ -2,12 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'profile_catalog.dart';
+import 'package:troona/skills/registry.dart';
 
 abstract interface class ProfileDocumentStore {
   Future<String?> read();
 
   /// Must throw on a failed write. A successful write replaces one document.
   Future<void> write(String document);
+}
+
+abstract interface class ProfileMigrationStore {
+  Future<String?> readMigrationBackup();
+  Future<void> writeMigrationBackup(String document);
 }
 
 final class ProfileRepository {
@@ -18,8 +24,50 @@ final class ProfileRepository {
 
   ProfileRepository._(this._store, this._catalog);
 
-  static Future<ProfileRepository> open(ProfileDocumentStore store) async =>
-      ProfileRepository._(store, decode(await store.read()));
+  static Future<ProfileRepository> open(ProfileDocumentStore store) async {
+    final raw = await store.read();
+    final catalog = decode(raw);
+    if (_legacyVersion(raw)) {
+      if (store is! ProfileMigrationStore) {
+        throw StateError('Profile migration requires backup storage.');
+      }
+      final backups = store as ProfileMigrationStore;
+      if (await backups.readMigrationBackup() == null) {
+        await backups.writeMigrationBackup(raw!);
+      }
+      await store.write(encode(catalog));
+    }
+    return ProfileRepository._(store, catalog);
+  }
+
+  static bool _legacyVersion(String? raw) {
+    try {
+      final version = (jsonDecode(raw!) as Map)['version'];
+      return version == 1 || version == 2;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> restorePreMigrationBackup() {
+    final result = _tail.then((_) async {
+      final store = _store;
+      if (store is! ProfileMigrationStore) {
+        throw StateError('Backup storage is unavailable.');
+      }
+      final backup = await (store as ProfileMigrationStore)
+          .readMigrationBackup();
+      if (!_legacyVersion(backup)) {
+        throw StateError('No valid pre-migration backup.');
+      }
+      final restored = decode(backup);
+      await _store.write(backup!);
+      _catalog = restored;
+      _changes.add(restored);
+    });
+    _tail = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return result;
+  }
 
   ProfileCatalog get catalog => _catalog;
   Stream<ProfileCatalog> get changes => _changes.stream;
@@ -37,6 +85,7 @@ final class ProfileRepository {
       return ProfileCatalog(
         names: {...current.names, added: added.label},
         bindings: current.bindings,
+        macros: current.macros,
         timing: current.timing,
       );
     });
@@ -50,6 +99,7 @@ final class ProfileRepository {
     return ProfileCatalog(
       names: {...current.names, profile: name.trim()},
       bindings: current.bindings,
+      macros: current.macros,
       timing: current.timing,
     );
   });
@@ -76,6 +126,7 @@ final class ProfileRepository {
           ?binding,
         ],
         timing: current.timing,
+        macros: current.macros,
       );
     });
   }
@@ -84,6 +135,7 @@ final class ProfileRepository {
     (current) => ProfileCatalog(
       names: current.names,
       bindings: current.bindings,
+      macros: current.macros,
       timing: timing,
     ),
   );
@@ -101,13 +153,39 @@ final class ProfileRepository {
     return result;
   }
 
+  Future<void> setSkillMacro(
+    ProfileId profile,
+    String skillKey,
+    List<Stroke>? strokes,
+  ) {
+    final macro = strokes == null
+        ? null
+        : SkillMacroBinding(profile, skillKey, strokes);
+    return _update((current) {
+      if (!current.names.containsKey(profile)) {
+        throw const FormatException('Add this profile first.');
+      }
+      return ProfileCatalog(
+        names: current.names,
+        bindings: current.bindings,
+        timing: current.timing,
+        macros: [
+          ...current.macros.where(
+            (m) => m.profile != profile || m.skillKey != skillKey,
+          ),
+          ?macro,
+        ],
+      );
+    });
+  }
+
   Future<void> dispose() async {
     await _tail;
     await _changes.close();
   }
 
   static String encode(ProfileCatalog catalog) => jsonEncode({
-    'version': 2,
+    'version': 3,
     'timing': {'holdMs': catalog.timing.holdMs, 'gapMs': catalog.timing.gapMs},
     'profiles': [
       for (final id in ProfileId.values.where(catalog.names.containsKey))
@@ -122,6 +200,10 @@ final class ProfileRepository {
                   .map((s) => s.toJson())
                   .toList(),
           },
+          'skillMacros': {
+            for (final macro in catalog.macros.where((m) => m.profile == id))
+              macro.skillKey: macro.strokes.map((s) => s.toJson()).toList(),
+          },
         },
     ],
   });
@@ -132,11 +214,12 @@ final class ProfileRepository {
     final messages = <String>[];
     final names = {...empty.names};
     final bindings = <ActionBinding>[];
+    final macros = <SkillMacroBinding>[];
     var timing = empty.timing;
     try {
       final json = jsonDecode(document) as Map;
       final legacy = json['version'] == 1;
-      if (!legacy && json['version'] != 2) {
+      if (!legacy && json['version'] != 2 && json['version'] != 3) {
         throw const FormatException('Unsupported profile version.');
       }
       try {
@@ -191,22 +274,55 @@ final class ProfileRepository {
               );
             }
           }
+          if (json['version'] == 3 && profile['skillMacros'] != null) {
+            try {
+              for (final entry in (profile['skillMacros'] as Map).entries) {
+                try {
+                  final macro = SkillMacroBinding(
+                    id,
+                    entry.key as String,
+                    (entry.value as List).map(Stroke.fromJson),
+                  );
+                  macros.add(macro);
+                  if (!skillDefinitions.any(
+                    (d) => d.id.key == macro.skillKey,
+                  )) {
+                    messages.add(
+                      '${id.label}: unknown skill ${macro.skillKey} remains saved and inactive.',
+                    );
+                  }
+                } catch (_) {
+                  messages.add(
+                    '${id.label}: invalid saved skill macro is inactive.',
+                  );
+                }
+              }
+            } catch (_) {
+              messages.add(
+                '${id.label}: invalid saved skill macros are inactive.',
+              );
+            }
+          }
         } catch (_) {
           messages.add('An invalid profile entry was ignored.');
         }
       }
       bindings.removeWhere((b) => duplicateProfiles.contains(b.profile));
+      macros.removeWhere((b) => duplicateProfiles.contains(b.profile));
       final counts = <String, int>{};
-      for (final binding in bindings) {
+      for (final binding in <ExecutableBinding>[...bindings, ...macros]) {
         counts.update(binding.comboKey, (n) => n + 1, ifAbsent: () => 1);
       }
-      bindings.removeWhere((b) {
+      bool conflicts(ExecutableBinding b) {
         if (counts[b.comboKey]! <= 1) return false;
         messages.add(
-          '${b.profile.label}: ${b.action.label} conflicts with another saved combo and is inactive.',
+          '${b.profile.label}: ${b.label} conflicts with another saved combo and is inactive.',
         );
         return true;
-      });
+      }
+
+      bindings.removeWhere(conflicts);
+      macros.removeWhere(conflicts);
     } catch (_) {
       return ProfileCatalog(
         names: empty.names,
@@ -220,6 +336,7 @@ final class ProfileRepository {
     return ProfileCatalog(
       names: names,
       bindings: bindings,
+      macros: macros,
       timing: timing,
       recoveryMessages: messages,
     );

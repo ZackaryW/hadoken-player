@@ -4,13 +4,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/features/profiles/domain/profile_catalog.dart';
 import 'package:troona/features/profiles/domain/profile_repository.dart';
 
-class MemoryProfileStore implements ProfileDocumentStore {
+class MemoryProfileStore
+    implements ProfileDocumentStore, ProfileMigrationStore {
   String? document;
+  String? backup;
+  bool failBackup = false;
   bool fail = false;
   Completer<void>? gate;
   int writes = 0;
   @override
   Future<String?> read() async => document;
+  @override
+  Future<String?> readMigrationBackup() async => backup;
+  @override
+  Future<void> writeMigrationBackup(String value) async {
+    if (failBackup) throw StateError('Backup unavailable');
+    backup = value;
+  }
+
   @override
   Future<void> write(String value) async {
     writes++;
@@ -32,6 +43,140 @@ void main() {
     repository = await ProfileRepository.open(store);
   });
   tearDown(() => repository.dispose());
+
+  test(
+    'manual macros share complete-combo reservations and survive ordinary edits',
+    () async {
+      await repository.setSkillMacro(ProfileId.p1, 'manual-test', [
+        forward,
+        backHold,
+      ]);
+      await repository.addProfile();
+      await repository.rename(ProfileId.p1, 'Ryu');
+      await repository.setTiming(RecognitionTiming(holdMs: 700, gapMs: 450));
+      await repository.setBinding(ProfileId.p2, PlayerAction.nextTrack, [
+        forward,
+      ]);
+      await expectLater(
+        repository.setBinding(ProfileId.p2, PlayerAction.stop, [
+          forward,
+          backHold,
+        ]),
+        throwsA(isA<BindingConflict>()),
+      );
+      await expectLater(
+        repository.setSkillMacro(ProfileId.p2, 'another', [forward, backHold]),
+        throwsA(isA<BindingConflict>()),
+      );
+      final reopened = await ProfileRepository.open(store);
+      addTearDown(reopened.dispose);
+      expect(reopened.catalog.macros.single.strokes, [forward, backHold]);
+      expect(reopened.catalog.macros.single.skillKey, 'manual-test');
+      expect(reopened.catalog.names[ProfileId.p1], 'Ryu');
+      expect(reopened.catalog.timing.holdMs, 700);
+      expect(
+        reopened.catalog.recoveryMessages.join(),
+        contains('unknown skill'),
+      );
+      await reopened.setSkillMacro(ProfileId.p1, 'manual-test', null);
+      await reopened.setBinding(ProfileId.p2, PlayerAction.stop, [
+        forward,
+        backHold,
+      ]);
+      expect(reopened.catalog.macros, isEmpty);
+    },
+  );
+
+  test(
+    'legacy migration backs up before writing v3 and supports exact rollback',
+    () async {
+      for (final version in [1, 2]) {
+        final legacy =
+            jsonDecode(
+                  ProfileRepository.encode(
+                    ProfileCatalog(
+                      names: {ProfileId.p1: 'Ryu', ProfileId.p2: 'Ken'},
+                      bindings: [
+                        ActionBinding(ProfileId.p2, PlayerAction.nextTrack, [
+                          forward,
+                        ]),
+                      ],
+                      timing: RecognitionTiming(holdMs: 750, gapMs: 420),
+                    ),
+                  ),
+                )
+                as Map;
+        legacy['version'] = version;
+        final original = jsonEncode(legacy);
+        final legacyStore = MemoryProfileStore()..document = original;
+        final migrated = await ProfileRepository.open(legacyStore);
+        expect(legacyStore.backup, original);
+        expect(jsonDecode(legacyStore.document!)['version'], 3);
+        expect(migrated.catalog.names[ProfileId.p2], 'Ken');
+        expect(migrated.catalog.bindings.single.profile, ProfileId.p2);
+        expect(migrated.catalog.timing.gapMs, 420);
+        expect(migrated.catalog.macros, isEmpty);
+        await migrated.setSkillMacro(ProfileId.p1, 'manual', [backHold]);
+        await migrated.restorePreMigrationBackup();
+        expect(legacyStore.document, original);
+        expect(migrated.catalog.macros, isEmpty);
+        expect(legacyStore.backup, original);
+        await migrated.dispose();
+      }
+    },
+  );
+
+  test(
+    'backup or migration write failure cannot destroy the original',
+    () async {
+      final raw =
+          jsonDecode(ProfileRepository.encode(ProfileCatalog.empty())) as Map;
+      raw['version'] = 2;
+      final original = jsonEncode(raw);
+      final legacyStore = MemoryProfileStore()
+        ..document = original
+        ..failBackup = true;
+      await expectLater(ProfileRepository.open(legacyStore), throwsStateError);
+      expect(legacyStore.document, original);
+      expect(legacyStore.backup, isNull);
+      legacyStore.failBackup = false;
+      legacyStore.fail = true;
+      await expectLater(ProfileRepository.open(legacyStore), throwsStateError);
+      expect(legacyStore.document, original);
+      expect(legacyStore.backup, original);
+      legacyStore.fail = false;
+      final migrated = await ProfileRepository.open(legacyStore);
+      await migrated.dispose();
+      expect(legacyStore.backup, original);
+    },
+  );
+
+  test(
+    'corrupt and duplicate macros are inactive; unknown valid macros survive',
+    () {
+      final raw =
+          jsonDecode(ProfileRepository.encode(ProfileCatalog.empty())) as Map;
+      raw['profiles'][0]['bindings'] = {
+        'nextTrack': [forward.toJson()],
+      };
+      raw['profiles'][0]['skillMacros'] = {
+        'skip-recovery': [forward.toJson()],
+        'unknown': [backHold.toJson()],
+        'corrupt': [],
+        '': [pause.toJson()],
+      };
+      final recovered = ProfileRepository.decode(jsonEncode(raw));
+      expect(recovered.bindings, isEmpty);
+      expect(recovered.macros.single.skillKey, 'unknown');
+      expect(recovered.recoveryMessages.join(), contains('inactive'));
+      expect(
+        ProfileRepository.decode(
+          ProfileRepository.encode(recovered),
+        ).macros.single.skillKey,
+        'unknown',
+      );
+    },
+  );
 
   test('starts with P1, three buttons, two durations and six actions', () {
     expect(repository.catalog.names, {ProfileId.p1: 'P1'});
@@ -57,7 +202,7 @@ void main() {
       expect(binding.profile, ProfileId.p2);
       expect(binding.action, PlayerAction.nextTrack);
       expect(binding.strokes, [forward, backHold]);
-      expect(jsonDecode(store.document!)['version'], 2);
+      expect(jsonDecode(store.document!)['version'], 3);
     },
   );
 

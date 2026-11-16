@@ -72,43 +72,74 @@ final class RecognitionTiming {
   }
 }
 
-final class ActionBinding {
+sealed class ExecutableBinding {
   final ProfileId profile;
-  final PlayerAction action;
   final List<Stroke> strokes;
-
-  ActionBinding(this.profile, this.action, Iterable<Stroke> strokes)
+  ExecutableBinding(this.profile, Iterable<Stroke> strokes)
     : strokes = List.unmodifiable(strokes) {
     if (this.strokes.isEmpty || this.strokes.length > 5) {
       throw const FormatException('A combination needs one to five strokes.');
     }
   }
 
-  String get id => '${profile.name}.${action.name}';
+  String get id;
+  String get label;
   String get comboKey => strokes.map((s) => s.key).join('|');
 }
 
+final class ActionBinding extends ExecutableBinding {
+  final PlayerAction action;
+  ActionBinding(ProfileId profile, this.action, Iterable<Stroke> strokes)
+    : super(profile, strokes);
+  @override
+  String get id => '${profile.name}.${action.name}';
+  @override
+  String get label => action.label;
+}
+
+final class SkillMacroBinding extends ExecutableBinding {
+  final String skillKey;
+  SkillMacroBinding(ProfileId profile, this.skillKey, Iterable<Stroke> strokes)
+    : super(profile, strokes) {
+    if (skillKey.trim().isEmpty) {
+      throw const FormatException('A skill identity is required.');
+    }
+  }
+  @override
+  String get id => '${profile.name}.skill:$skillKey';
+  @override
+  String get label => 'Activate $skillKey';
+}
+
 final class BindingConflict implements Exception {
-  final ActionBinding owner;
+  final ExecutableBinding owner;
   const BindingConflict(this.owner);
   @override
   String toString() =>
-      'Already assigned to ${owner.profile.label}: ${owner.action.label}.';
+      'Already assigned to ${owner.profile.label}: ${owner.label}.';
 }
 
 final class ProfileCatalog {
   final Map<ProfileId, String> names;
   final List<ActionBinding> bindings;
+  final List<SkillMacroBinding> macros;
+  Iterable<ExecutableBinding> get executableBindings sync* {
+    yield* bindings;
+    yield* macros;
+  }
+
   final RecognitionTiming timing;
   final List<String> recoveryMessages;
 
   ProfileCatalog({
     required Map<ProfileId, String> names,
     required Iterable<ActionBinding> bindings,
+    Iterable<SkillMacroBinding> macros = const [],
     required this.timing,
     Iterable<String> recoveryMessages = const [],
   }) : names = Map.unmodifiable(names),
        bindings = List.unmodifiable(bindings),
+       macros = List.unmodifiable(macros),
        recoveryMessages = List.unmodifiable(recoveryMessages) {
     if (!names.containsKey(ProfileId.p1) ||
         names.length > 3 ||
@@ -117,9 +148,9 @@ final class ProfileCatalog {
         'Add one to three named profiles, starting with P1.',
       );
     }
-    final combinations = <String, ActionBinding>{};
+    final combinations = <String, ExecutableBinding>{};
     final slots = <String>{};
-    for (final binding in this.bindings) {
+    for (final binding in executableBindings) {
       if (!names.containsKey(binding.profile)) {
         throw const FormatException('Add this profile first.');
       }
@@ -147,8 +178,22 @@ final class ProfileCatalog {
     return null;
   }
 
-  List<ActionBinding> sharedPrefixes(ActionBinding binding) => [
-    for (final other in bindings)
+  SkillMacroBinding? macroFor(ProfileId profile, String skillKey) {
+    for (final macro in macros) {
+      if (macro.profile == profile && macro.skillKey == skillKey) return macro;
+    }
+    return null;
+  }
+
+  ExecutableBinding? executableById(String id) {
+    for (final binding in executableBindings) {
+      if (binding.id == id) return binding;
+    }
+    return null;
+  }
+
+  List<ExecutableBinding> sharedPrefixes(ExecutableBinding binding) => [
+    for (final other in executableBindings)
       if (other.id != binding.id &&
           (startsWithCombo(other.strokes, binding.strokes) ||
               startsWithCombo(binding.strokes, other.strokes)))
