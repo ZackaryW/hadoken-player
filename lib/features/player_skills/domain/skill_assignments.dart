@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import '../../profiles/domain/profile_catalog.dart';
-import 'skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 
 abstract interface class SkillAssignmentStore {
   Future<String?> read();

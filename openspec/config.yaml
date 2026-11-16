@@ -36,6 +36,7 @@ context: |
   - Each screen or tab has one responsibility. Profile binding configuration, global timing, and practice are separate screens.
   - Start with P1 only. Additional persistent profiles require Add profile, up to three total.
   - Keep control surfaces concise: labels, icons and contextual validation only; no explanatory paragraphs beside controls.
+  - Keep individual skill implementations in the independent lib/skills source folder. Each skill owns its metadata, parameters, behavior and session state; app policy and UI integrate through the shared contract. Skill modules must not import Flutter or application features/services.
   - Do not create or expand documentation in /docs or elsewhere unless explicitly requested. Project decisions, implementation evidence and durable knowledge belong in OpenSpec and zmem. Preserve inherited upstream/license material; do not add new guides or reports outside OpenSpec/zmem.
 
   <!-- pspec:contexts:start -->

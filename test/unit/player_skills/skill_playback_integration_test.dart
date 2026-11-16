@@ -4,7 +4,7 @@ import 'package:troona/features/player_actions/data/playback_commands_adapter.da
 import 'package:troona/features/player_actions/domain/action_dispatcher.dart';
 import 'package:troona/features/player_actions/profile_controls.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
-import 'package:troona/features/player_skills/domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/profiles/domain/profile_catalog.dart';
 import 'package:troona/features/profiles/domain/profile_repository.dart';

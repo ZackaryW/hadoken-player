@@ -9,7 +9,7 @@ import 'package:troona/shared/widgets/app_dialog.dart';
 import 'package:troona/shared/widgets/app_icon_button.dart';
 import 'package:troona/shared/widgets/glass_sliver_header.dart';
 import '../../profiles/domain/profile_catalog.dart';
-import '../domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import '../domain/skill_assignments.dart';
 import '../domain/skill_policy.dart';
 import '../skill_controls.dart';
@@ -53,7 +53,11 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
         remaining = left;
         if (feedback?.contains('Skip Recovery ·') ?? false) {
           feedback = left > Duration.zero
-              ? SkillCooldown(selected, left).toString()
+              ? SkillCooldown(
+                  selected,
+                  left,
+                  skillLabel: SkillId.skipRecovery.label,
+                ).toString()
               : null;
         }
       });

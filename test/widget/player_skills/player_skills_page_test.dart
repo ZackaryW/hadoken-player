@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/core/theme/app_theme.dart';
 import 'package:troona/core/theme/components/glass_theme.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
-import 'package:troona/features/player_skills/domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/player_skills/skill_controls.dart';
 import 'package:troona/features/player_skills/presentation/player_skills_page.dart';

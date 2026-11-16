@@ -2,7 +2,7 @@ import '../profiles/domain/profile_catalog.dart';
 import '../profiles/domain/profile_repository.dart';
 import '../player_actions/domain/action_dispatcher.dart';
 import 'domain/skill_assignments.dart';
-import 'domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import 'domain/skill_policy.dart';
 
 final class SkillControls {
@@ -19,8 +19,14 @@ final class SkillControls {
 
   Future<void> setAssigned(ProfileId profile, SkillId skill, bool enabled) =>
       dispatcher.runOrdered(() async {
-        final left = await policy.remaining(profile);
-        if (left > Duration.zero) throw SkillCooldown(profile, left);
+        final recovery = await policy.recoveryFor(profile);
+        if (recovery != null) {
+          throw SkillCooldown(
+            profile,
+            recovery.remaining,
+            skillLabel: recovery.definition.label,
+          );
+        }
         await assignments.setAssigned(profile, skill, enabled);
       });
 }

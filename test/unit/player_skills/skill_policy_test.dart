@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
-import 'package:troona/features/player_skills/domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import 'package:troona/features/player_skills/domain/skill_policy.dart';
 import 'package:troona/features/player_skills/skill_controls.dart';
 import 'package:troona/features/player_actions/domain/action_dispatcher.dart';
 import 'package:troona/features/profiles/domain/profile_catalog.dart';
 import 'package:troona/features/profiles/domain/profile_repository.dart';
 import '../../helpers/skill_fakes.dart';
+import '../../helpers/probe_skill.dart';
 
 void main() {
   late ProfileRepository profiles;
@@ -98,6 +99,63 @@ void main() {
     );
     expect(commands.calls.length, 4);
   });
+  test(
+    'policy delegates every action to the registered runtime and filters assignments and failures',
+    () async {
+      final definition = ProbeSkill();
+      final adapter = SkillPolicy(
+        assignments: assignments,
+        clock: clock,
+        definitions: [definition],
+      );
+      addTearDown(adapter.dispose);
+      clock.elapsed = const Duration(seconds: 7);
+      for (final action in PlayerAction.values) {
+        final event = PlayerActionRequest(
+          requestId: action.name,
+          binding: ActionBinding(
+            ProfileId.p2,
+            action,
+            const [Stroke(InputButton.forward, StrokeKind.tap)],
+          ),
+          recognizedAt: Duration.zero,
+        );
+        await adapter.denialFor(event);
+        await adapter.recordSuccess(
+          event,
+          const CommandResult(ActionStatus.noOp, 'No change'),
+        );
+        await adapter.recordSuccess(
+          event,
+          const CommandResult(ActionStatus.failure, 'Failed'),
+        );
+        expect(
+          definition.runtime.successes.length,
+          definition.runtime.checks.length - 1,
+        );
+        await adapter.recordSuccess(
+          event,
+          const CommandResult(ActionStatus.success, 'Done'),
+        );
+        final received = definition.runtime.successes.last;
+        expect(received.action.name, action.name);
+        expect(received.playerId, 'p2');
+        expect(received.requestId, action.name);
+        expect(received.elapsed, const Duration(seconds: 7));
+      }
+      definition.runtime.denial = 'Probe denial';
+      expect(await adapter.denialFor(request(ProfileId.p2)), 'Probe denial');
+      final count = definition.runtime.checks.length;
+      expect(await adapter.denialFor(request(ProfileId.p1)), isNull);
+      expect(definition.runtime.checks.length, count);
+      definition.runtime.recovery = const Duration(seconds: 4);
+      expect(
+        (await adapter.recoveryFor(ProfileId.p2))!.definition.label,
+        'Probe skill',
+      );
+      expect(await adapter.remaining(ProfileId.p1), Duration.zero);
+    },
+  );
   test(
     'queued request and assignment observe success completion, not recognition time',
     () async {

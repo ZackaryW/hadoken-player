@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'package:troona/skills/skip_recovery/skip_recovery.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:troona/features/player_skills/domain/skill_catalog.dart';
+import 'package:troona/skills/registry.dart';
 import 'package:troona/features/player_skills/domain/skill_assignments.dart';
 import 'package:troona/features/profiles/domain/profile_catalog.dart';
 
