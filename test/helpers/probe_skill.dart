@@ -19,11 +19,24 @@ final class ProbeSkillRuntime extends SkillRuntime {
   final checks = <SkillEvent>[];
   final successes = <SkillEvent>[];
   String? denial;
+  Effort blockEffort = Effort.normal;
   Duration recovery = Duration.zero;
   @override
   String? denialFor(SkillEvent event) {
     checks.add(event);
     return denial;
+  }
+
+  @override
+  SkillActionBlock? decide(
+    SkillTarget target,
+    SkillContext context,
+    String requestId,
+  ) {
+    final block = super.decide(target, context, requestId);
+    return block == null
+        ? null
+        : SkillActionBlock(block.reason, effort: blockEffort);
   }
 
   @override

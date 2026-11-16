@@ -133,6 +133,72 @@ void main() {
     },
   );
 
+  test(
+    'code-defined effort overcomes weaker blocks, never ties or invalid bindings',
+    () async {
+      final definition = ProbeSkill();
+      definition.runtime.denial = 'Blocked';
+      definition.runtime.blockEffort = Effort(60);
+      final effortPolicy = SkillPolicy(
+        assignments: assignments,
+        clock: clock,
+        definitions: [definition],
+      );
+      final effortDispatcher = PlayerActionDispatcher(
+        playback: commands,
+        catalog: () => profiles.catalog,
+        abilities: effortPolicy,
+      );
+      Future<PlayerActionOutcome> attempt(
+        Effort effort, {
+        ActionBinding? binding,
+      }) => effortDispatcher.dispatch(
+        PlayerActionRequest(
+          requestId: '${sequence++}',
+          binding:
+              binding ??
+              profiles.catalog.bindingFor(
+                ProfileId.p2,
+                PlayerAction.nextTrack,
+              )!,
+          recognizedAt: Duration.zero,
+          effort: effort,
+        ),
+      );
+      expect((await attempt(Effort.normal)).result.status, ActionStatus.denied);
+      expect((await attempt(Effort(60))).result.status, ActionStatus.denied);
+      expect((await attempt(Effort(80))).result.status, ActionStatus.success);
+      definition.runtime.blockEffort = Effort.maximum;
+      expect(
+        (await attempt(Effort.maximum)).result.status,
+        ActionStatus.denied,
+      );
+      definition.runtime.blockEffort = Effort.minimum;
+      expect(
+        (await attempt(Effort.minimum)).result.status,
+        ActionStatus.denied,
+      );
+      expect((await attempt(Effort(0))).result.status, ActionStatus.success);
+      definition.runtime.denial = null;
+      expect(
+        (await attempt(Effort.minimum)).result.status,
+        ActionStatus.success,
+      );
+      expect(
+        (await attempt(
+          Effort.maximum,
+          binding: ActionBinding(ProfileId.p2, PlayerAction.nextTrack, [
+            const Stroke(InputButton.forward, StrokeKind.hold),
+          ]),
+        )).result.status,
+        ActionStatus.denied,
+      );
+      expect(commands.calls.length, 3);
+      await effortPolicy.dispose();
+      await effortDispatcher.dispose();
+    },
+  );
+
   test('owner cooldown, other players/actions and exact deadline', () async {
     expect(
       (await dispatcher.dispatch(request(ProfileId.p2))).result.status,

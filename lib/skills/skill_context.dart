@@ -1,4 +1,5 @@
 import 'capabilities/capability.dart';
+import 'effort.dart';
 
 enum SkillTrigger {
   actionSucceeded,
@@ -27,6 +28,7 @@ final class SkillContext {
   final String owner;
   final String? actor;
   final Duration elapsed;
+  final Effort effort;
   final int loop;
   final int queueRevision;
   final int bindingRevision;
@@ -40,6 +42,7 @@ final class SkillContext {
     required String owner,
     this.actor,
     required this.elapsed,
+    this.effort = Effort.normal,
     this.loop = 0,
     this.queueRevision = 0,
     this.bindingRevision = 0,

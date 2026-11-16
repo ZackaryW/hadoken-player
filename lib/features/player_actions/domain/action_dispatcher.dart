@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../../profiles/domain/profile_catalog.dart';
+import 'package:troona/skills/effort.dart';
 
 enum ActionStatus { success, denied, noOp, failure }
 
@@ -14,10 +15,12 @@ final class PlayerActionRequest {
   final String requestId;
   final ActionBinding binding;
   final Duration recognizedAt;
+  final Effort effort;
   const PlayerActionRequest({
     required this.requestId,
     required this.binding,
     required this.recognizedAt,
+    this.effort = Effort.normal,
   });
   ProfileId get profile => binding.profile;
   PlayerAction get action => binding.action;

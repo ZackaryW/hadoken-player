@@ -1,8 +1,10 @@
 import 'capabilities/capability.dart';
 import 'skill_context.dart';
+import 'effort.dart';
 
 export 'capabilities/capability.dart';
 export 'skill_context.dart';
+export 'effort.dart';
 
 /// Stable persisted identities. Behavior and metadata belong to definitions.
 enum SkillId {
@@ -45,6 +47,7 @@ abstract class SkillDefinition {
   Set<SkillTrigger> get triggers => const {SkillTrigger.actionSucceeded};
   Set<SkillCapability> get requiredCapabilities => const {};
   SkillFailureCleanup get failureCleanup => SkillFailureCleanup.retainApplied;
+  Effort get activationEffort => Effort.normal;
 }
 
 abstract class SkillRuntime {
@@ -54,17 +57,23 @@ abstract class SkillRuntime {
   bool recordSuccess(SkillEvent event);
   Duration remaining(String playerId, Duration elapsed);
 
-  String? decide(SkillTarget target, SkillContext context, String requestId) =>
-      target is PlaybackSkillTarget
-      ? denialFor(
-          SkillEvent(
-            requestId: requestId,
-            playerId: context.actor ?? context.owner,
-            action: target.action,
-            elapsed: context.elapsed,
-          ),
-        )
-      : null;
+  SkillActionBlock? decide(
+    SkillTarget target,
+    SkillContext context,
+    String requestId,
+  ) {
+    final reason = target is PlaybackSkillTarget
+        ? denialFor(
+            SkillEvent(
+              requestId: requestId,
+              playerId: context.actor ?? context.owner,
+              action: target.action,
+              elapsed: context.elapsed,
+            ),
+          )
+        : null;
+    return reason == null ? null : SkillActionBlock(reason);
+  }
 
   SkillReaction onEvent(SkillRuntimeEvent event, SkillContext context) {
     if (event is SkillActionSucceeded) {

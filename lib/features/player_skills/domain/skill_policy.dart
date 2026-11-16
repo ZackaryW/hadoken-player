@@ -135,17 +135,22 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
     });
   }
 
-  SkillContext _context(ProfileId owner, ProfileId actor, Duration now) =>
-      SkillContext(
-        sessionId: _session,
-        owner: owner.name,
-        actor: actor.name,
-        elapsed: now,
-        players: ProfileId.values
-            .where(assignments.profileExists)
-            .map((p) => p.name),
-        support: coordinator.adapters.keys,
-      );
+  SkillContext _context(
+    ProfileId owner,
+    ProfileId actor,
+    Duration now, {
+    Effort effort = Effort.normal,
+  }) => SkillContext(
+    sessionId: _session,
+    owner: owner.name,
+    actor: actor.name,
+    elapsed: now,
+    effort: effort,
+    players: ProfileId.values
+        .where(assignments.profileExists)
+        .map((p) => p.name),
+    support: coordinator.adapters.keys,
+  );
 
   Stream<void> get changes => _changes.stream;
 
@@ -215,16 +220,21 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
     await effects.retireDue(now);
     _requestSessions[request.requestId] = _session;
     final event = _event(request, now);
+    SkillActionBlock? blocking;
     for (final definition in _assigned(request.profile)) {
       final runtime = _runtimes[definition.id]!;
       final denial = runtime.decide(
         PlaybackSkillTarget(event.action),
-        _context(request.profile, request.profile, now),
+        _context(request.profile, request.profile, now, effort: request.effort),
         request.requestId,
       );
-      if (denial != null) return denial;
+      if (denial != null &&
+          !request.effort.overcomes(denial.effort) &&
+          (blocking == null || denial.effort.compareTo(blocking.effort) > 0)) {
+        blocking = denial;
+      }
     }
-    return null;
+    return blocking?.reason;
   }
 
   @override
@@ -254,7 +264,12 @@ final class SkillPolicy implements OrderedPlayerAbilityPolicy {
           invocationId: 'success:${request.requestId}',
           sessionId: _session,
         ),
-        context: _context(request.profile, request.profile, event.elapsed),
+        context: _context(
+          request.profile,
+          request.profile,
+          event.elapsed,
+          effort: request.effort,
+        ),
       );
       if (outcome.stateChanged) changed = true;
       if (outcome.error != null) throw StateError(outcome.error!);

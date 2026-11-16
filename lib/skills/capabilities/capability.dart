@@ -6,6 +6,7 @@ enum SkillCapability {
   restriction,
   comboOverride,
   listener,
+  playbackAction,
 }
 
 enum CapabilityStatus { applied, denied, noOp, unsupported, failed }
@@ -285,11 +286,13 @@ final class RestrictActions extends CapabilityRequest {
   final PlayerSelector players;
   final Set<SkillTarget> actions;
   final Duration lifetime;
+  final Effort effort;
   RestrictActions(
     super.effectId, {
     required this.players,
     required Iterable<SkillTarget> actions,
     required Duration lifetime,
+    this.effort = Effort.normal,
   }) : actions = Set.unmodifiable(actions),
        lifetime = requireLifetime(lifetime) {
     if (this.actions.isEmpty) {
@@ -353,6 +356,20 @@ final class RevokeSkillEffect extends CapabilityRequest {
     : handleId = requireIdentity(handleId);
   @override
   SkillCapability? get capability => null;
+}
+
+final class ExecutePlayerAction extends CapabilityRequest {
+  final String player;
+  final SkillAction action;
+  final Effort effort;
+  ExecutePlayerAction(
+    super.effectId, {
+    required String player,
+    required this.action,
+    this.effort = Effort.normal,
+  }) : player = requireIdentity(player);
+  @override
+  SkillCapability get capability => SkillCapability.playbackAction;
 }
 
 final class CapabilityResult {
