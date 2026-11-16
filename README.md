@@ -2,15 +2,12 @@
 
 A local audio player with P1–P3 profiles and customizable tap/hold combos.
 
-Open **Settings → Player profiles and combos**, choose a player, and use **Set**
+Open Now Playing and choose **Combo** beside **Player**. The gamepad button
+opens profile setup directly. Choose a player and use **Set**
 beside an action. Three buttons (Forward, Pause, Backward) accept taps and holds
 in sequences of up to five strokes. Saved combos have one owner across players;
-shared prefixes are supported. Use Practice to try them without changing music.
-
-See [input setup and timing](docs/profile-inputs.md),
-[Stage 1 verification](docs/hadoken-verification.md) and
-[baseline verification](docs/hadoken-baseline.md). The separate hardcoded player
-skills change remains unimplemented.
+shared prefixes are supported. The separate combo pad offers Practice without
+changing music; profile setup is also available under Settings.
 
 For a Windows Android build, use a compatible JDK (tested with 21):
 

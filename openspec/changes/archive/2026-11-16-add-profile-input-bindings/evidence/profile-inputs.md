@@ -1,6 +1,6 @@
 # Profile inputs
 
-Three fixed slots, P1–P3, each have an editable display name and one optional
+Start with P1. Add profile enables P2 and then P3, up to three total. Each has an editable display name and one optional
 combination per action: play/pause, next, previous, forward/back ten seconds and
 stop. A display name never changes a slot's identity.
 
@@ -13,10 +13,10 @@ independent of the profile being edited.
 ## Stored document
 
 `hadoken_profiles_v1` is a single JSON document in SharedPreferencesAsync,
-independent of Troona playback-session keys. `version: 1` contains `profiles`
-(three objects with `id`, `name`, and a `bindings` map from action IDs to ordered
+independent of Troona playback-session keys. `version: 2` contains `profiles`
+(one to three added profiles with `id`, `name`, and a `bindings` map from action IDs to ordered
 `{button, kind}` objects) and `timing` (`holdMs`, `gapMs`). Enum names are the
-version-one stable serialized IDs. Timings default to 600 and 500 milliseconds
+stable serialized IDs. Legacy version 1 retains configured players and omits untouched empty P2/P3 defaults. Explicitly added version 2 profiles persist even with no bindings. Timings default to 600 and 500 milliseconds
 respectively, must be positive, and are not part of combination identity.
 
 All writes are serialized, validated against the latest committed catalog, and
@@ -52,17 +52,23 @@ are exercised with an injected clock in `combo_input_test.dart`.
 
 ## Setup and use
 
-Open Settings → Player profiles and combos. Pick P1, P2 or P3 and use Rename
-player if desired. Choose Set beside an action, record the buttons and select
+Open Now Playing and tap the gamepad beside the Player / Combo switch, or open
+Settings → Player profiles. Use Add profile for P2/P3 and Rename if desired. Choose Set beside an action, record the buttons and select
 Save combo. Undo removes the last stroke; Clear draft starts over; Cancel keeps
 the existing saved binding. A sixth stroke is rejected. Duplicate feedback names
-the existing profile and action. Shared-prefix warnings explain the delay.
+the existing profile and action. The info control beside a shared-prefix combo explains the delay on demand. Set and Clear sit together beside the action; the saved combo is directly below.
 
-Open combo pad to use saved bindings. Play mode controls the current music;
+Choose Combo on Now Playing to use saved bindings alongside the track artwork.
+The circular inputs are Backward, Pause and Forward, with tap/hold notation and
+the matched owner's result above them. Player restores ordinary transport;
+switching mode, opening profile setup or leaving the screen cancels unfinished
+input immediately. The same input identities and timing apply in both layouts.
+
+Settings → Combo pad opens a separate input screen. Play mode controls music;
 Practice reports the matching player and action without changing playback.
 Recording is also silent. The Pause input button is just an input symbol: it
 does not directly pause unless the completed saved combo maps to play/pause.
-Change shared timing on the profile page. No keyboard, headset or background
+Change shared timing in Settings → Combo timing. No keyboard, headset or background
 raw-input capture is provided in this version.
 
 ## Playback and the Stage 2 seam
