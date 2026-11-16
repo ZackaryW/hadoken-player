@@ -16,6 +16,7 @@ import 'package:troona/features/profiles/domain/profile_repository.dart';
 import 'package:troona/l10n/app_localizations.dart';
 import '../../helpers/skill_fakes.dart';
 import '../../helpers/roboto.dart';
+import '../../helpers/probe_skill.dart';
 
 void main() {
   setUpAll(loadRoboto);
@@ -106,6 +107,51 @@ void main() {
     recognizedAt: Duration.zero,
   );
 
+  check('registered definition supplies tile metadata and recovery feedback', (
+    tester,
+  ) async {
+    await policy.dispose();
+    await dispatcher.dispose();
+    final definition = ProbeSkill();
+    policy = SkillPolicy(
+      assignments: assignments,
+      clock: clock,
+      definitions: [definition],
+    );
+    dispatcher = PlayerActionDispatcher(
+      playback: commands,
+      catalog: () => profiles.catalog,
+      abilities: policy,
+    );
+    controls = SkillControls(
+      profiles: profiles,
+      assignments: assignments,
+      policy: policy,
+      dispatcher: dispatcher,
+    );
+    await host(tester, PlayerSkillsPage(controls: controls));
+    expect(find.text('Probe skill'), findsOneWidget);
+    expect(find.text('Skip Recovery'), findsNothing);
+    await tap(tester, find.byTooltip('About Probe skill'));
+    expect(find.text('Probe description'), findsOneWidget);
+    await tap(tester, find.text('Done'));
+    await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
+    definition.runtime.recovery = const Duration(seconds: 4);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Ready in 4s'), findsOneWidget);
+    await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
+    expect(find.text('P1 · Probe skill · 4s remaining'), findsOneWidget);
+    expect(assignments.catalog.ownerOf(SkillId.skipRecovery), ProfileId.p1);
+    definition.runtime.recovery = Duration.zero;
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text('Active'), findsOneWidget);
+    expect(find.textContaining('remaining'), findsNothing);
+    await tap(tester, find.byKey(const ValueKey('assign-skip-recovery')));
+    expect(find.text('Inactive'), findsOneWidget);
+  });
+
   check('square tile lights up, turns gray and exposes exclusive owner state', (
     tester,
   ) async {
@@ -114,7 +160,9 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await host(tester, PlayerSkillsPage(controls: controls));
     final tile = find.byKey(const ValueKey('assign-skip-recovery'));
-    final surface = find.byKey(const ValueKey('skill-tile-surface'));
+    final surface = find.byKey(
+      const ValueKey('skill-tile-surface-skip-recovery'),
+    );
     final size = tester.getSize(surface);
     expect(size.width, closeTo(size.height, .01));
     expect(size.width, lessThan(200));
@@ -160,7 +208,9 @@ void main() {
       await controls.setAssigned(ProfileId.p2, SkillId.skipRecovery, true);
       await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
       expect(find.text('Owned by P2'), findsOneWidget);
-      final surface = find.byKey(const ValueKey('skill-tile-surface'));
+      final surface = find.byKey(
+        const ValueKey('skill-tile-surface-skip-recovery'),
+      );
       final size = tester.getSize(surface);
       expect(size.width, closeTo(size.height, .01));
       await tap(tester, find.text('P2'));

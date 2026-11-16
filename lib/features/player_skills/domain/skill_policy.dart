@@ -11,11 +11,11 @@ abstract interface class SkillClock {
 final class SkillCooldown implements Exception {
   final ProfileId profile;
   final Duration remaining;
-  final String skillLabel;
-  const SkillCooldown(this.profile, this.remaining, {required this.skillLabel});
+  final SkillDefinition skill;
+  const SkillCooldown(this.profile, this.remaining, {required this.skill});
   @override
   String toString() =>
-      '${profile.label} · $skillLabel · ${remainingSeconds(remaining)}s remaining';
+      '${profile.label} · ${skill.label} · ${remainingSeconds(remaining)}s remaining';
 }
 
 final class SkillRecovery {

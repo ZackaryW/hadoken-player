@@ -24,7 +24,8 @@ class PlayerSkillsPage extends StatefulWidget {
 class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     with WidgetsBindingObserver {
   ProfileId selected = ProfileId.p1;
-  Duration? remaining;
+  Map<SkillId, Duration>? remaining;
+  SkillId? cooldownSkill;
   String? feedback;
   bool busy = false;
   int revision = 0;
@@ -47,18 +48,20 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     final version = ++revision;
     final profile = selected;
     try {
-      final left = await controls.policy.remaining(profile);
+      final times = await controls.policy.remainingBySkill(profile);
       if (!mounted || version != revision) return;
       setState(() {
-        remaining = left;
-        if (feedback?.contains('Skip Recovery ·') ?? false) {
+        remaining = times;
+        final cooldown = cooldownSkill;
+        if (cooldown != null) {
+          final left = times[cooldown] ?? Duration.zero;
+          final definition = controls.policy.definitions.firstWhere(
+            (s) => s.id == cooldown,
+          );
           feedback = left > Duration.zero
-              ? SkillCooldown(
-                  selected,
-                  left,
-                  skillLabel: SkillId.skipRecovery.label,
-                ).toString()
+              ? SkillCooldown(selected, left, skill: definition).toString()
               : null;
+          if (left == Duration.zero) cooldownSkill = null;
         }
       });
     } catch (_) {
@@ -89,18 +92,24 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     super.dispose();
   }
 
-  Future<void> assign(bool enabled) async {
+  Future<void> assign(SkillId skill, bool enabled) async {
     final profile = selected;
     setState(() {
       busy = true;
       feedback = null;
+      cooldownSkill = null;
     });
     try {
-      await controls.setAssigned(profile, SkillId.skipRecovery, enabled);
+      await controls.setAssigned(profile, skill, enabled);
     } on SkillAlreadyAssigned catch (error) {
       if (mounted) setState(() => feedback = error.toString());
     } on SkillCooldown catch (error) {
-      if (mounted) setState(() => feedback = error.toString());
+      if (mounted) {
+        setState(() {
+          cooldownSkill = error.skill.id;
+          feedback = error.toString();
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() => feedback = 'Could not save skill. Try again.');
@@ -113,23 +122,41 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final assigned = controls.assignments.catalog.has(
-      selected,
-      SkillId.skipRecovery,
-    );
-    final owner = controls.assignments.catalog.ownerOf(SkillId.skipRecovery);
+  Widget skillTile(BuildContext context, SkillDefinition definition) {
+    final assigned = controls.assignments.catalog.has(selected, definition.id);
+    final owner = controls.assignments.catalog.ownerOf(definition.id);
     final ownedByAnother = owner != null && owner != selected;
+    final left = remaining?[definition.id];
     final status = ownedByAnother
         ? 'Owned by ${owner.label}'
         : !assigned
         ? 'Inactive'
-        : remaining == null
+        : left == null
         ? 'Checking…'
-        : remaining! > Duration.zero
-        ? 'Ready in ${remainingSeconds(remaining!)}s'
+        : left > Duration.zero
+        ? 'Ready in ${remainingSeconds(left)}s'
         : 'Active';
+    return _SkillTile(
+      definition: definition,
+      // Presentation-only glyph mapping; skill modules never import Flutter.
+      icon: switch (definition.id) {
+        SkillId.skipRecovery => AppIcons.skipRecovery,
+      },
+      assigned: assigned,
+      status: status,
+      onTap: busy || ownedByAnother
+          ? null
+          : () => assign(definition.id, !assigned),
+      onDetails: () => showMessageDialog(
+        context,
+        title: definition.label,
+        body: definition.description,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
@@ -163,6 +190,7 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
                                     selected = id;
                                     remaining = null;
                                     feedback = null;
+                                    cooldownSkill = null;
                                   });
                                   unawaited(refresh());
                                 },
@@ -187,18 +215,8 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
                         padding: EdgeInsets.zero,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          _SkillTile(
-                            assigned: assigned,
-                            status: status,
-                            onTap: busy || ownedByAnother
-                                ? null
-                                : () => assign(!assigned),
-                            onDetails: () => showMessageDialog(
-                              context,
-                              title: SkillId.skipRecovery.label,
-                              body: SkillId.skipRecovery.description,
-                            ),
-                          ),
+                          for (final definition in controls.policy.definitions)
+                            skillTile(context, definition),
                         ],
                       );
                     },
@@ -232,11 +250,15 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
 }
 
 class _SkillTile extends StatelessWidget {
+  final SkillDefinition definition;
+  final IconData icon;
   final bool assigned;
   final String status;
   final VoidCallback? onTap;
   final VoidCallback onDetails;
   const _SkillTile({
+    required this.definition,
+    required this.icon,
     required this.assigned,
     required this.status,
     required this.onTap,
@@ -249,7 +271,7 @@ class _SkillTile extends StatelessWidget {
     final foreground = assigned ? colors.accent : colors.labelSecondary;
     final radius = BorderRadius.circular(20);
     return AnimatedContainer(
-      key: const ValueKey('skill-tile-surface'),
+      key: ValueKey('skill-tile-surface-${definition.id.key}'),
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
         borderRadius: radius,
@@ -274,7 +296,7 @@ class _SkillTile extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Semantics(
-              label: SkillId.skipRecovery.label,
+              label: definition.label,
               value: status,
               toggled: assigned,
               enabled: onTap != null,
@@ -283,7 +305,7 @@ class _SkillTile extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  key: const ValueKey('assign-skip-recovery'),
+                  key: ValueKey('assign-${definition.id.key}'),
                   borderRadius: radius,
                   onTap: onTap,
                   excludeFromSemantics: true,
@@ -293,14 +315,10 @@ class _SkillTile extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            AppIcons.skipRecovery,
-                            size: 32,
-                            color: foreground,
-                          ),
+                          Icon(icon, size: 32, color: foreground),
                           const SizedBox(height: 8),
                           Text(
-                            SkillId.skipRecovery.label,
+                            definition.label,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 17,
@@ -314,7 +332,7 @@ class _SkillTile extends StatelessWidget {
                           const SizedBox(height: 6),
                           Text(
                             status,
-                            key: const ValueKey('skill-status'),
+                            key: ValueKey('skill-status-${definition.id.key}'),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
@@ -335,7 +353,7 @@ class _SkillTile extends StatelessWidget {
             right: 0,
             child: AppIconButton(
               icon: AppIcons.skillDetails,
-              tooltip: 'About Skip Recovery',
+              tooltip: 'About ${definition.label}',
               size: 18,
               onPressed: onDetails,
             ),

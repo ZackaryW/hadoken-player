@@ -24,7 +24,7 @@ final class SkillControls {
           throw SkillCooldown(
             profile,
             recovery.remaining,
-            skillLabel: recovery.definition.label,
+            skill: recovery.definition,
           );
         }
         await assignments.setAssigned(profile, skill, enabled);
