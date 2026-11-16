@@ -12,7 +12,8 @@ final class SkipRecovery extends SkillDefinition {
   String get summary => 'Next track · 10s recovery';
   @override
   String get description =>
-      'After you skip, wait 10 seconds before skipping again. Other players can still skip.';
+      'After your skip (${Effort.normal}): block your skip (${Effort.normal}) for 10s.\n'
+      'Other players: skip (${Effort.normal}).';
   @override
   SkillRuntime createRuntime() => _SkipRecoveryRuntime(this);
 }

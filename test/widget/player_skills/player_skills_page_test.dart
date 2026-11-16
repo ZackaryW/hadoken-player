@@ -168,6 +168,8 @@ void main() {
         await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
         expect(find.text('Configure macro'), findsNothing);
         await tap(tester, find.byTooltip('About Manual test'));
+        expect(find.textContaining('Activate (80)'), findsOneWidget);
+        expect(tester.takeException(), isNull);
         await tap(tester, find.text('Configure macro'));
         expect(find.text('Activation macro'), findsWidgets);
         expect(find.text('Not set'), findsOneWidget);
@@ -199,6 +201,28 @@ void main() {
     expect(find.text('Configure macro'), findsNothing);
     expect(find.byKey(const ValueKey('set-skill-macro')), findsNothing);
   });
+
+  for (final scale in [1.0, 2.0]) {
+    check('recovery details show action effort at scale $scale', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(360, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await host(tester, PlayerSkillsPage(controls: controls), scale: scale);
+      await tap(tester, find.byTooltip('About Skip Recovery'));
+      expect(find.textContaining('skip (50)'), findsOneWidget);
+      expect(
+        find.textContaining('block your skip (50) for 10s'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Other players: skip (50)'), findsOneWidget);
+      expect(find.textContaining('Activate ('), findsNothing);
+      expect(find.byType(TextField), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tap(tester, find.text('Done'));
+      expect(find.textContaining('block your skip'), findsNothing);
+    });
+  }
 
   check('registered definition supplies tile metadata and recovery feedback', (
     tester,

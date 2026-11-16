@@ -152,7 +152,7 @@ class _PlayerSkillsPageState extends State<PlayerSkillsPage>
       onDetails: () => showMessageDialog(
         context,
         title: definition.label,
-        body: definition.description,
+        body: definition.details,
         actionLabel: definition.triggers.contains(SkillTrigger.manualActivation)
             ? 'Configure macro'
             : null,

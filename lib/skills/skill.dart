@@ -53,6 +53,11 @@ abstract class SkillDefinition {
   Set<SkillCapability> get requiredCapabilities => const {};
   SkillFailureCleanup get failureCleanup => SkillFailureCleanup.retainApplied;
   Effort get activationEffort => Effort.normal;
+
+  /// Read-only details; effort belongs beside the action it qualifies.
+  String get details => triggers.contains(SkillTrigger.manualActivation)
+      ? 'Activate ($activationEffort)\n\n$description'
+      : description;
 }
 
 abstract class SkillRuntime {
