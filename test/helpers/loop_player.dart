@@ -40,6 +40,7 @@ final class LoopPlayer implements AudioPlayer {
   final loads = <List<String>>[];
   Completer<void>? loadGate;
   bool failNextLoad = false;
+  bool emitOldIndexOnSeek = false;
   bool disposed = false;
   int stops = 0;
   int? index = 0;
@@ -152,6 +153,7 @@ final class LoopPlayer implements AudioPlayer {
 
   @override
   Future<void> seek(Duration? position, {int? index}) async {
+    if (index != null && emitOldIndexOnSeek) indices.add(this.index);
     if (index != null) advance(index);
     this.position = position ?? Duration.zero;
   }

@@ -6,6 +6,9 @@ import 'package:troona/features/player/data/adapters/just_audio_adapter.dart';
 import 'package:troona/features/player/domain/entities/repeat_mode.dart';
 import 'package:troona/features/player/domain/entities/playback_state.dart';
 import 'package:troona/skills/skill.dart';
+import 'package:troona/features/player_actions/data/playback_commands_adapter.dart';
+import 'package:troona/features/player_actions/domain/action_dispatcher.dart';
+import 'package:troona/features/profiles/domain/profile_catalog.dart';
 import '../../helpers/fake_player.dart';
 import '../../helpers/loop_player.dart';
 
@@ -56,6 +59,19 @@ void main() {
   }
 
   List<String> native() => player.tracks.map((t) => t.id).toList();
+
+  test('late native index observations cannot undo a completed skip', () async {
+    player.emitOldIndexOnSeek = true;
+    final result = await PlaybackCommandsAdapter(
+      adapter,
+    ).execute(PlayerAction.nextTrack);
+    expect(result.status, ActionStatus.success);
+    expect(adapter.currentQueue!.currentIndex, 1);
+    await settle();
+    expect(adapter.currentQueue!.currentIndex, 1);
+    expect(player.currentIndex, 1);
+  });
+
   List<String> visible() =>
       adapter.currentQueue!.playbackTracks.map((t) => t.id).toList();
 

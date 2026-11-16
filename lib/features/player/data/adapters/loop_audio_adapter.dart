@@ -452,6 +452,10 @@ class LoopAudioAdapter extends JustAudioAdapter
     } else {
       _setEnded(false);
       await _switchTrack(() => _player.seek(Duration.zero, index: index));
+      // Native seek can re-emit the previous index before its target. Those
+      // observations wait behind this command; discard them before publishing
+      // the completed transition so callers never see it temporarily undone.
+      _windowRevision++;
       _updateQueue(_currentQueue!.copyWith(currentIndex: index));
       if (play) await _play();
     }
