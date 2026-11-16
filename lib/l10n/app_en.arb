@@ -1,0 +1,817 @@
+{
+  "@@locale": "en",
+  "appName": "Hadoken Player",
+  "actionCancel": "Cancel",
+  "actionClear": "Clear",
+  "actionClose": "Close",
+  "actionDelete": "Delete",
+  "actionDone": "Done",
+  "actionReset": "Reset",
+  "actionRetry": "Try again",
+  "actionSave": "Save",
+  "actionSeeAll": "See all",
+  "actionUndo": "Undo",
+  "actionPlay": "Play",
+  "actionShuffle": "Shuffle",
+  "errorGeneric": "Something went wrong. Try again.",
+  "songCount": "{count, plural, =0{No songs} =1{1 song} other{{count} songs}}",
+  "@songCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumCount": "{count, plural, =0{No albums} =1{1 album} other{{count} albums}}",
+  "singleCount": "{count, plural, =1{1 single} other{{count} singles}}",
+  "@singleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "albumSingle": "Single",
+  "@albumSingle": {
+    "description": "Stands for the song count under a single's name: Artist • Single."
+  },
+  "@albumCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "artistCount": "{count, plural, =0{No artists} =1{1 artist} other{{count} artists}}",
+  "@artistCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknownArtist": "Unknown artist",
+  "unknownAlbum": "Unknown album",
+  "likedSongs": "Liked songs",
+  "sizeMegabytes": "{size} MB",
+  "@sizeMegabytes": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "navHome": "Home",
+  "navLibrary": "Library",
+  "navSearch": "Search",
+  "navPlaylists": "Playlists",
+  "settingsTitle": "Settings",
+  "settingsPlayback": "Playback",
+  "settingsDuck": "Lower volume for notifications",
+  "settingsPauseOnCall": "Pause during calls",
+  "settingsResumeAfterCall": "Resume after calls",
+  "settingsLibrary": "Library",
+  "settingsRescan": "Rescan library",
+  "settingsRescanSubtitle": "Find songs added since the last scan",
+  "settingsRescanning": "Updating your library…",
+  "settingsCoversClear": "Clear cover cache",
+  "settingsCoversClearSubtitle": "Covers are rebuilt automatically.",
+  "settingsCoversConfirmTitle": "Clear cover cache?",
+  "settingsCoversConfirmBody": "Covers reload in the background. Your music, likes and playlists aren't affected.",
+  "settingsCoversCleared": "Cover cache cleared",
+  "settingsOnline": "Online extras",
+  "settingsOnlineFooter": "Optional. Bios and photos send artist and album names to Last.fm and Deezer. Your music files never leave this device.",
+  "settingsOnlineBios": "Artist bios and album notes",
+  "settingsOnlinePhotos": "Artist photos and album covers",
+  "settingsOnlineClear": "Clear downloaded info",
+  "settingsOnlineConfirmTitle": "Clear downloaded info?",
+  "settingsOnlineConfirmBody": "Bios, album notes and photos will download again when you open an artist or an album, if they are still turned on.",
+  "settingsOnlineCleared": "Downloaded info cleared",
+  "settingsAppearance": "Appearance",
+  "settingsGlass": "Glass effects",
+  "settingsGlassAuto": "Auto",
+  "settingsGlassFull": "Full",
+  "settingsGlassLight": "Light",
+  "settingsGlassOff": "Off",
+  "settingsGlassFooter": "Auto adapts to your phone. Choose Light or Off for smoother scrolling on older devices.",
+  "settingsHaptics": "Haptics",
+  "settingsSupport": "Help and feedback",
+  "settingsReport": "Report a problem",
+  "settingsReportSubtitle": "Shares device info and recent errors. You can read it before sending.",
+  "settingsReportSubject": "Hadoken Player problem report",
+  "settingsPrivacy": "Privacy policy",
+  "settingsLicenses": "Open-source licenses",
+  "settingsReset": "Reset",
+  "settingsForgetQueue": "Clear queue and position",
+  "settingsForgetQueueConfirmTitle": "Clear queue and position?",
+  "settingsForgetQueueConfirmBody": "Playback stops and Hadoken Player forgets where you were.",
+  "settingsForgetQueueDone": "Queue cleared",
+  "settingsResetSettings": "Reset settings",
+  "settingsResetConfirmTitle": "Reset settings?",
+  "settingsResetConfirmBody": "All preferences go back to their defaults. Your library, likes and playlists stay as they are.",
+  "settingsVersion": "Hadoken Player {version} ({build})",
+  "@settingsVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTagline": "Made for the music you own.",
+  "settingsLoadError": "We couldn't load your settings.",
+  "privacyTitle": "Privacy",
+  "privacyIntro": "Hadoken Player plays the music stored on your phone. It has no account, no ads and no analytics.",
+  "privacyLocalTitle": "On this device",
+  "privacyLocalBody": "Your library, likes, playlists and listening history are stored only on this phone. Hadoken Player reads your audio files and never your photos, videos or documents.",
+  "privacyOnlineTitle": "Online extras (off by default)",
+  "privacyOnlineBody": "There are two separate switches. Bios sends artist and album names to Last.fm. Photos sends them to Deezer, and downloads pictures from Deezer or Last.fm. These services also see your IP address, as with any web request. No file, account or listening history is sent. Turn either switch off at any time in Settings: requests to that service stop, and turning photos off also deletes the photos already downloaded.",
+  "privacyReportsTitle": "Problem reports",
+  "privacyReportsBody": "Errors are written to a log on this device. It can contain file names. Nothing is sent unless you choose Report a problem and share it yourself.",
+  "privacyBackupTitle": "Backups",
+  "privacyBackupBody": "Exporting a backup writes your playlists, likes, listening history and settings, with the names and sizes of your music files, to a file, unencrypted, and hands it to the app you choose. It goes nowhere else. Restoring reads only the file you pick.",
+  "privacyDeleteTitle": "Deleting your data",
+  "privacyDeleteBody": "Uninstalling Hadoken Player deletes everything it stored. Your music files, and backups you exported, are never touched.",
+  "permissionHeadline": "All your music.\nNothing in the way.",
+  "permissionSubhead": "Hadoken Player plays the songs already on your phone. No account, no ads, no streaming.",
+  "permissionQualityTitle": "Plays what you own",
+  "permissionQualityBody": "MP3, FLAC, AAC, WAV, OGG and Opus, at their original quality.",
+  "permissionPrivacyTitle": "Private by design",
+  "permissionPrivacyBody": "Your music stays on this device. Online extras are optional.",
+  "permissionLibraryTitle": "Ready in seconds",
+  "permissionLibraryBody": "Covers, albums and artists, sorted for you.",
+  "permissionAllow": "Allow access",
+  "permissionDeniedTitle": "Hadoken Player can't see your music yet",
+  "permissionDeniedBody": "Hadoken Player needs access to your audio files to build your library. It never reads your photos, videos or documents.",
+  "permissionBlockedTitle": "Access is turned off",
+  "permissionBlockedBody": "Allow Hadoken Player to access your music in your phone's settings, then come back. We'll take it from there.",
+  "permissionOpenSettings": "Open settings",
+  "permissionCheckAgain": "I turned it on",
+  "permissionFooter": "Free • No ads • No account",
+  "scanTitle": "Finding your music",
+  "scanPhaseScanning": "Looking for songs on your phone…",
+  "scanPhaseIndexing": "Building your library…",
+  "scanPhaseArtwork": "Adding album covers…",
+  "scanPhaseDone": "Almost ready…",
+  "scanSongsFound": "{count, plural, =1{1 song found} other{{count} songs found}}",
+  "@scanSongsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanProgress": "{count} of {total}",
+  "@scanProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scanNewSongs": "{count, plural, =1{1 new song added} other{{count} new songs added}}",
+  "@scanNewSongs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanRemovedSongs": "{count, plural, =1{1 song is no longer on your phone} other{{count} songs are no longer on your phone}}",
+  "@scanRemovedSongs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryRescanFailed": "Couldn't check for new music. Your library is as it was.",
+  "libraryLoadErrorTitle": "We couldn't open your library",
+  "libraryLoadErrorBody": "Check that Hadoken Player can still access your music, then try again.",
+  "errorTitle": "Something went wrong",
+  "playerCantPlay": "Can't play \"{title}\". Skipping to the next song.",
+  "@playerCantPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "playerCantPlayUnknown": "This song can't be played. Skipping to the next one.",
+  "playerQueueReplaced": "Queue replaced",
+  "notificationChannelName": "Playback controls",
+  "bootTitle": "Hadoken Player couldn't start",
+  "bootBody": "Restart the app. If it keeps happening, copy the report and send it to us.",
+  "bootCopyReport": "Copy report",
+  "bootReportCopied": "Report copied",
+  "libraryFilterAll": "All",
+  "libraryFilterSongs": "Songs",
+  "libraryFilterAlbums": "Albums",
+  "libraryFilterArtists": "Artists",
+  "libraryEmptyTitle": "No music on this device yet",
+  "libraryEmptyBody": "Copy songs to your phone, then scan again.",
+  "libraryScanAgain": "Scan again",
+  "libraryNoSongs": "No songs yet",
+  "libraryNoAlbums": "No albums yet",
+  "libraryNoArtists": "No artists yet",
+  "librarySort": "Sort",
+  "librarySortBy": "Sort by",
+  "librarySortTitle": "Title",
+  "librarySortArtist": "Artist",
+  "librarySortAlbum": "Album",
+  "librarySortRecent": "Recently added",
+  "libraryUpdating": "Updating your library…",
+  "libraryShuffleAll": "Shuffle all",
+  "albumByArtist": "{artist} • {songs}",
+  "@albumByArtist": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      },
+      "songs": {
+        "type": "String"
+      }
+    }
+  },
+  "statSongs": "{count, plural, =1{song} other{songs}}",
+  "@statSongs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statAlbums": "{count, plural, =1{album} other{albums}}",
+  "@statAlbums": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statArtists": "{count, plural, =1{artist} other{artists}}",
+  "@statArtists": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} min",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} hr",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} hr {minutes} min",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "trackPlayNext": "Play next",
+  "trackAddToQueue": "Add to queue",
+  "detailSongs": "Songs",
+  "detailAlbums": "Albums",
+  "detailSingles": "Singles",
+  "detailAppearsOn": "Appears on",
+  "detailAlsoInLibrary": "Also in your library",
+  "@detailAlsoInLibrary": {
+    "description": "Artists similar to this one that are in the library."
+  },
+  "detailPopular": "Popular",
+  "detailSeeAllSongs": "See all {count} songs",
+  "@detailSeeAllSongs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "detailShowLess": "Show less",
+  "detailMoreBy": "More by {artist}",
+  "@detailMoreBy": {
+    "placeholders": {
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "detailMore": "More options",
+  "detailBack": "Back",
+  "detailCountsSummary": "{songs} • {albums}",
+  "@detailCountsSummary": {
+    "placeholders": {
+      "songs": {
+        "type": "String"
+      },
+      "albums": {
+        "type": "String"
+      }
+    }
+  },
+  "inYourLibrary": "In your library",
+  "infoSongs": "Songs",
+  "infoAlbums": "Albums",
+  "infoSingles": "Singles",
+  "infoLength": "Length",
+  "infoYear": "Year",
+  "infoSize": "Size",
+  "infoFormat": "Format",
+  "formatLossless": "Lossless",
+  "albumLoadError": "We couldn't open this album.",
+  "artistLoadError": "We couldn't open this artist.",
+  "metaListeners": "{count, plural, =1{1 listener} other{{count} listeners}}",
+  "@metaListeners": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "compact"
+      }
+    }
+  },
+  "searchHint": "Songs, artists, albums",
+  "searchClear": "Clear search",
+  "searchIdleTitle": "Search your library",
+  "searchIdleBody": "Songs, artists and albums on this device.",
+  "searchNoResultsTitle": "No results for \"{query}\"",
+  "@searchNoResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResultsBody": "Try a shorter word or an artist name.",
+  "searchError": "Search isn't available right now.",
+  "searchSuggestedArtists": "Artists",
+  "searchSuggestedAlbums": "Albums",
+  "searchRecentlyAdded": "Recently added",
+  "searchBadgeArtist": "Artist",
+  "searchBadgeAlbum": "Album",
+  "searchBadgeSong": "Song",
+  "playlistsCreate": "New",
+  "playlistsListView": "List view",
+  "playlistsGridView": "Grid view",
+  "playlistsYours": "Your playlists",
+  "playlistsEmptyTitle": "Make your first playlist",
+  "playlistsEmptyBody": "Group songs for a mood, a moment or a road trip.",
+  "playlistNew": "New playlist",
+  "playlistEdit": "Edit playlist",
+  "playlistNameHint": "Playlist name",
+  "playlistAddCover": "Add a cover",
+  "playlistCreateAndAdd": "Create and add",
+  "playlistCreate": "Create",
+  "playlistAddTo": "Add to playlist",
+  "playlistNoneYet": "No playlists yet",
+  "playlistAddedTo": "Added to {name}",
+  "@playlistAddedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistAlreadyIn": "Already in {name}",
+  "@playlistAlreadyIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDeleteTitle": "Delete \"{name}\"?",
+  "@playlistDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistDeleteBody": "This removes the playlist only. The songs stay in your library.",
+  "playlistDeleted": "Playlist deleted",
+  "playlistEmptyTitle": "This playlist is empty",
+  "playlistEmptyBody": "Add songs from the ··· menu on any song.",
+  "playlistRemove": "Remove from playlist",
+  "playlistLoadError": "We couldn't load your playlists.",
+  "playlistOpenError": "We couldn't open this playlist.",
+  "likesEmptyTitle": "Songs you like will live here",
+  "likesEmptyBody": "Tap the heart on any song to save it.",
+  "likesSubtitle": "{songs} • Your favorites in one place",
+  "@likesSubtitle": {
+    "placeholders": {
+      "songs": {
+        "type": "String"
+      }
+    }
+  },
+  "likesBadge": "Favorites",
+  "likesRemove": "Remove from Liked songs",
+  "trackLike": "Like",
+  "trackAddToPlaylist": "Add to playlist…",
+  "trackGoToAlbum": "Go to album",
+  "trackGoToArtist": "Go to artist",
+  "toastPlaysNext": "Plays next",
+  "toastAddedToQueue": "Added to queue",
+  "toastLiked": "Added to Liked songs",
+  "toastUnliked": "Removed from Liked songs",
+  "homeGreetingMorning": "Good morning",
+  "homeGreetingAfternoon": "Good afternoon",
+  "homeGreetingEvening": "Good evening",
+  "homeGreetingNight": "Late-night session",
+  "homeSubtitleWarm": "Pick up where you left off.",
+  "homeSongsReady": "{count, plural, =1{1 song, ready when you are.} other{{count} songs, ready when you are.}}",
+  "@homeSongsReady": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEmptyTitle": "No music here yet",
+  "homeEmptyBody": "Copy songs to your phone's Music folder, then scan again.",
+  "homeFreshTitle": "Your library is ready",
+  "homeJumpBackIn": "Jump back in",
+  "homeQuickRecent": "Recently added",
+  "homeRecentlyPlayed": "Recently played",
+  "homeOnRepeat": "On repeat this week",
+  "homeRediscover": "Rediscover",
+  "homeYourArtists": "Your artists",
+  "homeRecentlyAdded": "Recently added",
+  "homeYourPlaylists": "Your playlists",
+  "homeWeeklyPlays": "{count, plural, =1{play this week} other{plays this week}}",
+  "@homeWeeklyPlays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeLoadError": "We couldn't load your home. Pull down to try again.",
+  "homeExtrasTitle": "Add artist photos and bios?",
+  "homeExtrasBody": "Hadoken Player can fetch them from Last.fm and Deezer using artist and album names. Your music files stay on this device.",
+  "homeExtrasAccept": "Turn on",
+  "homeExtrasDecline": "Not now",
+  "homeExtrasDeclined": "You can turn them on anytime in Settings.",
+  "recapTitle": "Your week in music",
+  "recapRange": "{start} to {end}",
+  "@recapRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "recapOpen": "Open your week in music",
+  "recapListened": "listened",
+  "recapTopArtist": "Top artist",
+  "recapTopSong": "Top song",
+  "recapDiscoveries": "First listens",
+  "recapDiscoveriesValue": "{count, plural, =0{No new songs this week} =1{1 song heard for the first time} other{{count} songs heard for the first time}}",
+  "@recapDiscoveriesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapPlays": "{count, plural, =1{1 play} other{{count} plays}}",
+  "@recapPlays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapHoursMinutes": "{hours} h {minutes} min",
+  "@recapHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recapMinutes": "{minutes} min",
+  "@recapMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recapEmpty": "Nothing was played last week.",
+  "recapCalendarCaption": "A filled dot is a day with music.",
+  "recapCalendarDay": "{date}, music played",
+  "@recapCalendarDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "replayName": "Replay {month}",
+  "@replayName": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "replayReady": "{name} is in your playlists: last month's most played songs.",
+  "@replayReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recapCalendarQuietDay": "{date}, no music",
+  "@recapCalendarQuietDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "queueTitle": "Queue",
+  "queueHistory": "History",
+  "queueBackToNow": "Back to now playing",
+  "queueNowPlaying": "Now playing",
+  "queueRepeatOne": "Repeating this song",
+  "queueRepeatAll": "Then back to the start",
+  "queueNothingNext": "Nothing up next",
+  "queueUpNext": "Up next • {count}",
+  "@queueUpNext": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "queueRemoved": "Removed \"{title}\"",
+  "@queueRemoved": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepTimer": "Sleep timer",
+  "sleepStopsAt": "Music stops at {time}.",
+  "@sleepStopsAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepStopsEndOfSong": "Music stops at the end of this song.",
+  "sleepIdle": "Stop the music after a while.",
+  "sleepOneHour": "1 hour",
+  "sleepEndOfSong": "End of song",
+  "sleepTurnOff": "Turn off",
+  "playbackSpeed": "Playback speed",
+  "playbackSpeedNormal": "{speed} (normal)",
+  "@playbackSpeedNormal": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackPosition": "Playback position",
+  "playbackPositionValue": "{position} of {duration}",
+  "@playbackPositionValue": {
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "metaAbout": "About",
+  "metaSource": "From {source}",
+  "@metaSource": {
+    "description": "Where the About text comes from, under it.",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "metaReadMore": "Read more",
+  "metaReadLess": "Show less",
+  "playerPause": "Pause",
+  "playerNext": "Next",
+  "playerPrevious": "Previous",
+  "playerShuffle": "Shuffle",
+  "playerRepeatOff": "Repeat off",
+  "playerRepeatAll": "Repeat all",
+  "playerRepeatOne": "Repeat this song",
+  "playerClose": "Close player",
+  "playerOpen": "Open player",
+  "whatsNewTitle": "What's new",
+  "whatsNewVersion": "Version {version}",
+  "@whatsNewVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "whatsNewAdded": "New",
+  "whatsNewImproved": "Improved",
+  "whatsNewFixed": "Fixed",
+  "whatsNewContinue": "Continue",
+  "whatsNewLatest": "Latest",
+  "whatsNewEarlier": "Earlier releases",
+  "whatsNewShowAll": "Show all {count} changes",
+  "@whatsNewShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatsNewShowLess": "Show fewer",
+  "whatsNewCountAdded": "{count, plural, =1{1 new} other{{count} new}}",
+  "@whatsNewCountAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatsNewCountImproved": "{count, plural, =1{1 improvement} other{{count} improvements}}",
+  "@whatsNewCountImproved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatsNewCountFixed": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@whatsNewCountFixed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatsNew100WeekTitle": "Your week in music",
+  "whatsNew100WeekBody": "Every Monday on Home: listening time, top artist and top song, with a calendar of the days you listened.",
+  "whatsNew100ReplayTitle": "Monthly Replay",
+  "whatsNew100ReplayBody": "At the start of each month, your 25 most played songs of the month before become a playlist.",
+  "whatsNew100SleepTitle": "Sleep timer and speed",
+  "whatsNew100SleepBody": "Stop the music after 15, 30 or 45 minutes, an hour or at the end of the song, and play from 0.75x to 2x.",
+  "whatsNew100QueueTitle": "Queue",
+  "whatsNew100QueueBody": "See what played and what comes next. Drag to reorder, swipe to remove, undo in one tap.",
+  "whatsNew100ExtrasTitle": "Artist photos and bios, your call",
+  "whatsNew100ExtrasBody": "Two switches in Settings, off by default. Your music files never leave your phone.",
+  "whatsNew100LibraryTitle": "Your library, offline",
+  "whatsNew100LibraryBody": "Songs, albums and artists from your phone, with search across all three. Scans show their progress live.",
+  "whatsNew100PlayerTitle": "Now Playing",
+  "whatsNew100PlayerBody": "Swipe between covers, seek on the ring, and enjoy soft fades on play, pause and skip.",
+  "whatsNew100PlaylistsTitle": "Playlists and likes",
+  "whatsNew100PlaylistsBody": "Create playlists, reorder their songs, and find every song you like in one place.",
+  "whatsNew100LanguageTitle": "English and French",
+  "whatsNew100LanguageBody": "The whole app follows your phone's language.",
+  "settingsBackup": "Backup",
+  "settingsBackupFooter": "The file holds your playlists, likes, listening history and settings, with the names and sizes of your music files, unencrypted. Keep it somewhere private.",
+  "backupExport": "Export a backup",
+  "backupExportSubtitle": "Save it to Files, Drive or another app.",
+  "backupShareSubject": "Hadoken Player backup",
+  "backupRestore": "Restore a backup",
+  "backupRestoreSubtitle": "Adds its playlists, likes and history to yours.",
+  "backupRestoreConfirmTitle": "Restore a backup?",
+  "backupRestoreConfirmBody": "Its playlists, likes and listening history are added to yours. Its settings replace yours, except online extras.",
+  "backupRestoreAction": "Choose file",
+  "backupRestoreInvalid": "This file is not a Troona backup, or it is damaged.",
+  "backupRestoreTooNew": "This backup comes from a newer version of Troona. Update the app, then try again.",
+  "backupRestoreDoneTitle": "Backup restored",
+  "backupRestoreFound": "Songs found on this phone: {found} of {total}.",
+  "@backupRestoreFound": {
+    "placeholders": {
+      "found": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreMissing": "{count, plural, =1{1 song is not on this phone. Add it, then restore the same file again to link it.} other{{count} songs are not on this phone. Add them, then restore the same file again to link them.}}",
+  "@backupRestoreMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreMore": "and {count} more",
+  "@backupRestoreMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreOnline": "Online extras were on in this backup. They stay as they are on this phone: turn them on above if you want them.",
+  "settingsUpdateCheck": "Check for updates",
+  "settingsUpdateCheckSubtitle": "Once a day, on GitHub",
+  "updateCheckNow": "Check for updates now",
+  "updateUpToDate": "Troona is up to date",
+  "updateCheckFailed": "Couldn't check for updates. Try again later.",
+  "updateAvailable": "Troona {version} is available",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateAvailableBody": "Download it from its release page on GitHub.",
+  "updateView": "View",
+  "updateSkip": "Skip this version",
+  "updateOpenFailed": "Couldn't open the browser",
+  "privacyUpdatesTitle": "Update check (off by default)",
+  "privacyUpdatesBody": "Hadoken Player does not check for or offer upstream Troona updates.",
+  "whatsNew110BackupTitle": "Backup and restore",
+  "whatsNew110BackupBody": "Save your playlists, likes, listening history and settings to a file, and bring them back on this phone or a new one. In Settings, under Backup.",
+  "whatsNew110UpdatesTitle": "Know when Troona updates",
+  "whatsNew110UpdatesBody": "Turn on Check for updates in Settings: a card on Home tells you when a new version is out. Off by default, nothing is installed for you.",
+  "whatsNew110ControlsTitle": "Like and resume from the lock screen",
+  "whatsNew110ControlsBody": "A heart in the media notification likes the current song (Android 13 and later). After Troona is closed, the media controls resume your last song (Android 11 and later).",
+  "whatsNew110RenameTitle": "Rename a playlist",
+  "whatsNew110RenameBody": "Long press a playlist, then Edit playlist.",
+  "whatsNew110ScreensTitle": "Small screens and large fonts",
+  "whatsNew110ScreensBody": "Now Playing keeps its controls on screen on smaller phones, and the whole app follows your phone's font size.",
+  "whatsNew110NotificationTitle": "Notification icon",
+  "whatsNew110NotificationBody": "The playback notification shows the Troona note in the status bar.",
+  "whatsNew111ChangelogTitle": "Every release in one place",
+  "whatsNew111ChangelogBody": "What's new now keeps the notes of every version, the newest first. Open it any time from Settings, under Help and feedback.",
+  "whatsNew111StartupTitle": "Reliable start",
+  "whatsNew111StartupBody": "Troona no longer stays on its launch screen when you open it after resuming music from the media controls or a headset.",
+  "whatsNew111HomeTitle": "Home right after the first scan",
+  "whatsNew111HomeBody": "Your music shows on Home as soon as the first scan finds it, without refreshing.",
+  "whatsNew120ArtistsTitle": "Artists from file names",
+  "whatsNew120ArtistsBody": "Songs downloaded without an artist take it from their file name, such as \"Artist - Title\", and sit with that artist's other songs. The rest read Unknown artist, in your language.",
+  "whatsNew120UndoTitle": "Undo a replaced queue",
+  "whatsNew120UndoBody": "Starting another album while songs you added with Play next or Add to queue are still to come now offers Undo, which brings your queue back where it was.",
+  "whatsNew120MenusTitle": "Menus and dialogs",
+  "whatsNew120MenusBody": "Song, album and playlist menus open as a sheet in Troona's style, and dialogs fade in smoothly.",
+  "whatsNew120LookTitle": "One look across the app",
+  "whatsNew120LookBody": "Icons, buttons, back buttons and missing covers look the same on every screen, and buttons are easier to tap.",
+  "whatsNew120PagesTitle": "Pages that slide in",
+  "whatsNew120PagesBody": "Settings, the privacy policy and Your week in music no longer show the previous page through them while they open.",
+  "whatsNew130ArtistsTitle": "Every artist of a song",
+  "whatsNew130ArtistsBody": "A song by several artists, such as \"Nicki Minaj, Beyoncé\" or \"Chiké feat Mohbad\", now counts for each of them: it shows on every artist's page and search finds each one. Names such as \"Tyler, The Creator\" stay one artist.",
+  "whatsNew130ArtistPageTitle": "Artist pages",
+  "whatsNew130ArtistPageBody": "An artist's page starts with their five most played songs, then their albums, their singles, the albums they appear on and similar artists from your library.",
+  "whatsNew130AlbumPageTitle": "Album pages",
+  "whatsNew130AlbumPageBody": "Albums show their year, and downloaded songs without track numbers come in the order they were downloaded. Guests a title does not name show under it.",
+  "whatsNew130AboutTitle": "About, when there is something to read",
+  "whatsNew130AboutBody": "With online info turned on, About shows only when Last.fm has a bio or a review, with the listeners and a few genres under it.",
+  "whatsNew130AlbumsTitle": "One album, not several copies",
+  "whatsNew130AlbumsBody": "An album downloaded in several folders, or singles saved one folder each, showed up several times. It is one album again, and its year shows.",
+  "whatsNew140TopTitle": "Back to the top",
+  "whatsNew140TopBody": "Tap the tab you are on to scroll its page back to the top.",
+  "whatsNew140EdgeTitle": "Edge to edge",
+  "whatsNew140EdgeBody": "Lists now scroll under the status bar and the floating tab bar, on every Android version, and fade out softly under the tab bar instead of stopping on a line.",
+  "whatsNew140TitlesTitle": "Large titles",
+  "whatsNew140TitlesBody": "Every page opens on a large title that shrinks into a glass bar as you scroll, with the back button and the page's actions. A title left halfway settles open or closed.",
+  "whatsNew140CoversTitle": "Album and playlist pages",
+  "whatsNew140CoversBody": "Their cover and buttons scroll away under the same glass bar, which then shows their name.",
+  "whatsNew140ArtistPhotoTitle": "Artist photos",
+  "whatsNew140ArtistPhotoBody": "An artist with a photo opens on it, edge to edge, with their name over it. Pull down to enlarge it.",
+  "whatsNew140SearchTitle": "Search",
+  "whatsNew140SearchBody": "The search field stays pinned at the top in a glass bar while the results scroll under it, and scrolling the results closes the keyboard."
+}

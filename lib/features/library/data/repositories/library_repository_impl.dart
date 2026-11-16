@@ -1,0 +1,128 @@
+import 'package:dartz/dartz.dart';
+import 'package:troona/core/error/error_handler.dart';
+import 'package:troona/core/error/failures.dart';
+import 'package:troona/features/library/data/sources/isar_library_data_source.dart';
+import 'package:troona/features/library/domain/entities/album.dart';
+import 'package:troona/features/library/domain/entities/artist.dart';
+import 'package:troona/features/library/domain/entities/playlist.dart';
+import 'package:troona/features/library/domain/entities/track.dart';
+import 'package:troona/features/library/domain/repositories/library_repository.dart';
+import 'package:troona/features/library/domain/services/library_grouping.dart';
+import 'package:troona/services/scanner/media_scanner_service.dart';
+
+final class LibraryRepositoryImpl implements LibraryRepository {
+  final IsarLibraryDataSource _cache;
+  final MediaScannerService _scanner;
+
+  const LibraryRepositoryImpl({
+    required IsarLibraryDataSource cache,
+    required MediaScannerService scanner,
+  }) : _cache = cache,
+       _scanner = scanner;
+
+  @override
+  Future<Either<Failure, Stream<ScanProgress>>> scanLibrary() async {
+    try {
+      return right(_scanner.scanLibrary());
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  void cancelScan() => _scanner.cancel();
+
+  @override
+  Future<Either<Failure, List<Track>>> getTracksByIds(List<String> ids) async {
+    try {
+      final tracks = await _cache.getTracksByIds(ids);
+      return right(tracks.map((t) => t.toEntity()).toList());
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Track>>> getTracks() async {
+    try {
+      final tracks = await _cache.getAllTracks();
+      return right(tracks.map((t) => t.toEntity()).toList());
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Album>>> getAlbums() async {
+    try {
+      final tracks = await _cache.getAllTracks();
+      return right(
+        LibraryGrouping.albumsOf(tracks.map((t) => t.toEntity()).toList()),
+      );
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Artist>>> getArtists() async {
+    try {
+      final tracks = await _cache.getAllTracks();
+      return right(
+        LibraryGrouping.artistsOf(tracks.map((t) => t.toEntity()).toList()),
+      );
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Track>>> searchTracks(String query) async {
+    try {
+      final results = await _cache.searchTracks(query);
+      return right(results.map((t) => t.toEntity()).toList());
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Playlist>> getLikesPlaylist() async {
+    try {
+      final playlist = await _cache.ensureLikes();
+      return right(playlist.toEntity());
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> addTrackToLikes(String trackId) async {
+    try {
+      await _cache.addTrackToLikes(trackId);
+      return right(unit);
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> removeTrackFromLikes(String trackId) async {
+    try {
+      await _cache.removeTrackFromLikes(trackId);
+      return right(unit);
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isTrackInLikes(String trackId) async {
+    try {
+      final liked = await _cache.isTrackInLikes(trackId);
+      return right(liked);
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+}

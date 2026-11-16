@@ -1,0 +1,64 @@
+import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:equatable/equatable.dart';
+import 'package:dartz/dartz.dart';
+import 'package:troona/core/error/failures.dart';
+import 'package:troona/features/library/domain/entities/artist_albums.dart';
+import 'package:troona/features/library/domain/entities/artist.dart';
+import 'package:troona/features/library/domain/entities/artist_detail.dart';
+import 'package:troona/features/library/domain/entities/artist_songs.dart';
+import 'package:troona/features/library/domain/repositories/artist_detail_repository.dart';
+
+part 'artist_detail_event.dart';
+part 'artist_detail_state.dart';
+
+class ArtistDetailBloc extends Bloc<ArtistDetailEvent, ArtistDetailState> {
+  final ArtistDetailRepository _repo;
+
+  ArtistDetailBloc({required ArtistDetailRepository repo})
+    : _repo = repo,
+      super(ArtistDetailInitial()) {
+    on<ArtistDetailRequested>(
+      _onArtistDetailRequested,
+      transformer: droppable(),
+    );
+  }
+
+  Future<void> _onArtistDetailRequested(
+    ArtistDetailRequested event,
+    Emitter<ArtistDetailState> emit,
+  ) async {
+    if (state is! ArtistDetailLoaded) {
+      emit(const ArtistDetailLoading());
+    }
+
+    final id = event.id.toString();
+
+    // The three reads run in parallel
+    final results = await Future.wait([
+      _repo.getArtistById(id),
+      _repo.getTopTracksByArtistId(id),
+      _repo.getAlbumsByArtistId(id),
+    ]);
+
+    final artistRes = results[0] as Either<Failure, Artist>;
+    final tracksRes = results[1] as Either<Failure, ArtistSongs>;
+    final albumsRes = results[2] as Either<Failure, ArtistAlbums>;
+
+    artistRes.fold((f) => emit(ArtistDetailError(f.message)), (artist) {
+      final songs = tracksRes.getOrElse(() => const ArtistSongs());
+      final albums = albumsRes.getOrElse(() => const ArtistAlbums());
+
+      emit(
+        ArtistDetailLoaded(
+          ArtistDetail(
+            artist: artist,
+            topTracks: songs.tracks,
+            topTracksByPlays: songs.byPlays,
+            albums: albums,
+          ),
+        ),
+      );
+    });
+  }
+}

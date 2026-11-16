@@ -1,0 +1,109 @@
+import 'package:dartz/dartz.dart';
+import 'package:troona/core/error/error_handler.dart';
+import 'package:troona/core/error/failures.dart';
+import 'package:troona/features/library/data/sources/isar_library_data_source.dart';
+import 'package:troona/features/library/domain/entities/artist.dart';
+import 'package:troona/features/library/domain/entities/artist_albums.dart';
+import 'package:troona/features/history/domain/repositories/play_history_repository.dart';
+import 'package:troona/features/library/domain/entities/artist_songs.dart';
+import 'package:troona/features/library/domain/repositories/artist_detail_repository.dart';
+import 'package:troona/features/library/domain/services/library_grouping.dart';
+import 'package:troona/features/library/domain/services/track_tags.dart';
+
+final class ArtistDetailRepositoryImpl implements ArtistDetailRepository {
+  final IsarLibraryDataSource _cache;
+  final PlayHistoryRepository _history;
+
+  const ArtistDetailRepositoryImpl({
+    required IsarLibraryDataSource cache,
+    required PlayHistoryRepository history,
+  }) : _cache = cache,
+       _history = history;
+
+  @override
+  Future<Either<Failure, Artist>> getArtistById(String id) async {
+    try {
+      final targetId = int.tryParse(id);
+      if (targetId == null) {
+        return left(const DatabaseFailure('Invalid artist ID format'));
+      }
+
+      // Their whole albums, to tell their own from the ones they appear on.
+      final tracks = await _cache.getAlbumTracksByArtistId(targetId);
+      final artist = LibraryGrouping.artistOf(targetId, [
+        for (final t in tracks) t.toEntity(),
+      ]);
+      if (artist == null) {
+        return left(const DatabaseFailure('Artist not found'));
+      }
+      return right(artist);
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ArtistSongs>> getTopTracksByArtistId(String id) async {
+    try {
+      final targetId = int.tryParse(id);
+      if (targetId == null) {
+        return left(const DatabaseFailure('Invalid ID format'));
+      }
+
+      // Every song that credits this artist, from the Isar cache
+      final tracks = [
+        for (final t in await _cache.getTracksByArtistId(targetId))
+          t.toEntity(),
+      ];
+      // Without the history, the songs still show, unranked.
+      final plays = (await _history.playCounts({
+        for (final t in tracks) t.id,
+      })).getOrElse(() => const {});
+      return right(ArtistSongs.ranked(tracks, plays));
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ArtistAlbums>> getAlbumsByArtistId(String id) async {
+    try {
+      final targetId = int.tryParse(id);
+      if (targetId == null) {
+        return left(const DatabaseFailure('Invalid ID format'));
+      }
+
+      final tracks = await _cache.getAlbumTracksByArtistId(targetId);
+      return right(
+        LibraryGrouping.albumsOfArtist(targetId, [
+          for (final t in tracks) t.toEntity(),
+        ]),
+      );
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Artist>>> getArtistsByNames(
+    List<String> names,
+  ) async {
+    try {
+      final artists = <Artist>[];
+      final ids = <int>{};
+      for (final name in names) {
+        final id = TrackTags.artistIdFor(name);
+        if (TrackTags.isUnknownArtist(name) || !ids.add(id)) continue;
+        final tracks = await _cache.getAlbumTracksByArtistId(id);
+        if (tracks.isEmpty) continue;
+        final artist = LibraryGrouping.artistOf(id, [
+          for (final t in tracks) t.toEntity(),
+        ]);
+        if (artist != null) artists.add(artist);
+      }
+      return right(artists);
+    } catch (e, st) {
+      return left(ErrorHandler.handle(e, st));
+    }
+  }
+}

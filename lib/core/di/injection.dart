@@ -1,0 +1,503 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
+
+import 'package:get_it/get_it.dart';
+import 'package:on_audio_query_pluse/on_audio_query.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:troona/core/utils/app_logger.dart';
+import 'package:troona/core/database/app_database.dart';
+import 'package:troona/core/network/api_client.dart';
+import 'package:troona/features/metadata/data/repositories/metadata_repository_impl.dart';
+import 'package:troona/features/metadata/data/sources/last_fm_remote_data_source.dart';
+import 'package:troona/features/metadata/data/sources/metadata_cache_data_source.dart';
+import 'package:troona/features/metadata/domain/repositories/metadata_repository.dart';
+import 'package:troona/features/metadata/presentation/cubit/album_metadata_cubit.dart';
+import 'package:troona/features/metadata/presentation/cubit/artist_metadata_cubit.dart';
+import 'package:troona/features/backup/data/backup_repository_impl.dart';
+import 'package:troona/features/backup/data/isar_backup_data_source.dart';
+import 'package:troona/features/backup/domain/repositories/backup_repository.dart';
+import 'package:troona/features/backup/domain/use_cases/export_backup_use_case.dart';
+import 'package:troona/features/backup/domain/use_cases/restore_backup_use_case.dart';
+import 'package:troona/features/backup/presentation/cubit/backup_cubit.dart';
+import 'package:troona/features/history/data/repositories/play_history_repository_impl.dart';
+import 'package:troona/features/history/data/sources/isar_play_history_data_source.dart';
+import 'package:troona/features/history/domain/repositories/play_history_repository.dart';
+import 'package:troona/features/history/data/sources/shared_prefs_monthly_replay_log.dart';
+import 'package:troona/features/history/domain/repositories/monthly_replay_log.dart';
+import 'package:troona/features/history/domain/use_cases/create_monthly_replay_use_case.dart';
+import 'package:troona/features/history/domain/use_cases/get_listening_calendar_use_case.dart';
+import 'package:troona/features/history/domain/use_cases/get_weekly_recap_use_case.dart';
+import 'package:troona/features/history/domain/use_cases/record_listening_use_case.dart';
+import 'package:troona/features/history/domain/use_cases/record_play_use_case.dart';
+import 'package:troona/features/history/presentation/cubit/weekly_recap_cubit.dart';
+import 'package:troona/features/home/data/repositories/home_repository_impl.dart';
+import 'package:troona/features/home/domain/repositories/home_repository.dart';
+import 'package:troona/features/home/domain/use_cases/get_home_feed_use_case.dart';
+import 'package:troona/features/home/presentation/bloc/home_bloc.dart';
+import 'package:troona/features/library/data/repositories/album_detail_repository_impl.dart';
+import 'package:troona/features/library/data/repositories/artist_detail_repository_impl.dart';
+import 'package:troona/features/library/data/repositories/library_repository_impl.dart';
+import 'package:troona/features/library/data/sources/isar_library_data_source.dart';
+import 'package:troona/features/library/data/sources/local_audio_data_source.dart';
+import 'package:troona/features/library/domain/repositories/album_detail_repository.dart';
+import 'package:troona/features/library/domain/repositories/artist_detail_repository.dart';
+import 'package:troona/features/library/domain/repositories/library_repository.dart';
+import 'package:troona/features/library/domain/use_cases/get_albums_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/get_artists_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/get_likes_playlist_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/get_tracks_by_ids_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/get_tracks_use_case.dart';
+import 'package:troona/features/library/presentation/bloc/album_detail/album_detail_bloc.dart';
+import 'package:troona/features/library/presentation/bloc/artist_detail/artist_detail_bloc.dart';
+import 'package:troona/features/library/presentation/bloc/similar_artists/similar_artists_cubit.dart';
+import 'package:troona/features/playlist/data/repositories/playlist_repository_impl.dart';
+import 'package:troona/features/playlist/domain/repositories/playlist_repository.dart';
+import 'package:troona/features/playlist/presentation/bloc/playlist/playlist_bloc.dart';
+import 'package:troona/features/playlist/presentation/bloc/playlist_detail/playlist_detail_bloc.dart';
+import 'package:troona/features/search/data/repositories/search_repository_impl.dart';
+import 'package:troona/features/search/domain/repositories/search_repository.dart';
+import 'package:troona/features/search/presentation/bloc/search_bloc.dart';
+import 'package:troona/features/settings/domain/entities/app_settings.dart';
+import 'package:troona/features/library/domain/use_cases/add_track_to_likes_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/remove_track_from_likes_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/is_track_in_likes_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/scan_library_use_case.dart';
+import 'package:troona/features/library/domain/use_cases/search_tracks_use_case.dart';
+import 'package:troona/features/library/presentation/bloc/library/library_bloc.dart';
+import 'package:troona/features/player/data/repositories/player_repository_impl.dart';
+import 'package:troona/features/player/data/adapters/resumable_session.dart';
+import 'package:troona/features/player/data/playback_session_store.dart';
+import 'package:troona/features/player/domain/ports/audio_service_port.dart';
+import 'package:troona/features/player/domain/repositories/player_repository.dart';
+import 'package:troona/features/player/domain/use_cases/play_track_use_case.dart';
+import 'package:troona/features/player/domain/use_cases/player_use_cases.dart';
+import 'package:troona/features/player/presentation/bloc/palette/track_palette_cubit.dart';
+import 'package:troona/features/player/presentation/bloc/player/player_bloc.dart';
+import 'package:troona/features/player/presentation/bloc/sleep_timer/sleep_timer_cubit.dart';
+import 'package:troona/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:troona/features/settings/data/repositories/maintenance_repository_impl.dart';
+import 'package:troona/features/settings/domain/repositories/maintenance_repository.dart';
+import 'package:troona/features/settings/domain/repositories/settings_repository.dart';
+import 'package:troona/features/settings/presentation/cubit/maintenance_cubit.dart';
+import 'package:troona/features/updates/data/update_repository_impl.dart';
+import 'package:troona/features/updates/domain/repositories/update_repository.dart';
+import 'package:troona/features/updates/domain/use_cases/check_for_update_use_case.dart';
+import 'package:troona/features/updates/presentation/cubit/update_cubit.dart';
+import 'package:troona/features/whats_new/data/shared_prefs_whats_new_repository.dart';
+import 'package:troona/features/whats_new/domain/repositories/whats_new_repository.dart';
+import 'package:troona/features/whats_new/domain/use_cases/check_whats_new_use_case.dart';
+import 'package:troona/features/settings/presentation/cubit/settings_cubit.dart';
+import 'package:troona/services/audio/audio_service_initializer.dart';
+import 'package:troona/services/audio/audio_session_service.dart';
+import 'package:troona/services/audio/media_like_sync.dart';
+import 'package:troona/services/audio/playback_resumer.dart';
+import 'package:troona/services/history/play_history_recorder.dart';
+import 'package:troona/services/metadata/artist_artwork_prefetch_service.dart';
+import 'package:troona/services/scanner/artwork_extractor.dart';
+import 'package:troona/services/scanner/media_scanner_service.dart';
+import 'package:troona/core/theme/components/glass_theme.dart'
+    hide GlassQuality;
+import 'package:troona/core/theme/glass_tier.dart';
+import 'package:troona/core/utils/haptics_helper.dart';
+import 'package:troona/features/player/presentation/bloc/likes/likes_cubit.dart';
+
+/// The global service locator.
+///
+/// Call [configureDependencies] once in `main()` before [runApp].
+/// All registrations are intentionally **manual** (no `injectable` code
+/// generation) for maximum transparency in an open-source project.
+final GetIt getIt = GetIt.instance;
+
+/// Registers all dependencies in the correct resolution order.
+///
+/// Dependencies are registered before the objects that consume them so that
+/// `getIt()` calls inside factory/singleton constructors always resolve.
+Future<void> configureDependencies() async {
+  // ── Core external clients ─────────────────────────────────────────────────
+  getIt.registerLazySingleton<ApiClient>(() => ApiClient());
+  getIt.registerLazySingleton<OnAudioQuery>(() => OnAudioQuery());
+  final sharedPrefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(sharedPrefs);
+  getIt.registerSingleton<PlaybackSessionStore>(
+    PlaybackSessionStore(sharedPrefs),
+  );
+
+  // ── Data sources ──────────────────────────────────────────────────────────
+
+  // One database for every feature: each data source declares its own
+  // collections and shares the open handle.
+  final isar = await AppDatabase.open([
+    ...IsarLibraryDataSource.schemas,
+    ...IsarPlayHistoryDataSource.schemas,
+  ]);
+  final historySource = IsarPlayHistoryDataSource(isar);
+  getIt
+    ..registerSingleton<IsarLibraryDataSource>(IsarLibraryDataSource(isar))
+    ..registerSingleton<IsarPlayHistoryDataSource>(historySource);
+  // Before the recorder starts: it only runs while the daily totals are
+  // empty, and the first play would make them non-empty.
+  try {
+    await historySource.backfillDays();
+  } catch (e, st) {
+    appLogger.e('Daily listening backfill failed', error: e, stackTrace: st);
+  }
+
+  getIt.registerLazySingleton<LocalAudioDataSource>(
+    () => OnAudioQueryDataSource(query: getIt()),
+  );
+
+  // ── Artwork cache directory ───────────────────────────────────────────────
+  // Use the OS-managed cache directory (not system temp) so artwork survives
+  // app restarts and is cleared automatically under storage pressure.
+  final cacheBase = await getApplicationCacheDirectory();
+  final artworkCache = Directory('${cacheBase.path}/troona_artwork_cache');
+  await artworkCache.create(recursive: true); // no-op if already exists
+
+  getIt.registerLazySingleton<ArtworkExtractor>(
+    () => ArtworkExtractor(query: getIt(), cacheDir: artworkCache),
+  );
+
+  // ── Metadata cache directory & Remote Data Source ─────────────────────────
+  final metadataCache = Directory('${cacheBase.path}/troona_metadata_cache');
+  await metadataCache.create(recursive: true);
+  // Downloaded artist photos and album covers sit with the rest of the
+  // online info, so clearing it (or measuring it) covers them too.
+  final onlinePhotos = Directory('${metadataCache.path}/photos');
+  // Older builds kept them in the local covers folder.
+  for (final legacy in ['artists', 'albums']) {
+    final dir = Directory('${artworkCache.path}/$legacy');
+    if (await dir.exists()) {
+      unawaited(dir.delete(recursive: true).then((_) {}, onError: (_) {}));
+    }
+  }
+  unawaited(MetadataRepositoryImpl.removeUnfinishedDownloads(onlinePhotos));
+  final metadataCacheDataSource = MetadataCacheDataSourceImpl(
+    cacheDir: metadataCache,
+  );
+  await metadataCacheDataSource.init();
+  getIt.registerSingleton<MetadataCacheDataSource>(metadataCacheDataSource);
+
+  getIt.registerLazySingleton<LastFmRemoteDataSource>(
+    () => LastFmRemoteDataSourceImpl(client: getIt()),
+  );
+
+  // ── Services ──────────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<MediaScannerService>(
+    () => MediaScannerService(
+      source: getIt(),
+      cache: getIt(),
+      artworkExtractor: getIt(),
+    ),
+  );
+
+  // Load settings once as a local variable: needed by AudioServiceInitializer
+  // before DI is fully wired. SettingsRepository is registered as a lazy
+  // singleton below (after all its own dependencies are ready).
+  final settingsRepo = SettingsRepositoryImpl(sharedPrefs);
+  final initialSettings = (await settingsRepo.loadSettings()).fold(
+    (_) => const AppSettings(),
+    (s) => s,
+  );
+
+  // Detect hardware GPU tier and apply the saved glass quality preference.
+  await GlassTier.detect();
+  GlassTheme.setDetectedTier(GlassTier.detected);
+  GlassTheme.overrideQuality(
+    initialSettings.glassQuality == GlassQuality.auto
+        ? null
+        : initialSettings.glassQuality,
+  );
+  AppHaptics.enabled = initialSettings.hapticFeedbackEnabled;
+
+  final likeButton = AudioServiceInitializer.likeButton(
+    PlatformDispatcher.instance.locales,
+  );
+  // The handler is built before the player it resumes: it waits for it.
+  final lastSession = Completer<ResumableSession>();
+  final audioPort = await AudioServiceInitializer.init(
+    initialSettings,
+    likeButton: likeButton,
+    lastSession: lastSession.future,
+  );
+  getIt.registerSingleton<AudioServicePort>(audioPort);
+  // Configure the OS audio session (focus, becoming noisy) before any track
+  // loads to avoid focus races.
+  final audioSessionService = AudioSessionService(audioPort, initialSettings);
+  await audioSessionService.init();
+  getIt.registerSingleton<AudioSessionService>(audioSessionService);
+
+  // Started here, not on first use: plays count from the first track,
+  // including one restored from the last session.
+  final historyRepo = PlayHistoryRepositoryImpl(getIt());
+  getIt
+    ..registerSingleton<PlayHistoryRepository>(historyRepo)
+    ..registerSingleton<PlayHistoryRecorder>(
+      PlayHistoryRecorder(
+        port: audioPort,
+        recordPlay: RecordPlayUseCase(historyRepo),
+        recordListening: RecordListeningUseCase(historyRepo),
+      )..start(),
+    );
+
+  // ── Repositories ──────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<LibraryRepository>(
+    () => LibraryRepositoryImpl(cache: getIt(), scanner: getIt()),
+  );
+  getIt.registerLazySingleton<HomeRepository>(
+    () => HomeRepositoryImpl(db: getIt(), history: getIt()),
+  );
+  getIt.registerLazySingleton<AlbumDetailRepository>(
+    () => AlbumDetailRepositoryImpl(cache: getIt()),
+  );
+  getIt.registerLazySingleton<ArtistDetailRepository>(
+    () => ArtistDetailRepositoryImpl(cache: getIt(), history: getIt()),
+  );
+  getIt.registerLazySingleton<PlaylistRepository>(
+    () => PlaylistRepositoryImpl(cache: getIt()),
+  );
+  getIt.registerLazySingleton<MonthlyReplayLog>(
+    () => SharedPrefsMonthlyReplayLog(getIt()),
+  );
+  getIt.registerLazySingleton<CreateMonthlyReplayUseCase>(
+    () => CreateMonthlyReplayUseCase(
+      history: getIt(),
+      getTracksByIds: getIt(),
+      playlists: getIt(),
+      log: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<BackupRepository>(
+    () => BackupRepositoryImpl(
+      source: IsarBackupDataSource(isar, maxPlays: historySource.maxEvents),
+      settings: getIt(),
+      replayLog: getIt(),
+      exportDir: Directory('${cacheBase.path}/troona_backup'),
+    ),
+  );
+  getIt.registerLazySingleton<SearchRepository>(
+    () => SearchRepositoryImpl(db: getIt()),
+  );
+  getIt.registerLazySingleton<PlayerRepository>(
+    () => PlayerRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<MetadataRepository>(
+    () => MetadataRepositoryImpl(
+      cache: getIt(),
+      remote: getIt(),
+      settingsRepo: getIt(),
+      client: getIt(),
+      artworkCacheDir: onlinePhotos,
+    ),
+  );
+  getIt.registerLazySingleton<MaintenanceRepository>(
+    () => MaintenanceRepositoryImpl(
+      library: getIt(),
+      metadata: getIt(),
+      coverDir: artworkCache,
+    ),
+  );
+  getIt.registerLazySingleton<WhatsNewRepository>(
+    () => SharedPrefsWhatsNewRepository(getIt()),
+  );
+  getIt.registerLazySingleton<CheckWhatsNewUseCase>(
+    () => CheckWhatsNewUseCase(getIt(), getIt()),
+  );
+  // Its own Dio: GitHub headers and a short timeout.
+  getIt.registerLazySingleton<UpdateRepository>(
+    () => UpdateRepositoryImpl(
+      dio: Dio(UpdateRepositoryImpl.options),
+      prefs: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<ArtistArtworkPrefetchService>(
+    () => ArtistArtworkPrefetchService(repo: getIt()),
+  );
+
+  // ── Use cases ─────────────────────────────────────────────────────────────
+  getIt
+    ..registerLazySingleton<ScanLibraryUseCase>(
+      () => ScanLibraryUseCase(getIt()),
+    )
+    ..registerLazySingleton<GetTracksUseCase>(() => GetTracksUseCase(getIt()))
+    ..registerLazySingleton<GetTracksByIdsUseCase>(
+      () => GetTracksByIdsUseCase(getIt()),
+    )
+    ..registerLazySingleton<GetAlbumsUseCase>(() => GetAlbumsUseCase(getIt()))
+    ..registerLazySingleton<GetArtistsUseCase>(() => GetArtistsUseCase(getIt()))
+    ..registerLazySingleton<SearchTracksUseCase>(
+      () => SearchTracksUseCase(getIt()),
+    )
+    ..registerLazySingleton<GetLikesPlaylistUseCase>(
+      () => GetLikesPlaylistUseCase(getIt()),
+    )
+    ..registerLazySingleton<AddTrackToLikesUseCase>(
+      () => AddTrackToLikesUseCase(getIt()),
+    )
+    ..registerLazySingleton<RemoveTrackFromLikesUseCase>(
+      () => RemoveTrackFromLikesUseCase(getIt()),
+    )
+    ..registerLazySingleton<IsTrackInLikesUseCase>(
+      () => IsTrackInLikesUseCase(getIt()),
+    )
+    ..registerLazySingleton<GetHomeFeedUseCase>(
+      () => GetHomeFeedUseCase(getIt()),
+    )
+    ..registerLazySingleton<PlayTrackUseCase>(() => PlayTrackUseCase(getIt()))
+    ..registerLazySingleton<PauseUseCase>(() => PauseUseCase(getIt()))
+    ..registerLazySingleton<ResumeUseCase>(() => ResumeUseCase(getIt()))
+    ..registerLazySingleton<SeekUseCase>(() => SeekUseCase(getIt()))
+    ..registerLazySingleton<SkipNextUseCase>(() => SkipNextUseCase(getIt()))
+    ..registerLazySingleton<SkipPreviousUseCase>(
+      () => SkipPreviousUseCase(getIt()),
+    )
+    ..registerLazySingleton<SetQueueUseCase>(() => SetQueueUseCase(getIt()))
+    ..registerLazySingleton<AddToQueueUseCase>(() => AddToQueueUseCase(getIt()))
+    ..registerLazySingleton<RemoveFromQueueUseCase>(
+      () => RemoveFromQueueUseCase(getIt()),
+    )
+    ..registerLazySingleton<MoveQueueItemUseCase>(
+      () => MoveQueueItemUseCase(getIt()),
+    )
+    ..registerLazySingleton<ToggleShuffleUseCase>(
+      () => ToggleShuffleUseCase(getIt()),
+    )
+    ..registerLazySingleton<SetRepeatModeUseCase>(
+      () => SetRepeatModeUseCase(getIt()),
+    )
+    ..registerLazySingleton<SetVolumeUseCase>(() => SetVolumeUseCase(getIt()))
+    ..registerLazySingleton<SetSpeedUseCase>(() => SetSpeedUseCase(getIt()))
+    ..registerLazySingleton<SkipToIndexUseCase>(
+      () => SkipToIndexUseCase(getIt()),
+    );
+
+  // ── Presentation layer ────────────────────────────────────────────────────
+  // AudioSessionService is injected so runtime setting changes (call handling,
+  // ducking) are propagated immediately without an app restart.
+  getIt.registerLazySingleton<SettingsCubit>(
+    () => SettingsCubit(
+      getIt(),
+      getIt<AudioSessionService>(),
+      getIt<MetadataRepository>(),
+    )..load(),
+  );
+  getIt.registerFactory<MaintenanceCubit>(() => MaintenanceCubit(getIt()));
+  // Singleton: a restore keeps running after Settings closes, and reopening
+  // it must not start a second task beside it.
+  getIt.registerLazySingleton<BackupCubit>(
+    () => BackupCubit(
+      export: ExportBackupUseCase(getIt()),
+      restore: RestoreBackupUseCase(getIt(), getIt()),
+    ),
+  );
+  // Singleton: Home's card and Settings show the same check.
+  getIt.registerLazySingleton<UpdateCubit>(
+    () => UpdateCubit(
+      // Upstream Troona releases are not updates for Hadoken's package.
+      enabled: false,
+      check: CheckForUpdateUseCase(getIt(), getIt()),
+      repo: getIt(),
+      settings: getIt(),
+    ),
+  );
+  getIt.registerFactory<WeeklyRecapCubit>(
+    () => WeeklyRecapCubit(
+      recap: GetWeeklyRecapUseCase(getIt(), getIt()),
+      calendar: GetListeningCalendarUseCase(getIt()),
+    ),
+  );
+
+  getIt.registerSingleton<TrackPaletteCubit>(TrackPaletteCubit());
+
+  // Singleton: the timer keeps running when Now Playing closes.
+  getIt.registerSingleton<SleepTimerCubit>(SleepTimerCubit(port: getIt()));
+
+  // PlayerBloc is registered as a singleton because it owns 7 stream
+  // subscriptions to AudioServicePort. A factory would re-subscribe on every
+  // navigation event and leak subscriptions if an old instance is not closed
+  // before a new one is created. Use BlocProvider.value in the widget tree so
+  // the provider never calls close() on this singleton.
+  getIt.registerSingleton<PlayerBloc>(
+    PlayerBloc(
+      playTrack: getIt(),
+      pause: getIt(),
+      resume: getIt(),
+      seek: getIt(),
+      skipNext: getIt(),
+      skipPrevious: getIt(),
+      setQueue: getIt(),
+      addToQueue: getIt(),
+      removeFromQueue: getIt(),
+      moveQueueItem: getIt(),
+      toggleShuffle: getIt(),
+      setRepeatMode: getIt(),
+      setVolume: getIt(),
+      setSpeed: getIt(),
+      skipToIndex: getIt(),
+      audioServicePort: getIt(),
+      sessionStore: getIt(),
+      getTracksByIds: getIt(),
+    ),
+  );
+  lastSession.complete(
+    PlaybackResumer(store: getIt(), getTracksByIds: getIt(), player: getIt()),
+  );
+
+  getIt.registerSingleton<LikesCubit>(
+    LikesCubit(
+      addTrack: getIt(),
+      removeTrack: getIt(),
+      isTrackLiked: getIt(),
+      getLikesPlaylist: getIt(),
+    ),
+  );
+  // Started here: the heart of the media controls works without any page
+  // open.
+  getIt.registerSingleton<MediaLikeSync>(
+    MediaLikeSync(button: likeButton, likes: getIt(), port: audioPort)..start(),
+  );
+
+  getIt.registerFactory<HomeBloc>(
+    () => HomeBloc(repo: getIt(), prefetchService: getIt()),
+  );
+
+  getIt.registerFactory<SearchBloc>(() => SearchBloc(repo: getIt()));
+
+  getIt.registerFactory<ArtistDetailBloc>(
+    () => ArtistDetailBloc(repo: getIt()),
+  );
+  getIt.registerFactory<SimilarArtistsCubit>(
+    () => SimilarArtistsCubit(repo: getIt()),
+  );
+
+  getIt.registerFactory<PlaylistBloc>(() => PlaylistBloc(repo: getIt()));
+
+  getIt.registerFactory<PlaylistDetailBloc>(
+    () => PlaylistDetailBloc(repo: getIt()),
+  );
+
+  getIt.registerFactory<AlbumDetailBloc>(() => AlbumDetailBloc(repo: getIt()));
+
+  getIt.registerFactory<ArtistMetadataCubit>(
+    () => ArtistMetadataCubit(repo: getIt()),
+  );
+
+  getIt.registerFactory<AlbumMetadataCubit>(
+    () => AlbumMetadataCubit(repo: getIt()),
+  );
+
+  // LibraryBloc remains a factory so each ShellRoute mount creates a fresh
+  // instance with a clean state. The initial scan is triggered by AppShell.
+  getIt.registerFactory<LibraryBloc>(
+    () => LibraryBloc(
+      scanLibrary: getIt(),
+      getTracks: getIt(),
+      prefetchService: getIt(),
+    ),
+  );
+}

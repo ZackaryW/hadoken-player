@@ -1,0 +1,2836 @@
+{
+  "repository": "https://github.com/donfreddy/troona-music",
+  "revision": "3f233344a28328fa380b2e8ac0c81ab061259ff6",
+  "files": [
+    {
+      "source": ".github/RELEASE_TEMPLATE.md",
+      "destination": ".github/RELEASE_TEMPLATE.md",
+      "sha256": "41fea6e7519fb04256f376d4b0cc3fd4007f979ecc0af34e7dd24ccd10a9bea7"
+    },
+    {
+      "source": ".github/workflows/ci.yml",
+      "destination": ".github/workflows/ci.yml",
+      "sha256": "58622c006f6c33150d49a291b679929c1cd7121a70d91ab776ed5495aefb07d2"
+    },
+    {
+      "source": ".gitignore",
+      "destination": "docs/upstream/troona-gitignore",
+      "sha256": "b16ba7d9f9f3f29f0f4505a6ec9f57e5dc55ac08cbda245a6d6b17a8e2ef80db"
+    },
+    {
+      "source": ".metadata",
+      "destination": ".metadata",
+      "sha256": "d41ab33b350dccb299252b0dbf81e33ad498786ea954171bb38e769aaaf2fe3d"
+    },
+    {
+      "source": ".vscode/launch.json",
+      "destination": ".vscode/launch.json",
+      "sha256": "4924db615fa2a5579546a6a5cdd449d13e72d1b96ebad202b3efd3a23737ff59"
+    },
+    {
+      "source": ".vscode/settings.json",
+      "destination": ".vscode/settings.json",
+      "sha256": "08a7815fa20031ce630ab1d1f82d1ea3910902df77fcc39752935a83e8e55ad5"
+    },
+    {
+      "source": "CHANGELOG.md",
+      "destination": "CHANGELOG.md",
+      "sha256": "2290d92a62daae558a26fe5ef9abd75882542f55e16a84e483189bff9ae6c1a4"
+    },
+    {
+      "source": "CLAUDE.md",
+      "destination": "CLAUDE.md",
+      "sha256": "d1830875bc1964f494864b1ec1fada243c33d4616f1610f7be618bd48eac51cb"
+    },
+    {
+      "source": "CODE_OF_CONDUCT.md",
+      "destination": "CODE_OF_CONDUCT.md",
+      "sha256": "13c7d17f9aed9e1d5afbfd7b64dea464a84f29a3318c89d3708fcfea270761a4"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "destination": "CONTRIBUTING.md",
+      "sha256": "4e0f6175be469bf722f74033a03079338336ca167e2d5c9478f7b6bce6acd1d9"
+    },
+    {
+      "source": "LICENSE",
+      "destination": "docs/upstream/troona-LICENSE",
+      "sha256": "e0a03b72926e1e6d5e65c9a2e2c570ff6e7d5bda73c533c0f34234f320dd33a2"
+    },
+    {
+      "source": "README.md",
+      "destination": "docs/upstream/troona-README.md",
+      "sha256": "7afde072ed1b98d61fc2a8e2c1a527bcb5a1f8f056ee84db791bcef98f3729b7"
+    },
+    {
+      "source": "analysis_options.yaml",
+      "destination": "analysis_options.yaml",
+      "sha256": "74ecf1f3f18caeba6af92d28aa1268cdadcfb57d21ed24e98b011ed897b58675"
+    },
+    {
+      "source": "android/.gitignore",
+      "destination": "android/.gitignore",
+      "sha256": "c9af75dbc2c8aa867476a09426c80b178c4aeed8b9393ae48503eedfa3273d71"
+    },
+    {
+      "source": "android/app/build.gradle.kts",
+      "destination": "android/app/build.gradle.kts",
+      "sha256": "86e01e0556a9e8dc31089dfa294ea9a25140813f20a58777d13ed9f6e0009d4c"
+    },
+    {
+      "source": "android/app/src/debug/AndroidManifest.xml",
+      "destination": "android/app/src/debug/AndroidManifest.xml",
+      "sha256": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-hdpi/ic_launcher.png",
+      "destination": "android/app/src/debug/res/mipmap-hdpi/ic_launcher.png",
+      "sha256": "703fb2141c79e246382bb7c85c685a5c14111335c2b4f569d710f3040c74b21e"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_background.png",
+      "destination": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_background.png",
+      "sha256": "d78ac1e74dbc935416527be7a4b854f3ff1b87f6d41977b263937e58bc63aeb8"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "sha256": "654ec8e8d2451d4ee6ca6a2cd7aa1981bbc43b5cb46d740d6d0f77475b2d4b82"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/debug/res/mipmap-hdpi/ic_launcher_monochrome.png",
+      "sha256": "189acfc5b16dbf304682fb6d28448c0a246b0de1e9e823ec99f6178b5a7d20e6"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-mdpi/ic_launcher.png",
+      "destination": "android/app/src/debug/res/mipmap-mdpi/ic_launcher.png",
+      "sha256": "b312d43e5dafa77bad38527c4ecea7c0fb98c5e76f14b65f09ff918b058564f4"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_background.png",
+      "destination": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_background.png",
+      "sha256": "7ac12daaab900b6284cdcee0e317b1055153df1e23dedf5991062fd9cd4bdf53"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "sha256": "b8e675b0845525a5e35efee374a1a1720ce47fb1c1a9568dc421c98a16f63e73"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/debug/res/mipmap-mdpi/ic_launcher_monochrome.png",
+      "sha256": "98ce6b7a5b174a1a7306bc47c3dc8bf54503eb8bfabce853d8705987dfb182c5"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher.png",
+      "destination": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher.png",
+      "sha256": "033e491ab624f63cff45f307b75ef51943a8aede4927802ea3be3f47b5879727"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_background.png",
+      "sha256": "0dff49b3dea3a5be2869a0803fa3adebb7e24f0e89d8faf5e3a0e105077de495"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "sha256": "70b44a74cabc28d16bb84e64380c98a2eb8d66be15d8bdc7c75ac0e34f4f44f4"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/debug/res/mipmap-xhdpi/ic_launcher_monochrome.png",
+      "sha256": "cb54b1b37b857bbd8ff33d2f6da3b7451809a75f5d8685e2b15cac4432d54b9f"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher.png",
+      "destination": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher.png",
+      "sha256": "422ab09de41222dccb6ea5b43d18a423d6015748feee61b806a4fee76e863533"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_background.png",
+      "sha256": "7ef70b1171fe6ae67f92dd8f9d1dba83584bce9a7fab88ba6d4c1196560dd75c"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "sha256": "5b6473528b057b917ab1df1ed8d945ba3efd5cf352aa6c8d5fee0ca726921d25"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/debug/res/mipmap-xxhdpi/ic_launcher_monochrome.png",
+      "sha256": "ecf8ae379afc0bd249dc3c0bcd50df2e8c2b212c32cee4ad16b19012bbd4c900"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher.png",
+      "destination": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha256": "e209321b1c7b7144413d817bc0b202532295f3b9f7642ac13f4b252631025404"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_background.png",
+      "sha256": "2e3ebc5f5438db942f7417296a4137b65e985461e930a3d881721d6e596da4a7"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "sha256": "7bbc8134f59c5d03c803f9d0ecd8bd7b28d16edd7040598a024d63d82c6116c8"
+    },
+    {
+      "source": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/debug/res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
+      "sha256": "311eb8ea199d0373c8c9921ab0b556b219d27a3a824dabcd1e96fd00633cd335"
+    },
+    {
+      "source": "android/app/src/main/AndroidManifest.xml",
+      "destination": "android/app/src/main/AndroidManifest.xml",
+      "sha256": "667df9a3eeef00caea751e7f9746193819ce3ce6a7a41600b34e3562307aa4ad"
+    },
+    {
+      "source": "android/app/src/main/kotlin/com/donfreddy/troona/MainActivity.kt",
+      "destination": "android/app/src/main/kotlin/com/donfreddy/troona/MainActivity.kt",
+      "sha256": "c2db0d9c791921181646c544d87ea99862761d7a45afcb86af915503787ea36f"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-hdpi/ic_stat_troona.png",
+      "destination": "android/app/src/main/res/drawable-hdpi/ic_stat_troona.png",
+      "sha256": "59e7f428a1ed0ba8deafb75d68bc38f3fec267c119c4b8fbe84c6456abdd2636"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-mdpi/ic_stat_troona.png",
+      "destination": "android/app/src/main/res/drawable-mdpi/ic_stat_troona.png",
+      "sha256": "11537463703dcc26f1531012052ce95271f65d406ae20f614785fb1c6bf4daed"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-v21/launch_background.xml",
+      "destination": "android/app/src/main/res/drawable-v21/launch_background.xml",
+      "sha256": "916eeccda5092186a55010672a203e8aec394facbd2f5ab529bbd6b44d48990e"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-xhdpi/ic_stat_troona.png",
+      "destination": "android/app/src/main/res/drawable-xhdpi/ic_stat_troona.png",
+      "sha256": "8122070ffb330641d231e763b9ff6f3aa373f4f390c66d558a19f2fa02246cf8"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-xxhdpi/ic_stat_troona.png",
+      "destination": "android/app/src/main/res/drawable-xxhdpi/ic_stat_troona.png",
+      "sha256": "20d1d5fda196ddc614f0af34847292dc1f80cd9e5d28e1303fb14265e68d12ae"
+    },
+    {
+      "source": "android/app/src/main/res/drawable-xxxhdpi/ic_stat_troona.png",
+      "destination": "android/app/src/main/res/drawable-xxxhdpi/ic_stat_troona.png",
+      "sha256": "1685e373b0e5cbfacb49e7f49f83a462636698c2b75faed5812dd261e0dca289"
+    },
+    {
+      "source": "android/app/src/main/res/drawable/ic_like.xml",
+      "destination": "android/app/src/main/res/drawable/ic_like.xml",
+      "sha256": "2bc421702fb7923e0fb86b3932db2b5dcaca14668550be9d9e9025ea904937b0"
+    },
+    {
+      "source": "android/app/src/main/res/drawable/ic_like_filled.xml",
+      "destination": "android/app/src/main/res/drawable/ic_like_filled.xml",
+      "sha256": "d4688556de6346d670c060019cce3cd824219f650cd9d17e23879f70f0a3d26c"
+    },
+    {
+      "source": "android/app/src/main/res/drawable/launch_background.xml",
+      "destination": "android/app/src/main/res/drawable/launch_background.xml",
+      "sha256": "916eeccda5092186a55010672a203e8aec394facbd2f5ab529bbd6b44d48990e"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "destination": "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "6a7c66aeab4b039febf250b2abc7c87dfd2ab81bb0eda1495249c9f38a4af810"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "destination": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "sha256": "5573f52c5b9fc9d06f08c74d72c89122668f4ca7f2f25bd572b5f83ed8159902"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-hdpi/ic_launcher_background.png",
+      "destination": "android/app/src/main/res/mipmap-hdpi/ic_launcher_background.png",
+      "sha256": "6372de0fecf135406a3974c7034d027e6967669dfcc54509cde9a5b3461fde4e"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png",
+      "sha256": "1bfa0b56e9d9c735702d11043f8d68f72d3c4092957199c6c987e09fdaf6c41a"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-hdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/main/res/mipmap-hdpi/ic_launcher_monochrome.png",
+      "sha256": "74a283aa777b7c88f690ccf5c3eb1b9441795816b00f6d8002576ec0b190c573"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "destination": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "sha256": "4fa608e366a5cc5ba4d4d1206b605b73aaf18ed83a91f79879ee524df7c82420"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-mdpi/ic_launcher_background.png",
+      "destination": "android/app/src/main/res/mipmap-mdpi/ic_launcher_background.png",
+      "sha256": "f881dbb0c8b5b36d5d3bfb5377525e947c4a093d406e17b2b9f02c376d023811"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png",
+      "sha256": "d7f947ad44ada63ceaefdc05c88dba9ec4d8a7812195d7cf841bbeee28555c9a"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png",
+      "sha256": "a312fd51b9d35dce7f5b9f08829b06a56b2eaf1c4250a99d678d0ec791d019a8"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "destination": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "sha256": "fa1bffc40df6a19aebf1378a87fd47dd13aa38b17ebcccfce85045b8241b64a3"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_background.png",
+      "sha256": "a9bd27cca2a1efbdaa14517b4ab7621a1b9f0c850b878cdc9ef596f47d96994d"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png",
+      "sha256": "da826872e7449dc1b31ab28957c00c514cdacef8ac219233e92f49edcbffa7ce"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.png",
+      "sha256": "c372d2f8a39bc716c83cbdb9ada378eb6f0209e5172be94c2ee9567de6cf5a39"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "destination": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "sha256": "826ca8806615754c530f0e3c4ba6906be5302f9ad3c3093fec5845ed467462ef"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_background.png",
+      "sha256": "562b7f814f10257da5d199b432f1b4a2dfeb7286e20c99046ff18e9e1d1a26a8"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png",
+      "sha256": "c7db95bfeea503a33efea3aadeea98fa3cdcdabbeb65ac571cd7e935dd98d253"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher_monochrome.png",
+      "sha256": "1f8586757d7e4c152d8fafb1b14a8ec909c8eab2ee3653e19190625aa2af448a"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "destination": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "sha256": "f20c70ece172e7b6667c362f14654d4d496da0fd998bd3116d36f171f3778980"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png",
+      "destination": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png",
+      "sha256": "d2e59de7c7e9817357e4e8a99ad99c6e25637ec1311f6392195b5102a4a35702"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "destination": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "sha256": "a8d9228976a07ca0862d53cac628bed268867e186db4b8793bdc756d8985b27b"
+    },
+    {
+      "source": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
+      "destination": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
+      "sha256": "16df09bfdd62893df20909aa623769cc9b9565c56d2ba526e9da77440252a542"
+    },
+    {
+      "source": "android/app/src/main/res/raw/keep.xml",
+      "destination": "android/app/src/main/res/raw/keep.xml",
+      "sha256": "56fa35bee88aef71ec3a8d210c41185af4d5991c472c8a74ab9fa9ce51a4bdae"
+    },
+    {
+      "source": "android/app/src/main/res/values-v31/styles.xml",
+      "destination": "android/app/src/main/res/values-v31/styles.xml",
+      "sha256": "b3c0271ae7e4cce4d0fe2f5c9da24a81d6578142f366d374c9f880506d5cb42d"
+    },
+    {
+      "source": "android/app/src/main/res/values/colors.xml",
+      "destination": "android/app/src/main/res/values/colors.xml",
+      "sha256": "9247e4200c9dd8f6a4d2688f2eec5892de218914fe48e62d59417bf64bec9beb"
+    },
+    {
+      "source": "android/app/src/main/res/values/styles.xml",
+      "destination": "android/app/src/main/res/values/styles.xml",
+      "sha256": "dcff02f7dbb39a945eaae843614a23b4969362dfa57f4c91007a7ec72b60cd34"
+    },
+    {
+      "source": "android/app/src/main/res/xml/data_extraction_rules.xml",
+      "destination": "android/app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "7716e89c69c175522b86fb691004a49e3d609e214d0231d63e655a438a803b5b"
+    },
+    {
+      "source": "android/app/src/profile/AndroidManifest.xml",
+      "destination": "android/app/src/profile/AndroidManifest.xml",
+      "sha256": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c"
+    },
+    {
+      "source": "android/build.gradle.kts",
+      "destination": "android/build.gradle.kts",
+      "sha256": "218f400e3fff31c9c986a2535dfb974560e1b4d33cc27b7c1fee96a2b7e44454"
+    },
+    {
+      "source": "android/gradle.properties",
+      "destination": "android/gradle.properties",
+      "sha256": "a6716982d3990f4953e92cf21ef20d1a64e8811a2de542f29478eb8e078d2956"
+    },
+    {
+      "source": "android/gradle/wrapper/gradle-wrapper.properties",
+      "destination": "android/gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "1220fdd333a881e47441de07b23f9dd1ebd35459730543ae429cf249847d91bf"
+    },
+    {
+      "source": "android/key.properties.example",
+      "destination": "android/key.properties.example",
+      "sha256": "db18b3748c6f1d7d87f5896ebddf8b38961af50cbc10085b1838016100f1350b"
+    },
+    {
+      "source": "android/settings.gradle.kts",
+      "destination": "android/settings.gradle.kts",
+      "sha256": "4d438e37bd80ccc48ded4892c9026994cabe8cfb9c20d2947a609248495c869b"
+    },
+    {
+      "source": "assets/images/app-logo-round.png",
+      "destination": "assets/images/app-logo-round.png",
+      "sha256": "db36da8965be4ebb0b987b36c6a6bf2ed65d9a6850ff3768458fd696a4b48c36"
+    },
+    {
+      "source": "assets/images/app-logo.png",
+      "destination": "assets/images/app-logo.png",
+      "sha256": "8cead6024a061a1bc86eb8c06a5e259468d09e4e875f5941abede63a61a82ac1"
+    },
+    {
+      "source": "assets/images/github-download.svg",
+      "destination": "assets/images/github-download.svg",
+      "sha256": "1d0dab8eb9ddd9f3bc03770b7bbe4fceec59a223f7eaef7e465a39d8fc4e7975"
+    },
+    {
+      "source": "assets/images/openapk.svg",
+      "destination": "assets/images/openapk.svg",
+      "sha256": "652ffa3e52f335af280416d739db9843ecc520de76f428fff3f7cb82645daab7"
+    },
+    {
+      "source": "devtools_options.yaml",
+      "destination": "devtools_options.yaml",
+      "sha256": "99119330d774616e9e8f151014c3b3cf90a5e858fe4b8e459544eeda2acbc0e8"
+    },
+    {
+      "source": "docs/ARCHITECTURE.md",
+      "destination": "docs/ARCHITECTURE.md",
+      "sha256": "13d941a8b98ec6433c3a78e0c50e692a7fb4a98e40040a5a310d229da2b23eae"
+    },
+    {
+      "source": "docs/privacy-policy.md",
+      "destination": "docs/privacy-policy.md",
+      "sha256": "972931244647a09a86f5cc8a08f7a5404f1dba06e4d2ed7776fdd97e8829e54b"
+    },
+    {
+      "source": "ios/.gitignore",
+      "destination": "ios/.gitignore",
+      "sha256": "e85b4db8ba6ed14708e5f7d3c60336e5a3067ce11329b84aa8ba5d98603ee253"
+    },
+    {
+      "source": "ios/Flutter/AppFrameworkInfo.plist",
+      "destination": "ios/Flutter/AppFrameworkInfo.plist",
+      "sha256": "88e403d33087654522431733ad261741f836f92c94a50ee792820b4f1ed89716"
+    },
+    {
+      "source": "ios/Flutter/Debug.xcconfig",
+      "destination": "ios/Flutter/Debug.xcconfig",
+      "sha256": "0252d55e8f79bda3b6f336b9523c740fe59d4d1b806e6398a906132b1734b309"
+    },
+    {
+      "source": "ios/Flutter/Release.xcconfig",
+      "destination": "ios/Flutter/Release.xcconfig",
+      "sha256": "f1a2e46792280a99f79c4c2775df5817c2ab803d2c0d928ccf4e3c59721faca2"
+    },
+    {
+      "source": "ios/Podfile",
+      "destination": "ios/Podfile",
+      "sha256": "4a8bcaf25e1a354dfd94161571f087a4125952b009f59b198358dd643727119f"
+    },
+    {
+      "source": "ios/Podfile.lock",
+      "destination": "ios/Podfile.lock",
+      "sha256": "31b57bb3e77da90340c999f358b2c5c02773c17197a651213ffb84ca4d6b64e5"
+    },
+    {
+      "source": "ios/Runner.xcodeproj/project.pbxproj",
+      "destination": "ios/Runner.xcodeproj/project.pbxproj",
+      "sha256": "e9318cd3c4b38e5e9fb0a0a2cb216e7d4ce7b8ecd86cf13a1042dd463efe85bb"
+    },
+    {
+      "source": "ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+      "destination": "ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+      "sha256": "ac28b35c2b940210bec0fff8e424b07fd0efe9112ab178a10533583f251a386c"
+    },
+    {
+      "source": "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "destination": "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "sha256": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30"
+    },
+    {
+      "source": "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+      "destination": "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+      "sha256": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74"
+    },
+    {
+      "source": "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme",
+      "destination": "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme",
+      "sha256": "570c49fd61c67330efb75097018d1b0df0c68d03667631105a5acf5621112b1b"
+    },
+    {
+      "source": "ios/Runner.xcworkspace/contents.xcworkspacedata",
+      "destination": "ios/Runner.xcworkspace/contents.xcworkspacedata",
+      "sha256": "505cf76cad37d19ae93e07254f2235ffd0095362bcbaa253c463d79896f6b8e0"
+    },
+    {
+      "source": "ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "destination": "ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+      "sha256": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30"
+    },
+    {
+      "source": "ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+      "destination": "ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+      "sha256": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74"
+    },
+    {
+      "source": "ios/Runner/AppDelegate.swift",
+      "destination": "ios/Runner/AppDelegate.swift",
+      "sha256": "13e99dab5435148efc15d9177ba505da3d24859a6ba663767510622fdf7a97fa"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@2x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@2x.png",
+      "sha256": "29a6b7cf7c8fd31623b5f03e696965e3ec4d64ddda72075a4d71354a3231ddab"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@2x~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@2x~ipad.png",
+      "sha256": "29a6b7cf7c8fd31623b5f03e696965e3ec4d64ddda72075a4d71354a3231ddab"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@3x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20@3x.png",
+      "sha256": "83ffac1104c4f6e40fb59b7120cd7010f9e12e4d6545def06f72669fe244a7c6"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-20~ipad.png",
+      "sha256": "63bad525ef4e72a90cf5544ec26c0e035008ce49177c83bcba9af72178af793a"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29.png",
+      "sha256": "5248fa3e2523319a01cecdcfc2d2b13ae706ca07711d1e5bba12cd88fdfddb6b"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@2x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@2x.png",
+      "sha256": "160132d28da108c4a970aa5d3029dc221f7018e1b44d2ce079975063f8710297"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@2x~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@2x~ipad.png",
+      "sha256": "160132d28da108c4a970aa5d3029dc221f7018e1b44d2ce079975063f8710297"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@3x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29@3x.png",
+      "sha256": "ccc6eded075b7b400b0f8b0d76bdfb233a39d4e1555614ada321711f15de2504"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-29~ipad.png",
+      "sha256": "5248fa3e2523319a01cecdcfc2d2b13ae706ca07711d1e5bba12cd88fdfddb6b"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@2x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@2x.png",
+      "sha256": "27af0867a6dea24c03e0413b3919c5e30dc044ecfaceae8cbd45c108ae6c3b01"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@2x~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@2x~ipad.png",
+      "sha256": "27af0867a6dea24c03e0413b3919c5e30dc044ecfaceae8cbd45c108ae6c3b01"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@3x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40@3x.png",
+      "sha256": "703cc6664ca123784bd9908cf07bc080ec639f5e796e93dceadcb85358c9cf26"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-40~ipad.png",
+      "sha256": "29a6b7cf7c8fd31623b5f03e696965e3ec4d64ddda72075a4d71354a3231ddab"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-60@2x~car.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-60@2x~car.png",
+      "sha256": "703cc6664ca123784bd9908cf07bc080ec639f5e796e93dceadcb85358c9cf26"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-60@3x~car.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-60@3x~car.png",
+      "sha256": "ff4fc5552e75093507bbddd6e8e3529603015a2eb092efe0abdf006b93c93929"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-83.5@2x~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon-83.5@2x~ipad.png",
+      "sha256": "1bc6b38bf81dce0cdfa5d21e4ac9ec439fa1cf9e931bfe82fdec861344b73c34"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@2x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@2x.png",
+      "sha256": "703cc6664ca123784bd9908cf07bc080ec639f5e796e93dceadcb85358c9cf26"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@2x~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@2x~ipad.png",
+      "sha256": "4a6873fe8e2d917f9ee8518aa2409f4e89dd10536b822c4bb7e99f208a30a139"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@3x.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon@3x.png",
+      "sha256": "ff4fc5552e75093507bbddd6e8e3529603015a2eb092efe0abdf006b93c93929"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon~ios-marketing.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon~ios-marketing.png",
+      "sha256": "cbf494a8dcb20e1488d2a0bbee2e3a2001305ed948fde79c94d9875eab927751"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon~ipad.png",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/AppIcon~ipad.png",
+      "sha256": "e458d1e0757e6fc4ef3628180fc873d84a7bf01e94f4966f02496e3c82feb9b7"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "destination": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "sha256": "c9633a45a5d56d293906c90638b97bae35bbbe166ed5cc97f72011d4378f6d76"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+      "destination": "ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+      "sha256": "fbd112a9f3b541a1d811f71ac8e4fe68b6176687d973a5f4d99b7aa4a722e94e"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+      "destination": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+      "destination": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+      "destination": "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+    },
+    {
+      "source": "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+      "destination": "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+      "sha256": "853ac958e2416fe2540f6f61165283a3618b71a7ba5f85f65ac41c2158dfcd21"
+    },
+    {
+      "source": "ios/Runner/Base.lproj/LaunchScreen.storyboard",
+      "destination": "ios/Runner/Base.lproj/LaunchScreen.storyboard",
+      "sha256": "bc3644fbb251ff1e18de25a4932c927850ae1a025be3dd1447940429633fe4b2"
+    },
+    {
+      "source": "ios/Runner/Base.lproj/Main.storyboard",
+      "destination": "ios/Runner/Base.lproj/Main.storyboard",
+      "sha256": "dcea4686c02065e56217fd19fcfb73d7509b41872e7486126149d47a18559363"
+    },
+    {
+      "source": "ios/Runner/Info.plist",
+      "destination": "ios/Runner/Info.plist",
+      "sha256": "1d839e7f6f147de5d552225fe18fef1337f9005ee0ca9e87d7bd92583fbcb91f"
+    },
+    {
+      "source": "ios/Runner/Runner-Bridging-Header.h",
+      "destination": "ios/Runner/Runner-Bridging-Header.h",
+      "sha256": "efe657d8b27f7f8595a0d416bffb33fe7d93bd2869d81f7353b556c439d7a1a7"
+    },
+    {
+      "source": "ios/RunnerTests/RunnerTests.swift",
+      "destination": "ios/RunnerTests/RunnerTests.swift",
+      "sha256": "c0e04141287eb7f9c9f3d31cf5be8cb626a9ea71351206c9121578e8b8f480c3"
+    },
+    {
+      "source": "l10n.yaml",
+      "destination": "l10n.yaml",
+      "sha256": "3cf70d45fbafca0f6b492f1403619b84cf18e227cf2318bace24e3e56424982a"
+    },
+    {
+      "source": "lib/app_shell.dart",
+      "destination": "lib/app_shell.dart",
+      "sha256": "de3e7cc301c8ff9649af55b8acdb757eda0cea21163fef67c7f722a1f9af2686"
+    },
+    {
+      "source": "lib/boot_failure_app.dart",
+      "destination": "lib/boot_failure_app.dart",
+      "sha256": "d9d1c7ea6194029cbd5198896bcd60cb61619115f40334196c5dbd8e25f88f99"
+    },
+    {
+      "source": "lib/core/database/app_database.dart",
+      "destination": "lib/core/database/app_database.dart",
+      "sha256": "74e8ea6233d44ff3f869ee3ee9a9d93e6cac589d56007de37369a112719f98a3"
+    },
+    {
+      "source": "lib/core/di/injection.dart",
+      "destination": "lib/core/di/injection.dart",
+      "sha256": "6dcac2a3280170581fd902e879d7dbb1b9e9b6ea66013f38dd0020d7e01618db"
+    },
+    {
+      "source": "lib/core/error/error_handler.dart",
+      "destination": "lib/core/error/error_handler.dart",
+      "sha256": "19ebda84432f785b5134c364ff5cc38867a2b6b7f9d8211f7e0165f914642414"
+    },
+    {
+      "source": "lib/core/error/exceptions.dart",
+      "destination": "lib/core/error/exceptions.dart",
+      "sha256": "522ae1b09ca79347484450dd9bcc24c8b98ac08a1aef10345439ac5964f30337"
+    },
+    {
+      "source": "lib/core/error/failures.dart",
+      "destination": "lib/core/error/failures.dart",
+      "sha256": "c42b5c4f1b432c859b0b4b8fdf76816f1c29837c759862d2f68a7c5b7189e74e"
+    },
+    {
+      "source": "lib/core/extensions/context_ext.dart",
+      "destination": "lib/core/extensions/context_ext.dart",
+      "sha256": "ec3fe860663d7ad345a163cf91804018baee2b1a749fd55a9c69432ee990144c"
+    },
+    {
+      "source": "lib/core/extensions/datetime_ext.dart",
+      "destination": "lib/core/extensions/datetime_ext.dart",
+      "sha256": "333c26c99730151feb73052394f1ffde6115ce4eafa847eec117d124d4361d25"
+    },
+    {
+      "source": "lib/core/extensions/duration_ext.dart",
+      "destination": "lib/core/extensions/duration_ext.dart",
+      "sha256": "743c4dc38f26a53d1cf42f4cfdaf837534e5b8c8db6e25cfa6a2bc30061d3af4"
+    },
+    {
+      "source": "lib/core/extensions/num_ext.dart",
+      "destination": "lib/core/extensions/num_ext.dart",
+      "sha256": "fc7e4b2199964b5253633f26f691ae3387bc2c6d3b50faaef026879e176f1d79"
+    },
+    {
+      "source": "lib/core/extensions/string_ext.dart",
+      "destination": "lib/core/extensions/string_ext.dart",
+      "sha256": "fc2ea546cebb0a83eac47f8ea91196c4072140daddb81862db922970bf26d4b9"
+    },
+    {
+      "source": "lib/core/layout/app_layout.dart",
+      "destination": "lib/core/layout/app_layout.dart",
+      "sha256": "c8bb4f8c046f145350926e373a8193f861c9eb61d86f6f7992d33e34f5c9246a"
+    },
+    {
+      "source": "lib/core/network/api_client.dart",
+      "destination": "lib/core/network/api_client.dart",
+      "sha256": "3c3512e93df5a00e1ec67d02180bdf4b3e705ccce53fe23adb8267fb82264ef9"
+    },
+    {
+      "source": "lib/core/network/api_endpoints.dart",
+      "destination": "lib/core/network/api_endpoints.dart",
+      "sha256": "43eb3a714850bf1fe800c6442183bfbca96ba8873986418856dfcf8206e443c4"
+    },
+    {
+      "source": "lib/core/router/app_router.dart",
+      "destination": "lib/core/router/app_router.dart",
+      "sha256": "0fb678b4e70540d7e3a5327721ec168c710fc9cf79472ac888b0c1ccae4c1d64"
+    },
+    {
+      "source": "lib/core/theme/app_theme.dart",
+      "destination": "lib/core/theme/app_theme.dart",
+      "sha256": "a8d75fdf4cdb0fabeecd6af0afa6b3af1ccca95040476c9e33260741bcbcaff8"
+    },
+    {
+      "source": "lib/core/theme/components/blur_budget.dart",
+      "destination": "lib/core/theme/components/blur_budget.dart",
+      "sha256": "a3ace8043a56eac83428f9d25239de9a14acefb04ca1d035d8658d2ac2c5cad4"
+    },
+    {
+      "source": "lib/core/theme/components/glass_filter.dart",
+      "destination": "lib/core/theme/components/glass_filter.dart",
+      "sha256": "af1854cd8d1555d8284770a937f95087b06550a4474607eaf827389cf9d281a5"
+    },
+    {
+      "source": "lib/core/theme/components/glass_theme.dart",
+      "destination": "lib/core/theme/components/glass_theme.dart",
+      "sha256": "d3663e8d227e3983cd3ce5a2f1a42d3651f79459dd359720abbd4c17ec5dd581"
+    },
+    {
+      "source": "lib/core/theme/glass_tier.dart",
+      "destination": "lib/core/theme/glass_tier.dart",
+      "sha256": "2a0b394306d56a1b4dc674d8a39b8c39ad28430160c753fe9638e2ed5b908f67"
+    },
+    {
+      "source": "lib/core/theme/primitives/color_primitives.dart",
+      "destination": "lib/core/theme/primitives/color_primitives.dart",
+      "sha256": "f94a531466d4034727640f9c0db90df22d44d1359b4bb0c82bb12c900258d280"
+    },
+    {
+      "source": "lib/core/theme/semantic/app_colors.dart",
+      "destination": "lib/core/theme/semantic/app_colors.dart",
+      "sha256": "95a6d31a423825de0509f7e3e9de532017cf42de11a582b2b33994e93214d6ed"
+    },
+    {
+      "source": "lib/core/theme/semantic/app_icons.dart",
+      "destination": "lib/core/theme/semantic/app_icons.dart",
+      "sha256": "3a9d2dd25f983076a16541d6d50ca18d865e7316f71048d6d25b6316da3223dc"
+    },
+    {
+      "source": "lib/core/theme/semantic/app_spacing.dart",
+      "destination": "lib/core/theme/semantic/app_spacing.dart",
+      "sha256": "0eb57d3f9a9db4edad7a63ae6d52e28d385e71797888255fbfc04231eff9cf83"
+    },
+    {
+      "source": "lib/core/theme/semantic/app_typography.dart",
+      "destination": "lib/core/theme/semantic/app_typography.dart",
+      "sha256": "eb5a48b172b45b671acce1d9c880667efbe1d6769170a7abdbdf2a4b36fea7d7"
+    },
+    {
+      "source": "lib/core/utils/app_logger.dart",
+      "destination": "lib/core/utils/app_logger.dart",
+      "sha256": "c1019af42443894af500d7b635f790bc19344ce5de468b8c7b4c8994bea07887"
+    },
+    {
+      "source": "lib/core/utils/crash_log.dart",
+      "destination": "lib/core/utils/crash_log.dart",
+      "sha256": "c5d374401c932564ef72c13158c8290f365c18f582ad5c3e5c45bfab6140f7a2"
+    },
+    {
+      "source": "lib/core/utils/debouncer.dart",
+      "destination": "lib/core/utils/debouncer.dart",
+      "sha256": "e04384c9d06b3ca7b392a9fd0bda705c3517b418db3cef4d430ad3c6367fe78f"
+    },
+    {
+      "source": "lib/core/utils/haptics_helper.dart",
+      "destination": "lib/core/utils/haptics_helper.dart",
+      "sha256": "f4c67c432f4976b3934de2dfde825ff621cb2ddf1696df4f2cdf8f62a7881456"
+    },
+    {
+      "source": "lib/core/utils/permission_handler.dart",
+      "destination": "lib/core/utils/permission_handler.dart",
+      "sha256": "b0dbb4b622bfd201557997dc244d0920d603d811f6f10b9b41390ec94d5c78c0"
+    },
+    {
+      "source": "lib/core/utils/sort_key.dart",
+      "destination": "lib/core/utils/sort_key.dart",
+      "sha256": "9f0035970aed21b68526843f738bbb1f3433bec768b60c670a7ea1e7ba0f9908"
+    },
+    {
+      "source": "lib/features/backup/data/backup_codec.dart",
+      "destination": "lib/features/backup/data/backup_codec.dart",
+      "sha256": "d94ce413d27c60c58ce3899d707263035c74d5061dca0dc2d6b2780fe9d2b84a"
+    },
+    {
+      "source": "lib/features/backup/data/backup_repository_impl.dart",
+      "destination": "lib/features/backup/data/backup_repository_impl.dart",
+      "sha256": "3f84c7de765d4aeb7f8f36ec72e91e6efb36590abd19ad4d1c9655638df3d361"
+    },
+    {
+      "source": "lib/features/backup/data/isar_backup_data_source.dart",
+      "destination": "lib/features/backup/data/isar_backup_data_source.dart",
+      "sha256": "44ed181f9a902edbab18d1876ee000974a3ff4f2140348f42b4a4f76c84964e0"
+    },
+    {
+      "source": "lib/features/backup/domain/entities/backup.dart",
+      "destination": "lib/features/backup/domain/entities/backup.dart",
+      "sha256": "e74a9729f3bb2b1421ce926e1477dd7dad571249e487726b12116d93c5de9294"
+    },
+    {
+      "source": "lib/features/backup/domain/repositories/backup_repository.dart",
+      "destination": "lib/features/backup/domain/repositories/backup_repository.dart",
+      "sha256": "f3c8bc89d3eebcc1e786b43651bcdca060980df2742fb4377ade8ab0ffd35e54"
+    },
+    {
+      "source": "lib/features/backup/domain/track_matcher.dart",
+      "destination": "lib/features/backup/domain/track_matcher.dart",
+      "sha256": "5c94faee89ea5ec0e5066fc15a4c5f08c87ae0ae20a2a88fd92d42a6273b0b84"
+    },
+    {
+      "source": "lib/features/backup/domain/use_cases/export_backup_use_case.dart",
+      "destination": "lib/features/backup/domain/use_cases/export_backup_use_case.dart",
+      "sha256": "a98648a9120a39d2f70ef6ace1d34a35d0113d860c9047bf4efb903adb04028e"
+    },
+    {
+      "source": "lib/features/backup/domain/use_cases/restore_backup_use_case.dart",
+      "destination": "lib/features/backup/domain/use_cases/restore_backup_use_case.dart",
+      "sha256": "dbec74b9ce15ce25a0bf3c0cf0d8a3eef80632428965bd56573a107edc2d16ac"
+    },
+    {
+      "source": "lib/features/backup/presentation/cubit/backup_cubit.dart",
+      "destination": "lib/features/backup/presentation/cubit/backup_cubit.dart",
+      "sha256": "a7774b0eee8773264d329b5a7116dd3d8f63e61b2fe9f771e347b0b88c0047a5"
+    },
+    {
+      "source": "lib/features/history/data/models/listening_models.dart",
+      "destination": "lib/features/history/data/models/listening_models.dart",
+      "sha256": "95b6b9850f9af8a7d0475a63f3cc5b22ed9a24fc6035b1a74a9abbd85fd03742"
+    },
+    {
+      "source": "lib/features/history/data/models/listening_models.g.dart",
+      "destination": "lib/features/history/data/models/listening_models.g.dart",
+      "sha256": "2dfd751cce1e6f9910a46d7ccb9c7b9d7022fbd0aafac07abc9219fa957a321f"
+    },
+    {
+      "source": "lib/features/history/data/models/play_event_model.dart",
+      "destination": "lib/features/history/data/models/play_event_model.dart",
+      "sha256": "59391171fe4bb8ab2de1d805068ea45e27a0c120cb6ab44d37fb594e9c58ffed"
+    },
+    {
+      "source": "lib/features/history/data/models/play_event_model.g.dart",
+      "destination": "lib/features/history/data/models/play_event_model.g.dart",
+      "sha256": "5aa96ee5690ba2e5273966ddb850290cc48417f5fe41173a15f45f46ddbf7811"
+    },
+    {
+      "source": "lib/features/history/data/repositories/play_history_repository_impl.dart",
+      "destination": "lib/features/history/data/repositories/play_history_repository_impl.dart",
+      "sha256": "83dbc980838b137ec6ca23e353641b35fb96d5d5292821552de945504990d7d5"
+    },
+    {
+      "source": "lib/features/history/data/sources/isar_play_history_data_source.dart",
+      "destination": "lib/features/history/data/sources/isar_play_history_data_source.dart",
+      "sha256": "6a66c6bf7d8b629d21addd7cee6aeaeed7a6c80faee5c742080a5df0edeac73e"
+    },
+    {
+      "source": "lib/features/history/data/sources/shared_prefs_monthly_replay_log.dart",
+      "destination": "lib/features/history/data/sources/shared_prefs_monthly_replay_log.dart",
+      "sha256": "dd163d1c1bb0d33f69c8086819051ae296cfc895f965d448155208314f3e0c9e"
+    },
+    {
+      "source": "lib/features/history/domain/entities/listening_stats.dart",
+      "destination": "lib/features/history/domain/entities/listening_stats.dart",
+      "sha256": "a2489d0d725b9ad81e751d5ba6b84a353ea6c555610e31bffc9024f280796f7a"
+    },
+    {
+      "source": "lib/features/history/domain/entities/play_event.dart",
+      "destination": "lib/features/history/domain/entities/play_event.dart",
+      "sha256": "e88a1db44d088002c9f0ea735068ce042e55a235568a9ae5b3ecd4f93c751064"
+    },
+    {
+      "source": "lib/features/history/domain/entities/weekly_recap.dart",
+      "destination": "lib/features/history/domain/entities/weekly_recap.dart",
+      "sha256": "c8d795b6aa13491f24d45311484463dbf06d8bb60e3ca78a140fa2caeb03cbad"
+    },
+    {
+      "source": "lib/features/history/domain/listening_day.dart",
+      "destination": "lib/features/history/domain/listening_day.dart",
+      "sha256": "e437264e2b0819a07c7aa2ccf0a1755231dd21df50d1669ea5d809a2e58b03f0"
+    },
+    {
+      "source": "lib/features/history/domain/play_counter.dart",
+      "destination": "lib/features/history/domain/play_counter.dart",
+      "sha256": "74f7c91a77512c85105178e76bd33fc0fe329537f48b193775b59989b6eb90d3"
+    },
+    {
+      "source": "lib/features/history/domain/repositories/monthly_replay_log.dart",
+      "destination": "lib/features/history/domain/repositories/monthly_replay_log.dart",
+      "sha256": "db023bda36a6edb48f512931ed2d6c2413964fa3dd5a968096e939d80befa040"
+    },
+    {
+      "source": "lib/features/history/domain/repositories/play_history_repository.dart",
+      "destination": "lib/features/history/domain/repositories/play_history_repository.dart",
+      "sha256": "066e74dc904d96e39ccf8aaa9f941c162c8e1b500673f52ea8d5147cdcbc28e5"
+    },
+    {
+      "source": "lib/features/history/domain/use_cases/create_monthly_replay_use_case.dart",
+      "destination": "lib/features/history/domain/use_cases/create_monthly_replay_use_case.dart",
+      "sha256": "6a3475edc4234e79a81cc92ee0084f048387588cf0fe9ca7937274d850025d9a"
+    },
+    {
+      "source": "lib/features/history/domain/use_cases/get_listening_calendar_use_case.dart",
+      "destination": "lib/features/history/domain/use_cases/get_listening_calendar_use_case.dart",
+      "sha256": "97584871b834a68b960202acc4776320a13cb7cf07e6a9ed835419e505727083"
+    },
+    {
+      "source": "lib/features/history/domain/use_cases/get_weekly_recap_use_case.dart",
+      "destination": "lib/features/history/domain/use_cases/get_weekly_recap_use_case.dart",
+      "sha256": "45b6d35d75d21d13a4d933cf582ff9d041d4a73c940a9a20b2c032fd455aa585"
+    },
+    {
+      "source": "lib/features/history/domain/use_cases/record_listening_use_case.dart",
+      "destination": "lib/features/history/domain/use_cases/record_listening_use_case.dart",
+      "sha256": "21b5259562922cb951d9b4b57be1d3d1ca35a24c747272327d9f75346be6f6d0"
+    },
+    {
+      "source": "lib/features/history/domain/use_cases/record_play_use_case.dart",
+      "destination": "lib/features/history/domain/use_cases/record_play_use_case.dart",
+      "sha256": "6643dee2db89c5bca17816b35fcf7c8d26aa53d3f4757104915976d9c99b3249"
+    },
+    {
+      "source": "lib/features/history/presentation/cubit/weekly_recap_cubit.dart",
+      "destination": "lib/features/history/presentation/cubit/weekly_recap_cubit.dart",
+      "sha256": "76c186b24696a0bf642667bb95a65c09ed4cc21afc64591c07441ac1b1b162b5"
+    },
+    {
+      "source": "lib/features/history/presentation/pages/weekly_recap_page.dart",
+      "destination": "lib/features/history/presentation/pages/weekly_recap_page.dart",
+      "sha256": "3bea1d40aa34262a6da76a20916cefe015c177d9869e70773f8036fbf56b64f5"
+    },
+    {
+      "source": "lib/features/history/presentation/utils/recap_format.dart",
+      "destination": "lib/features/history/presentation/utils/recap_format.dart",
+      "sha256": "0223bc0140ad35c4ec6107c599e2d9117b7becbd6e82cfc66ff8e3aa1a085784"
+    },
+    {
+      "source": "lib/features/history/presentation/widgets/listening_calendar.dart",
+      "destination": "lib/features/history/presentation/widgets/listening_calendar.dart",
+      "sha256": "f4fcd66234b65c852b662b30b7d0f0d7c450e7960bb18b5b804341dca4e79578"
+    },
+    {
+      "source": "lib/features/history/presentation/widgets/weekly_recap_card.dart",
+      "destination": "lib/features/history/presentation/widgets/weekly_recap_card.dart",
+      "sha256": "c0473c9f55080570d16d7abb26423d4fdc2db676d2dac86a0e6a7f06085c14e1"
+    },
+    {
+      "source": "lib/features/home/data/repositories/home_repository_impl.dart",
+      "destination": "lib/features/home/data/repositories/home_repository_impl.dart",
+      "sha256": "570c3ad2bbff72bf92dcc00c7dc353d23ca6147a3d135e59a1a42e25b648d5b2"
+    },
+    {
+      "source": "lib/features/home/domain/entities/home_feed.dart",
+      "destination": "lib/features/home/domain/entities/home_feed.dart",
+      "sha256": "f6472f59423eb395747f27ee14465b66c009d151885e9acf06f064ab9002d16e"
+    },
+    {
+      "source": "lib/features/home/domain/entities/track_play_count.dart",
+      "destination": "lib/features/home/domain/entities/track_play_count.dart",
+      "sha256": "343534ac1246274cbd83008e8dddae0c18f1600fcc2cba2b9ef7cd9e7a047817"
+    },
+    {
+      "source": "lib/features/home/domain/repositories/home_repository.dart",
+      "destination": "lib/features/home/domain/repositories/home_repository.dart",
+      "sha256": "0b38196596b2d0c2eb38837e8e9b3f6c7ca2c41685f5fba1519c1617d06ea902"
+    },
+    {
+      "source": "lib/features/home/domain/use_cases/get_home_feed_use_case.dart",
+      "destination": "lib/features/home/domain/use_cases/get_home_feed_use_case.dart",
+      "sha256": "31564b6625bb962dd90a908c52f304e96aed77bb5708e4893d02995c38f5fae0"
+    },
+    {
+      "source": "lib/features/home/presentation/bloc/home_bloc.dart",
+      "destination": "lib/features/home/presentation/bloc/home_bloc.dart",
+      "sha256": "0cc7e4fe92c85419c7ca7e061dd65c5fcf73c8fa49280372ba1ea25462215b07"
+    },
+    {
+      "source": "lib/features/home/presentation/bloc/home_event.dart",
+      "destination": "lib/features/home/presentation/bloc/home_event.dart",
+      "sha256": "0087ecc8dd216bfacd490881d3476fb6d8313c2d074aff990f387f0a3ed6443a"
+    },
+    {
+      "source": "lib/features/home/presentation/bloc/home_state.dart",
+      "destination": "lib/features/home/presentation/bloc/home_state.dart",
+      "sha256": "a6770cb1bf8e1484b8d6bccf595ad082429388efc4b9abd413e04528a90129c9"
+    },
+    {
+      "source": "lib/features/home/presentation/pages/home_page.dart",
+      "destination": "lib/features/home/presentation/pages/home_page.dart",
+      "sha256": "208b2423216729374936005d6004fa08b5c13f99db02dfac10d58b8b00d20595"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/hidden_gems_row.dart",
+      "destination": "lib/features/home/presentation/widgets/hidden_gems_row.dart",
+      "sha256": "7da6561238da3fbbdceae317a188f4f87fa9f5868a7830b8c4a6cf972e3cf662"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/home_hero_banner.dart",
+      "destination": "lib/features/home/presentation/widgets/home_hero_banner.dart",
+      "sha256": "a32512f9b1ac17a8486df2d2383e6da4c9b6efb6cc03b277489a1b970c5e7ceb"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/online_extras_offer.dart",
+      "destination": "lib/features/home/presentation/widgets/online_extras_offer.dart",
+      "sha256": "9a49710a230f4f4cae197a02e773c3539ceaa7479126648c8395f32166fd9699"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/quick_access_row.dart",
+      "destination": "lib/features/home/presentation/widgets/quick_access_row.dart",
+      "sha256": "dece050c7442ffef03eeaeb5ed804aae20d9750a3d13d4ab9390f209114a7403"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/recently_played_grid.dart",
+      "destination": "lib/features/home/presentation/widgets/recently_played_grid.dart",
+      "sha256": "7f3785a2a682e13b039f8d4a8d7c016fd9911bed98e80cb2a98f891ea8d5e07e"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/shimmer_row.dart",
+      "destination": "lib/features/home/presentation/widgets/shimmer_row.dart",
+      "sha256": "555c914573f3c8ed441259a5e671acd6c75beea71edd1398a4902ad779df52c3"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/top_weekly_row.dart",
+      "destination": "lib/features/home/presentation/widgets/top_weekly_row.dart",
+      "sha256": "5a9f9b7154c754127cd19c35628ff1425cced0541029191647ac84e4539d2698"
+    },
+    {
+      "source": "lib/features/home/presentation/widgets/trending_row.dart",
+      "destination": "lib/features/home/presentation/widgets/trending_row.dart",
+      "sha256": "51c9e76898f969b8b5f5147782a55dccbb986e12d5ac05267afc9fe359379a18"
+    },
+    {
+      "source": "lib/features/library/data/models/album_model.dart",
+      "destination": "lib/features/library/data/models/album_model.dart",
+      "sha256": "f14ee1be317e06feca2b3c9c98338b8d7d3199dffbe4c8f41a5d7512adbe3775"
+    },
+    {
+      "source": "lib/features/library/data/models/artist_model.dart",
+      "destination": "lib/features/library/data/models/artist_model.dart",
+      "sha256": "31d2ba1a4cd95c5a11bc0b06b5f462e9e270e1fb578a0292b6340a8a06bb2dde"
+    },
+    {
+      "source": "lib/features/library/data/models/playlist_model.dart",
+      "destination": "lib/features/library/data/models/playlist_model.dart",
+      "sha256": "e8c17ef007429bf164f19297aa34ef3547df06fabac800d93212e0ce63c5be75"
+    },
+    {
+      "source": "lib/features/library/data/models/playlist_model.g.dart",
+      "destination": "lib/features/library/data/models/playlist_model.g.dart",
+      "sha256": "e32f87930f8257074450a8ce659b0174b21964abf3a54bfd838bd8070c99ae00"
+    },
+    {
+      "source": "lib/features/library/data/models/track_model.dart",
+      "destination": "lib/features/library/data/models/track_model.dart",
+      "sha256": "5510a11f8314b9fc0f4214d66a2ac32fa707d62cbddff16782471ee553278c35"
+    },
+    {
+      "source": "lib/features/library/data/models/track_model.g.dart",
+      "destination": "lib/features/library/data/models/track_model.g.dart",
+      "sha256": "13f02d4acd6e6416ee43db57467d68872ea7fc2fc84c1e3bfbd2b7b4babeb285"
+    },
+    {
+      "source": "lib/features/library/data/repositories/album_detail_repository_impl.dart",
+      "destination": "lib/features/library/data/repositories/album_detail_repository_impl.dart",
+      "sha256": "181ab38ac356795f3a8fb5a67699275d29bf02f054582349aaaf83f609d93088"
+    },
+    {
+      "source": "lib/features/library/data/repositories/artist_detail_repository_impl.dart",
+      "destination": "lib/features/library/data/repositories/artist_detail_repository_impl.dart",
+      "sha256": "5a6e370529dd0646a05106fa92c7682ab1b968914d0876f83caa44e6e1db958b"
+    },
+    {
+      "source": "lib/features/library/data/repositories/library_repository_impl.dart",
+      "destination": "lib/features/library/data/repositories/library_repository_impl.dart",
+      "sha256": "c730ab55a864f1ab6f72db90dc3e0f36011b203d3e4419fae6348404fe5a91ac"
+    },
+    {
+      "source": "lib/features/library/data/sources/isar_library_data_source.dart",
+      "destination": "lib/features/library/data/sources/isar_library_data_source.dart",
+      "sha256": "d83508d33f878a90f42fc13351d450574f9bac434368e224a03491a5ead6d109"
+    },
+    {
+      "source": "lib/features/library/data/sources/local_audio_data_source.dart",
+      "destination": "lib/features/library/data/sources/local_audio_data_source.dart",
+      "sha256": "4f58bbdeb5df5227d650643c8b0a4294ddde6c5e3393cbc1902c44bd0496cade"
+    },
+    {
+      "source": "lib/features/library/domain/entities/album.dart",
+      "destination": "lib/features/library/domain/entities/album.dart",
+      "sha256": "fcee2b750afbd088c0947df99dd64b56cc35056559ce0b3873c2f2a08096f47b"
+    },
+    {
+      "source": "lib/features/library/domain/entities/album_detail.dart",
+      "destination": "lib/features/library/domain/entities/album_detail.dart",
+      "sha256": "fe7eaf394d276e8cf98870baf1eacfe96ea18d510a0f28c77564140441e700d9"
+    },
+    {
+      "source": "lib/features/library/domain/entities/artist.dart",
+      "destination": "lib/features/library/domain/entities/artist.dart",
+      "sha256": "209ae9321a74e54318854e2a643f751035126225526c9d1b0ad1571257f53534"
+    },
+    {
+      "source": "lib/features/library/domain/entities/artist_albums.dart",
+      "destination": "lib/features/library/domain/entities/artist_albums.dart",
+      "sha256": "74c8d652b71327b95a5703a7c0f5e905f02ebd3743f8e331da4049d7edfb8e89"
+    },
+    {
+      "source": "lib/features/library/domain/entities/artist_credit.dart",
+      "destination": "lib/features/library/domain/entities/artist_credit.dart",
+      "sha256": "780c3fa07e5a7a94dc8ee0769b78be78121d4c4c7ea2bf94855bd68f3c7f0563"
+    },
+    {
+      "source": "lib/features/library/domain/entities/artist_detail.dart",
+      "destination": "lib/features/library/domain/entities/artist_detail.dart",
+      "sha256": "b3ccff6309fd3d92f06ed182be47410a501aff93abb462c41d4c9a5dc5511bdb"
+    },
+    {
+      "source": "lib/features/library/domain/entities/artist_songs.dart",
+      "destination": "lib/features/library/domain/entities/artist_songs.dart",
+      "sha256": "ed68c37b0fb59244d5153fd11af568d4038cebbd7000f32c6f8d101587998f9d"
+    },
+    {
+      "source": "lib/features/library/domain/entities/audio_format.dart",
+      "destination": "lib/features/library/domain/entities/audio_format.dart",
+      "sha256": "9ba2d9c2ed87c523fabd978a87c918ed5c10a7bfffb9ee7710057ef98fc43893"
+    },
+    {
+      "source": "lib/features/library/domain/entities/playlist.dart",
+      "destination": "lib/features/library/domain/entities/playlist.dart",
+      "sha256": "64ce766b800f13b3c0285be449e7e55f0268593c571384b89ebb5e13896bcd5d"
+    },
+    {
+      "source": "lib/features/library/domain/entities/track.dart",
+      "destination": "lib/features/library/domain/entities/track.dart",
+      "sha256": "42ce984279c17bead57001f8cfb380e6c141f55c7a784d6f4c86cb8c4db53eb5"
+    },
+    {
+      "source": "lib/features/library/domain/repositories/album_detail_repository.dart",
+      "destination": "lib/features/library/domain/repositories/album_detail_repository.dart",
+      "sha256": "2489911b8bdcd6a492febc2d267b0fe620918c9b5f4d8544d8304d38ef30d4d3"
+    },
+    {
+      "source": "lib/features/library/domain/repositories/artist_detail_repository.dart",
+      "destination": "lib/features/library/domain/repositories/artist_detail_repository.dart",
+      "sha256": "cb7c8759e6345903afc75105d16900f19c429745d7fa7e2272ebd567f9258a51"
+    },
+    {
+      "source": "lib/features/library/domain/repositories/library_repository.dart",
+      "destination": "lib/features/library/domain/repositories/library_repository.dart",
+      "sha256": "c805eff927f24316dad3f07dd0387114b6fa9b3d830bb5024cca8fb8d6ec1b48"
+    },
+    {
+      "source": "lib/features/library/domain/services/album_merge.dart",
+      "destination": "lib/features/library/domain/services/album_merge.dart",
+      "sha256": "208981f1b1aacdc604aa62a6762cc8934add4b0964afd14e0deb810fe661e0c3"
+    },
+    {
+      "source": "lib/features/library/domain/services/album_order.dart",
+      "destination": "lib/features/library/domain/services/album_order.dart",
+      "sha256": "734bc4c9b9114558c4b99ca14af0cbddc646281f01307aeb5bce317383397a7b"
+    },
+    {
+      "source": "lib/features/library/domain/services/artist_credits.dart",
+      "destination": "lib/features/library/domain/services/artist_credits.dart",
+      "sha256": "4be6fa181b1b12b46ee69995f8600d8d3fe82ff8726dcae97b23931be8eab95e"
+    },
+    {
+      "source": "lib/features/library/domain/services/library_grouping.dart",
+      "destination": "lib/features/library/domain/services/library_grouping.dart",
+      "sha256": "6d5160b29fb5412a73ff9b5f20e833d16ff5d224691a17d18042a2eed0ffb91d"
+    },
+    {
+      "source": "lib/features/library/domain/services/single_release.dart",
+      "destination": "lib/features/library/domain/services/single_release.dart",
+      "sha256": "dacadd737762cdb475286ce73b57ff7397c3a7bee9739eca331e2850899f48c1"
+    },
+    {
+      "source": "lib/features/library/domain/services/track_tags.dart",
+      "destination": "lib/features/library/domain/services/track_tags.dart",
+      "sha256": "6948bbc32c9cca60decbf136c8e84f4c1a7ba330da71c1d3f5fd59b22a4f3869"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/add_track_to_likes_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/add_track_to_likes_use_case.dart",
+      "sha256": "a1137f6bfb739a2853f21cc2a88010a1a61e42afbaa385221141e2e548d5ca74"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/get_albums_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/get_albums_use_case.dart",
+      "sha256": "fc86c9cc3436088b858c97f7fdc3bafaeed12cfd854277f64664625deab054e9"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/get_artists_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/get_artists_use_case.dart",
+      "sha256": "ad10c2bc926523c5ad51feed5861267d11bc73ebf12e4bfb2c5031742c831354"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/get_likes_playlist_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/get_likes_playlist_use_case.dart",
+      "sha256": "d083900b35ec42201f3f425cca22ed9597aeec981eec07fffb686a3697dead52"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/get_tracks_by_ids_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/get_tracks_by_ids_use_case.dart",
+      "sha256": "e7b69caa5972b66c81dddaa73306f1bdb9746d43f9f7bc848fec27aaa6df4ad1"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/get_tracks_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/get_tracks_use_case.dart",
+      "sha256": "10f0d0373ec692ca3e7fdf99faba2e0438f66512cefc122b83a1ce0a4550af81"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/is_track_in_likes_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/is_track_in_likes_use_case.dart",
+      "sha256": "29a89ad6191cb8b6b9ae5001214b2457d1fa8acab2a444d987433553f193118d"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/remove_track_from_likes_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/remove_track_from_likes_use_case.dart",
+      "sha256": "8b9b177e0c1d36f36a559b2aa7f2600621f5c92858344e6ba4598a7adfdfa4e5"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/scan_library_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/scan_library_use_case.dart",
+      "sha256": "a45fba19b022dd91ef3e0373b698629cd50e634f96dc3b93b267137f1d9cd2d8"
+    },
+    {
+      "source": "lib/features/library/domain/use_cases/search_tracks_use_case.dart",
+      "destination": "lib/features/library/domain/use_cases/search_tracks_use_case.dart",
+      "sha256": "347372be6c15824235872853d943b07ae1f56a7040816b968a94f91addf93b78"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/album_detail/album_detail_bloc.dart",
+      "destination": "lib/features/library/presentation/bloc/album_detail/album_detail_bloc.dart",
+      "sha256": "d97c1950dfc57034df0358bfe794b67fc7f42678a12ff085ed512ced635bc865"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/album_detail/album_detail_event.dart",
+      "destination": "lib/features/library/presentation/bloc/album_detail/album_detail_event.dart",
+      "sha256": "a452bbbe3a36b0963478386be5bb5de358ec867a1801ddca0020ed5aed247c67"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/album_detail/album_detail_state.dart",
+      "destination": "lib/features/library/presentation/bloc/album_detail/album_detail_state.dart",
+      "sha256": "621f15bcea8435bef3fd8e494c8478160288d5d0c069b06fb495a86837a21c5d"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/artist_detail/artist_detail_bloc.dart",
+      "destination": "lib/features/library/presentation/bloc/artist_detail/artist_detail_bloc.dart",
+      "sha256": "938649d4cd160aa92e44c166af0cc384615097f368e156747e9c2ad874143a58"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/artist_detail/artist_detail_event.dart",
+      "destination": "lib/features/library/presentation/bloc/artist_detail/artist_detail_event.dart",
+      "sha256": "14b8afecdc23e1d0eb9f6cbd1a1281dca70e5d53411316e334f34ead9ec43990"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/artist_detail/artist_detail_state.dart",
+      "destination": "lib/features/library/presentation/bloc/artist_detail/artist_detail_state.dart",
+      "sha256": "043270f713088321524db56c8bd349182abb8614799fd9e0e9a8020ff2d7da9d"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/library/library_bloc.dart",
+      "destination": "lib/features/library/presentation/bloc/library/library_bloc.dart",
+      "sha256": "4219d1f3def806c0591fcce6c2f3b0c260a1c2478fae24f264db815d361832d7"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/library/library_event.dart",
+      "destination": "lib/features/library/presentation/bloc/library/library_event.dart",
+      "sha256": "734bf106e82fedfde04f89287b3f20e79136eadc8481efacb05558d4bc2b5fe1"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/library/library_state.dart",
+      "destination": "lib/features/library/presentation/bloc/library/library_state.dart",
+      "sha256": "8886c6a706b4be43314c39b9658912f652fe0e518715d7747bf7cacdb6c25f18"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/library/library_view.dart",
+      "destination": "lib/features/library/presentation/bloc/library/library_view.dart",
+      "sha256": "65c29fa84caeb03e2209a5adc5ff4d6351dc8bf6ba5f6376d8424032b67788e5"
+    },
+    {
+      "source": "lib/features/library/presentation/bloc/similar_artists/similar_artists_cubit.dart",
+      "destination": "lib/features/library/presentation/bloc/similar_artists/similar_artists_cubit.dart",
+      "sha256": "8a7ca8764fdea1fb00ef04830c8c592ccf90b115e60e358b5324238f72a08385"
+    },
+    {
+      "source": "lib/features/library/presentation/pages/album_detail_page.dart",
+      "destination": "lib/features/library/presentation/pages/album_detail_page.dart",
+      "sha256": "8b8d90d45eef3e0294fb0bb36c3f710c950c23c56a6aae7e2a368e99f86d22c2"
+    },
+    {
+      "source": "lib/features/library/presentation/pages/artist_detail_page.dart",
+      "destination": "lib/features/library/presentation/pages/artist_detail_page.dart",
+      "sha256": "fe19f9eedec1004790e8463116400b62a7090cf036be97756f2d9d4bdd7dbd24"
+    },
+    {
+      "source": "lib/features/library/presentation/pages/library_page.dart",
+      "destination": "lib/features/library/presentation/pages/library_page.dart",
+      "sha256": "46d11effafbae94ddb939f285fcab5fa67ac7c692525d212f457955d19fff208"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/album_card.dart",
+      "destination": "lib/features/library/presentation/widgets/album_card.dart",
+      "sha256": "ae1ff08793fadd8b2f39332213f71ad7613ae7a0d1f4c72fa8d0691312894210"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/album_track_list_tile.dart",
+      "destination": "lib/features/library/presentation/widgets/album_track_list_tile.dart",
+      "sha256": "9bf966e5ff62d7026d96de93cf24386a323c2b0b7eea2097982702cd58ba0a68"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/artist_card.dart",
+      "destination": "lib/features/library/presentation/widgets/artist_card.dart",
+      "sha256": "f2453e527ab564524facd9a582f11a817150c38d370d53298af632012ec314af"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/artist_releases.dart",
+      "destination": "lib/features/library/presentation/widgets/artist_releases.dart",
+      "sha256": "b2e783bd8c486beeb17ff722065417e87b5a673a4f338cd9f79a651ec049fcbf"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/library_segment_control.dart",
+      "destination": "lib/features/library/presentation/widgets/library_segment_control.dart",
+      "sha256": "6cc1f4d286265c2de1f068d60fbdc1de787ccc4efd6b4c355daf4dcb8fa2030e"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/library_stats_banner.dart",
+      "destination": "lib/features/library/presentation/widgets/library_stats_banner.dart",
+      "sha256": "2e2dd6848379cf108aba177abadb6026498c8691a705ab88e91b2f3e2ffdec3f"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/shuffle_banner.dart",
+      "destination": "lib/features/library/presentation/widgets/shuffle_banner.dart",
+      "sha256": "b0de8e192e5ac9d771245ade8dbce84b223de69457f9c005e2b1160731b04a81"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/track_actions/show_track_actions.dart",
+      "destination": "lib/features/library/presentation/widgets/track_actions/show_track_actions.dart",
+      "sha256": "0238f7b388f0712f784d6f626af00d021c035a9fe488077e8bee2593d1037d00"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/track_actions/track_action.dart",
+      "destination": "lib/features/library/presentation/widgets/track_actions/track_action.dart",
+      "sha256": "13ceaec094218bf9041d50bbbe733bf75d66e584cefb4078698e3c00d7ec0feb"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/track_list_tile.dart",
+      "destination": "lib/features/library/presentation/widgets/track_list_tile.dart",
+      "sha256": "63f74fcf4962c288b61e2addf87a829366eedcd5dfb91b05d64248a7f92aa5f4"
+    },
+    {
+      "source": "lib/features/library/presentation/widgets/track_shimmer.dart",
+      "destination": "lib/features/library/presentation/widgets/track_shimmer.dart",
+      "sha256": "f9a322b2f50cbe88aaeae15dedc11e232a481e44359aec773ca0fab3cf853826"
+    },
+    {
+      "source": "lib/features/metadata/data/models/last_fm_album_dto.dart",
+      "destination": "lib/features/metadata/data/models/last_fm_album_dto.dart",
+      "sha256": "7ef47d92c4cf9f0f87456e3ff3b5aa1986a0569ef7f0589d0a30f229c2647038"
+    },
+    {
+      "source": "lib/features/metadata/data/models/last_fm_artist_dto.dart",
+      "destination": "lib/features/metadata/data/models/last_fm_artist_dto.dart",
+      "sha256": "1d6cad2e62d8253cee15217e5c0a4e27e5152ee8c81142bd6478945e528c2c04"
+    },
+    {
+      "source": "lib/features/metadata/data/repositories/metadata_repository_impl.dart",
+      "destination": "lib/features/metadata/data/repositories/metadata_repository_impl.dart",
+      "sha256": "52df54bd964922232753d22c2ea975c4af2691855457c19a0c13a05b72000d29"
+    },
+    {
+      "source": "lib/features/metadata/data/sources/last_fm_remote_data_source.dart",
+      "destination": "lib/features/metadata/data/sources/last_fm_remote_data_source.dart",
+      "sha256": "71c3400a06e276827acdaac400f6d5f735bbb815a4aee9ac475f23a3993f042f"
+    },
+    {
+      "source": "lib/features/metadata/data/sources/metadata_cache_data_source.dart",
+      "destination": "lib/features/metadata/data/sources/metadata_cache_data_source.dart",
+      "sha256": "956736519c2782e60f47a24001fc10e8cbea7adfe646b229b9ab16a63a5d21c2"
+    },
+    {
+      "source": "lib/features/metadata/domain/entities/album_online_info.dart",
+      "destination": "lib/features/metadata/domain/entities/album_online_info.dart",
+      "sha256": "3825baf5f2d38dfb4bf7c67de66657fbcd8995317f9ebaefbd571ade893598a6"
+    },
+    {
+      "source": "lib/features/metadata/domain/entities/artist_online_info.dart",
+      "destination": "lib/features/metadata/domain/entities/artist_online_info.dart",
+      "sha256": "0e8cd802bf76811978803962fd4d67a4feb83b423bf073fd3b873714e457cf86"
+    },
+    {
+      "source": "lib/features/metadata/domain/repositories/metadata_repository.dart",
+      "destination": "lib/features/metadata/domain/repositories/metadata_repository.dart",
+      "sha256": "cb9f870086c880d9e8d68292ea31595a8b71032a0651f3971cd277d07fecc17f"
+    },
+    {
+      "source": "lib/features/metadata/presentation/cubit/album_metadata_cubit.dart",
+      "destination": "lib/features/metadata/presentation/cubit/album_metadata_cubit.dart",
+      "sha256": "ce63fd6151fcb762a8f6fe0edb36560c2643599fc8f9c6728ef3026a9684f98b"
+    },
+    {
+      "source": "lib/features/metadata/presentation/cubit/artist_metadata_cubit.dart",
+      "destination": "lib/features/metadata/presentation/cubit/artist_metadata_cubit.dart",
+      "sha256": "32e1e5681f68f94ab877e726aa2b3c1c15e671a5335a11c02af42bad5ed11580"
+    },
+    {
+      "source": "lib/features/metadata/presentation/widgets/online_about_card.dart",
+      "destination": "lib/features/metadata/presentation/widgets/online_about_card.dart",
+      "sha256": "7fbe7e11cf9de4362802814c04829ff48ef490399f9f058256d46ddfe12996f9"
+    },
+    {
+      "source": "lib/features/permissions/presentation/pages/permission_page.dart",
+      "destination": "lib/features/permissions/presentation/pages/permission_page.dart",
+      "sha256": "1edb9cb673e129cda9a052a82470040a9eec11d01bfd736b905c0538ec9af796"
+    },
+    {
+      "source": "lib/features/player/data/adapters/audio_handler_impl.dart",
+      "destination": "lib/features/player/data/adapters/audio_handler_impl.dart",
+      "sha256": "e9292870a738f8a5fc9ca5ece1916a6f53f6779bf2fb070b9ff9d3d0fb440ce3"
+    },
+    {
+      "source": "lib/features/player/data/adapters/gain_ramp.dart",
+      "destination": "lib/features/player/data/adapters/gain_ramp.dart",
+      "sha256": "d37e3ecf2d54a372756275ad8450f8139e99fb3feb84fea8aa8fefa72233dbbe"
+    },
+    {
+      "source": "lib/features/player/data/adapters/just_audio_adapter.dart",
+      "destination": "lib/features/player/data/adapters/just_audio_adapter.dart",
+      "sha256": "8c5ba4176a0edd43fec06f4db3bb6d909417220e00fb4be7ad6167747de4c551"
+    },
+    {
+      "source": "lib/features/player/data/adapters/media_like_button.dart",
+      "destination": "lib/features/player/data/adapters/media_like_button.dart",
+      "sha256": "d8a1a008b2e609b589a9bfab3a2592b41d6377a14a3d027bbb8bb87475cf9caf"
+    },
+    {
+      "source": "lib/features/player/data/adapters/resumable_session.dart",
+      "destination": "lib/features/player/data/adapters/resumable_session.dart",
+      "sha256": "82df633f74017f8cb487e8147962b9254c48827a3373576da0450940d35a3ae1"
+    },
+    {
+      "source": "lib/features/player/data/playback_session_store.dart",
+      "destination": "lib/features/player/data/playback_session_store.dart",
+      "sha256": "f158b138112e3b98fc4bde91a22644bcbeacdc2cc4f42cdc1805d0cfb9188132"
+    },
+    {
+      "source": "lib/features/player/data/repositories/player_repository_impl.dart",
+      "destination": "lib/features/player/data/repositories/player_repository_impl.dart",
+      "sha256": "00b5dd715f6e2e5fd191c45c7090529c87b8e5a3325e632bf6d01270915e8cbc"
+    },
+    {
+      "source": "lib/features/player/domain/entities/playback_state.dart",
+      "destination": "lib/features/player/domain/entities/playback_state.dart",
+      "sha256": "a0a7a1ee9af4883a93ed6a526c0571632fd9a21e8a246bb8384264e0a8b965fc"
+    },
+    {
+      "source": "lib/features/player/domain/entities/queue.dart",
+      "destination": "lib/features/player/domain/entities/queue.dart",
+      "sha256": "a6c40675d36018934356b0d41a729fedf113e573b77bfd16855f018a1bf38179"
+    },
+    {
+      "source": "lib/features/player/domain/entities/repeat_mode.dart",
+      "destination": "lib/features/player/domain/entities/repeat_mode.dart",
+      "sha256": "39baaabb93ce94d3551bd6640efd8ecb174e46adbd261e946f7e1cde4b391f9a"
+    },
+    {
+      "source": "lib/features/player/domain/ports/audio_service_port.dart",
+      "destination": "lib/features/player/domain/ports/audio_service_port.dart",
+      "sha256": "84440b9d6732bfef424eb450fe9a933c4a6414bf4d09c35f144b68015ea66bf3"
+    },
+    {
+      "source": "lib/features/player/domain/repositories/player_repository.dart",
+      "destination": "lib/features/player/domain/repositories/player_repository.dart",
+      "sha256": "ff501fcf53d7e80563bcf5155e5f285539198e14535ff0df146a9c5aaa5ea65d"
+    },
+    {
+      "source": "lib/features/player/domain/use_cases/play_track_use_case.dart",
+      "destination": "lib/features/player/domain/use_cases/play_track_use_case.dart",
+      "sha256": "4a3b768c55cc972a37e29a1c47db8b92a51bca9cc8d9d08bb6c7e4aec2dafb66"
+    },
+    {
+      "source": "lib/features/player/domain/use_cases/player_use_cases.dart",
+      "destination": "lib/features/player/domain/use_cases/player_use_cases.dart",
+      "sha256": "ca2bc6c73f993cfb861820326d02a628e05b91d341448328edf3c9d798421f67"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/likes/likes_cubit.dart",
+      "destination": "lib/features/player/presentation/bloc/likes/likes_cubit.dart",
+      "sha256": "a26fbecf2f2345c2dd21d5dc2eec8422aba6a837b7d5bd25a4e016e8fba7bf7a"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/likes/likes_state.dart",
+      "destination": "lib/features/player/presentation/bloc/likes/likes_state.dart",
+      "sha256": "7a38b3f04e9ca4ff2dbf6f311238d45fb980d908d1298cb7d11acdda91fca0c4"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/palette/track_palette_cubit.dart",
+      "destination": "lib/features/player/presentation/bloc/palette/track_palette_cubit.dart",
+      "sha256": "c32295cbc9197a1bac80b554cfaf8d5a2b2f0f2cc645bc5b4aa43248e2108125"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/player/playback_progress.dart",
+      "destination": "lib/features/player/presentation/bloc/player/playback_progress.dart",
+      "sha256": "fd4218db7ec0f6a738eeb652f866e5538f223e6e86b4cbb37f6ad0470d3d3561"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/player/player_bloc.dart",
+      "destination": "lib/features/player/presentation/bloc/player/player_bloc.dart",
+      "sha256": "f1286090d9b9114fc0a34e9fb003281a2b9e1863ac6d383ca18a7f12dd61d302"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/player/player_event.dart",
+      "destination": "lib/features/player/presentation/bloc/player/player_event.dart",
+      "sha256": "9170a04bd09ad2d7f9e9b6d00e32b88c9cc262d104660452662b88b2a247214f"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/player/player_notice.dart",
+      "destination": "lib/features/player/presentation/bloc/player/player_notice.dart",
+      "sha256": "6faef9d9c4df8d05abe946aa29aac97cd1d91f91cb4c5a68cd6e73a4a5514dbe"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/player/player_state.dart",
+      "destination": "lib/features/player/presentation/bloc/player/player_state.dart",
+      "sha256": "f88972171d06f4280ecb5782e18aee3ee8c2f3f5e1b795a7c68f0d3367a2c4db"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/sleep_timer/sleep_timer_cubit.dart",
+      "destination": "lib/features/player/presentation/bloc/sleep_timer/sleep_timer_cubit.dart",
+      "sha256": "b55e0db8390e2c9d36f759cbceb5031b4605d00ebd103994454c516df2726ad7"
+    },
+    {
+      "source": "lib/features/player/presentation/bloc/sleep_timer/sleep_timer_state.dart",
+      "destination": "lib/features/player/presentation/bloc/sleep_timer/sleep_timer_state.dart",
+      "sha256": "0824d0fb39650c26109d69194b75037b05c1a419be78fb114ac7dd02abd0df81"
+    },
+    {
+      "source": "lib/features/player/presentation/pages/full_player_page.dart",
+      "destination": "lib/features/player/presentation/pages/full_player_page.dart",
+      "sha256": "f6e21cffc59d67d3b5ee736c76b8db5ffba195d839a2f58f0854376e8da5400b"
+    },
+    {
+      "source": "lib/features/player/presentation/utils/play_shuffled.dart",
+      "destination": "lib/features/player/presentation/utils/play_shuffled.dart",
+      "sha256": "d2c45085778d9bb68f19bce7335f3c21fea155c16acceab410f1e22bef62e893"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/artwork_carousel.dart",
+      "destination": "lib/features/player/presentation/widgets/artwork_carousel.dart",
+      "sha256": "5f3cd8ae3971417511b77f1dbdc7c49ebf38a577aecf328d8f22909c7d3b6c3f"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/glass_lens.dart",
+      "destination": "lib/features/player/presentation/widgets/glass_lens.dart",
+      "sha256": "257eda2eb7b0011983691548d3d62378331770999798d1e46756c4cd3a713d48"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/now_playing_hero.dart",
+      "destination": "lib/features/player/presentation/widgets/now_playing_hero.dart",
+      "sha256": "851c3e5e6fd9ec4b9803fe8d3d89290c1757d66f421878ed3e3791b845fe06a6"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/play_shuffle_buttons.dart",
+      "destination": "lib/features/player/presentation/widgets/play_shuffle_buttons.dart",
+      "sha256": "0e96d96b78ede7f76d1eb38efc140b964e3eb346b94e96b37ea21f8c4f57a4d5"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/player_controls.dart",
+      "destination": "lib/features/player/presentation/widgets/player_controls.dart",
+      "sha256": "3e55f68e84d32b6864b2f0dda453561e99bf6138b2c19fa849790afb6db96354"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/player_notice_toast.dart",
+      "destination": "lib/features/player/presentation/widgets/player_notice_toast.dart",
+      "sha256": "bdc2621601ec14262b9de008dbc65a6787a4dd18ec924a4faddfec54261a9bff"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/player_progress_bar.dart",
+      "destination": "lib/features/player/presentation/widgets/player_progress_bar.dart",
+      "sha256": "ab577bbc8275674d297e908c0649c264a6270c58a1079ae0028946ad94a63de1"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/player_utility_dock.dart",
+      "destination": "lib/features/player/presentation/widgets/player_utility_dock.dart",
+      "sha256": "71cd288e6fb568cf7f8f61b9d47ecea265a88fe783f017e6b74f23873376cefe"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/progress_ring.dart",
+      "destination": "lib/features/player/presentation/widgets/progress_ring.dart",
+      "sha256": "d15137fc959c89562b84d01c5db9e6bc489a4d8cc54f88d3751429e14cc379f7"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/queue_sheet.dart",
+      "destination": "lib/features/player/presentation/widgets/queue_sheet.dart",
+      "sha256": "91dfd9e0eec0b9459c29ad7a547aaa3bf57bdbb1959251c455b8ffb53a42eb52"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/repeat_shuffle_buttons.dart",
+      "destination": "lib/features/player/presentation/widgets/repeat_shuffle_buttons.dart",
+      "sha256": "279f79f3e257571fa2429e1f66f0f903984521c5d70fab8c008030e4d77505a2"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/rotating_artwork.dart",
+      "destination": "lib/features/player/presentation/widgets/rotating_artwork.dart",
+      "sha256": "680707003a456d74e5feb86a6894c4fd24aab5a2bc8bd7d43a1b2f5214104114"
+    },
+    {
+      "source": "lib/features/player/presentation/widgets/track_title_switcher.dart",
+      "destination": "lib/features/player/presentation/widgets/track_title_switcher.dart",
+      "sha256": "06f536a1727d135eb5e6df3695c42bc5bf6205727f55c43b7a8586aa81366508"
+    },
+    {
+      "source": "lib/features/playlist/data/repositories/playlist_repository_impl.dart",
+      "destination": "lib/features/playlist/data/repositories/playlist_repository_impl.dart",
+      "sha256": "7170c44bc9c0c2d0499f61bd643e8f0d0925671d60f6c883ce86c1bd99f29714"
+    },
+    {
+      "source": "lib/features/playlist/domain/entities/playlist_detail.dart",
+      "destination": "lib/features/playlist/domain/entities/playlist_detail.dart",
+      "sha256": "2b25cdd994fce48b8ae9e06fe8e13695a4e3aaf6f18ef7addf6948551edb458e"
+    },
+    {
+      "source": "lib/features/playlist/domain/repositories/playlist_repository.dart",
+      "destination": "lib/features/playlist/domain/repositories/playlist_repository.dart",
+      "sha256": "64d63237d676213d787c07982be0a76c60f674f3e8e15d26f4d04875f464c0bd"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist/playlist_bloc.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist/playlist_bloc.dart",
+      "sha256": "60b397484599a2e06a8dcb8999d5de84585a6d934bffa56d16b34907ed21a232"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist/playlist_event.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist/playlist_event.dart",
+      "sha256": "1880eea12d517f28c2638d8653defa3b8ed6adb54793cca1a09ef46d97c9e26f"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist/playlist_state.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist/playlist_state.dart",
+      "sha256": "1559e85fc62ad3da0ca533e3e51ba0ce8ad7bb80c9bc3b7cc295828f64eac7e3"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_bloc.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_bloc.dart",
+      "sha256": "b3eddeae2ff7995edf3758abfec52834623bcb2b75bb6a1660675d8e6ed2ffdd"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_event.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_event.dart",
+      "sha256": "97020813b8859634fc83e18e375b7cc1919b6fd79fff0a7da91e82720dbc2de5"
+    },
+    {
+      "source": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_state.dart",
+      "destination": "lib/features/playlist/presentation/bloc/playlist_detail/playlist_detail_state.dart",
+      "sha256": "b1413b7338f392413f1511e3f2a469c3d0bf7cb225808025fd741538b688c005"
+    },
+    {
+      "source": "lib/features/playlist/presentation/pages/playlist_editor_page.dart",
+      "destination": "lib/features/playlist/presentation/pages/playlist_editor_page.dart",
+      "sha256": "dba8ca12d8d95d1318f4b082acf80b284de0ff13dc4d9ffc14f7ac3781333e87"
+    },
+    {
+      "source": "lib/features/playlist/presentation/pages/playlist_page.dart",
+      "destination": "lib/features/playlist/presentation/pages/playlist_page.dart",
+      "sha256": "be4a2e7a912ecc8d72513852c8db26cfd17dd410f009fe41583cef87fee2aec2"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/add_to_playlist_sheet.dart",
+      "destination": "lib/features/playlist/presentation/widgets/add_to_playlist_sheet.dart",
+      "sha256": "9dc22cf5d3644b92a307b8afc5830a4419018dd1350c466d6176c50c60b52937"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/likes_hero_card.dart",
+      "destination": "lib/features/playlist/presentation/widgets/likes_hero_card.dart",
+      "sha256": "fd86721b5618dd7fd921c6a834b8d087815915f7e1243121f970407e9c331c1e"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/playlist_card.dart",
+      "destination": "lib/features/playlist/presentation/widgets/playlist_card.dart",
+      "sha256": "bba5228d8ed6bf4a38e87e2ddad401444e4ec9618d4d3991d170a8cbfa0a6843"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/playlist_cover.dart",
+      "destination": "lib/features/playlist/presentation/widgets/playlist_cover.dart",
+      "sha256": "b57facdb7cdd29526e53321402b06c322bae6c66c7522339269b5cb87a894de6"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/playlist_detail_page.dart",
+      "destination": "lib/features/playlist/presentation/widgets/playlist_detail_page.dart",
+      "sha256": "86c3b0ee2b8312dca9c0df5f1099606580bee7e4a6c7555d0b56801b67c604ee"
+    },
+    {
+      "source": "lib/features/playlist/presentation/widgets/playlist_mosaic.dart",
+      "destination": "lib/features/playlist/presentation/widgets/playlist_mosaic.dart",
+      "sha256": "73ceb26d355e14f3a209b7730dce097c5137ae8c5cd39878e2b5e7f7166f140d"
+    },
+    {
+      "source": "lib/features/search/data/repositories/search_repository_impl.dart",
+      "destination": "lib/features/search/data/repositories/search_repository_impl.dart",
+      "sha256": "dcc2b19d8cfe89c3a946cb9b4162c03f660e6d06f6831ef75b69f56840dacf24"
+    },
+    {
+      "source": "lib/features/search/domain/entities/search_result.dart",
+      "destination": "lib/features/search/domain/entities/search_result.dart",
+      "sha256": "10493c0df7ad89b1d972c6009f7a1e835ae304f4fc3325a3998fa06c7a776238"
+    },
+    {
+      "source": "lib/features/search/domain/repositories/search_repository.dart",
+      "destination": "lib/features/search/domain/repositories/search_repository.dart",
+      "sha256": "5dd863ea3d7316bc2e822f6fdeb79b6ad90dbc97419c75369dad0b37ff4f220d"
+    },
+    {
+      "source": "lib/features/search/presentation/bloc/search_bloc.dart",
+      "destination": "lib/features/search/presentation/bloc/search_bloc.dart",
+      "sha256": "d4a734de05f8daf6512a1fcb3008c3bd184521bc2c663e5d29bbdd7c4ca9c7dd"
+    },
+    {
+      "source": "lib/features/search/presentation/bloc/search_event.dart",
+      "destination": "lib/features/search/presentation/bloc/search_event.dart",
+      "sha256": "98253d07723d4ab77d0fdfca9e66ca7a94edc2446629e273f037ce687e2fe9f1"
+    },
+    {
+      "source": "lib/features/search/presentation/bloc/search_state.dart",
+      "destination": "lib/features/search/presentation/bloc/search_state.dart",
+      "sha256": "bef92d7631d1eb72c4bff4e387bd069da2d327dc2d4ca2f377312ef884fb152b"
+    },
+    {
+      "source": "lib/features/search/presentation/pages/search_page.dart",
+      "destination": "lib/features/search/presentation/pages/search_page.dart",
+      "sha256": "c007e33d3ee3fabc02ad00337c7fe43cd579e548e9c7de03b04e34fa353c6e47"
+    },
+    {
+      "source": "lib/features/search/presentation/widgets/search_artist_chip.dart",
+      "destination": "lib/features/search/presentation/widgets/search_artist_chip.dart",
+      "sha256": "998338cc83d6e6aecfd35a5d00966c0175011dc9759a41a68717a9670d3b9c72"
+    },
+    {
+      "source": "lib/features/search/presentation/widgets/search_results_view.dart",
+      "destination": "lib/features/search/presentation/widgets/search_results_view.dart",
+      "sha256": "89d391d21eecae65d848a8169dc5e2ebef1b03b138307704c76f052a34b4e19a"
+    },
+    {
+      "source": "lib/features/search/presentation/widgets/search_suggestions.dart",
+      "destination": "lib/features/search/presentation/widgets/search_suggestions.dart",
+      "sha256": "41fdbdc6f23ad2b81c8969d445ef94479af43b0efe791021532a12a700bdbd58"
+    },
+    {
+      "source": "lib/features/search/presentation/widgets/search_top_result.dart",
+      "destination": "lib/features/search/presentation/widgets/search_top_result.dart",
+      "sha256": "77f90fb79d0ee38921e3a5d4287cb972cd8634ad99308246524ad29e876124c4"
+    },
+    {
+      "source": "lib/features/settings/data/repositories/maintenance_repository_impl.dart",
+      "destination": "lib/features/settings/data/repositories/maintenance_repository_impl.dart",
+      "sha256": "c45b01ea410b930d06da7d6bd86f91dc3894c58a9c2752d5af3b4e01f28d8da0"
+    },
+    {
+      "source": "lib/features/settings/data/repositories/settings_repository_impl.dart",
+      "destination": "lib/features/settings/data/repositories/settings_repository_impl.dart",
+      "sha256": "8381d2d9a24dd7e088ac32fdf564360b4e01ff8add9ebca03f7840f4574078ff"
+    },
+    {
+      "source": "lib/features/settings/domain/entities/app_settings.dart",
+      "destination": "lib/features/settings/domain/entities/app_settings.dart",
+      "sha256": "aa6db74c4b05a145b97fa89371cd4bede254e14a84b7b0afd6c96743b0df3afc"
+    },
+    {
+      "source": "lib/features/settings/domain/repositories/maintenance_repository.dart",
+      "destination": "lib/features/settings/domain/repositories/maintenance_repository.dart",
+      "sha256": "f83a855fcab72abd3f62528c4894a964fb64b872eea5fcec9dd58d491548f35e"
+    },
+    {
+      "source": "lib/features/settings/domain/repositories/settings_repository.dart",
+      "destination": "lib/features/settings/domain/repositories/settings_repository.dart",
+      "sha256": "233ce5abcc771f693334559817f63a4825916175d932ee5166562f94000f40e6"
+    },
+    {
+      "source": "lib/features/settings/presentation/cubit/maintenance_cubit.dart",
+      "destination": "lib/features/settings/presentation/cubit/maintenance_cubit.dart",
+      "sha256": "2182388a2b3ff8c603b802ffdb84b70ab85ca2acab06ac18dec244736d6fd51b"
+    },
+    {
+      "source": "lib/features/settings/presentation/cubit/settings_cubit.dart",
+      "destination": "lib/features/settings/presentation/cubit/settings_cubit.dart",
+      "sha256": "80b0190c4545a847666f6aeab99ff03bd69cfd36df325f30f2fa8a0f0f90e9d4"
+    },
+    {
+      "source": "lib/features/settings/presentation/cubit/settings_state.dart",
+      "destination": "lib/features/settings/presentation/cubit/settings_state.dart",
+      "sha256": "5ccaffaf49f0b2a88333463f29c13a3e36120443c208964b436a03f63c893814"
+    },
+    {
+      "source": "lib/features/settings/presentation/pages/privacy_page.dart",
+      "destination": "lib/features/settings/presentation/pages/privacy_page.dart",
+      "sha256": "b6e916d9b64bf90a8f9f56ebaa58e22d29d3f86bc3237f441a7651dc46349a0a"
+    },
+    {
+      "source": "lib/features/settings/presentation/pages/settings_page.dart",
+      "destination": "lib/features/settings/presentation/pages/settings_page.dart",
+      "sha256": "6bd199fdd585b1c42b382c2b9fb28f7aa38fa13edf4a4c613b3eafcaf50fb033"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/debug_section.dart",
+      "destination": "lib/features/settings/presentation/widgets/debug_section.dart",
+      "sha256": "756f639ff57ae76c690e96ce5c7f3fb6e2f15d6825ea45f3de5069d9bbffd1dc"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/segmented_row.dart",
+      "destination": "lib/features/settings/presentation/widgets/segmented_row.dart",
+      "sha256": "cb4a4583c6d7c6acf40070c229b763b1cb397244bef52af18b07982f2d14c217"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/settings_section.dart",
+      "destination": "lib/features/settings/presentation/widgets/settings_section.dart",
+      "sha256": "e9fe7ac517a58075c10517b4655d6cad4e5e5a7835958c6139aa1470ba79dc2d"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/settings_section_header.dart",
+      "destination": "lib/features/settings/presentation/widgets/settings_section_header.dart",
+      "sha256": "d4916c79ba14fc0905c787cdaef8c047a89fc377b10262c9ee0eb1e84a6a784a"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/settings_tile.dart",
+      "destination": "lib/features/settings/presentation/widgets/settings_tile.dart",
+      "sha256": "341647b376fcac92baa65e8a886e7118e50c99052bbfa58adfb1221fa595d383"
+    },
+    {
+      "source": "lib/features/settings/presentation/widgets/slider_tile.dart",
+      "destination": "lib/features/settings/presentation/widgets/slider_tile.dart",
+      "sha256": "2cf3443b74c168d89a773ef64207a89ceedd9c1212f14894868e5de4d7d53d8f"
+    },
+    {
+      "source": "lib/features/updates/data/update_repository_impl.dart",
+      "destination": "lib/features/updates/data/update_repository_impl.dart",
+      "sha256": "2606671fa60acfc5f55b49193d4a9389344bc48e1835e565858775bb4ac104b5"
+    },
+    {
+      "source": "lib/features/updates/domain/entities/app_release.dart",
+      "destination": "lib/features/updates/domain/entities/app_release.dart",
+      "sha256": "ff9abb1156f8ab9e03f7f1808cd93cbbdba36bc5ac4a4afa88673f433ae1082c"
+    },
+    {
+      "source": "lib/features/updates/domain/repositories/update_repository.dart",
+      "destination": "lib/features/updates/domain/repositories/update_repository.dart",
+      "sha256": "c26897ab4335193299c15b02610abb543a62530278efd3ce1e611c788b629520"
+    },
+    {
+      "source": "lib/features/updates/domain/use_cases/check_for_update_use_case.dart",
+      "destination": "lib/features/updates/domain/use_cases/check_for_update_use_case.dart",
+      "sha256": "e2ccbfa8f5ddc13231612ff7312acff2bafb9ea55fb22270664fd24eb3d4557e"
+    },
+    {
+      "source": "lib/features/updates/domain/version.dart",
+      "destination": "lib/features/updates/domain/version.dart",
+      "sha256": "59737b0ca3ae8465f0a2dac3e3c5e266ef7305c42333b958ad4a8c1e105d83c0"
+    },
+    {
+      "source": "lib/features/updates/presentation/cubit/update_cubit.dart",
+      "destination": "lib/features/updates/presentation/cubit/update_cubit.dart",
+      "sha256": "192ceb07c663d2beb28c1fc5d1cd244fe69914988321e3158c78bdfb5ad3c86b"
+    },
+    {
+      "source": "lib/features/updates/presentation/open_release.dart",
+      "destination": "lib/features/updates/presentation/open_release.dart",
+      "sha256": "a292483dc1b0b827564071b686424dad8b73171de82540422ac9246cfda0a3e6"
+    },
+    {
+      "source": "lib/features/updates/presentation/widgets/update_card.dart",
+      "destination": "lib/features/updates/presentation/widgets/update_card.dart",
+      "sha256": "661babe1f0693a1927dad6097713c659b9e2db6e58d7c117391e42eab1c92886"
+    },
+    {
+      "source": "lib/features/whats_new/data/shared_prefs_whats_new_repository.dart",
+      "destination": "lib/features/whats_new/data/shared_prefs_whats_new_repository.dart",
+      "sha256": "a9536698d464c60470100267d2d32020216ef3131131af9fe3f6d1c9c1370e88"
+    },
+    {
+      "source": "lib/features/whats_new/domain/repositories/whats_new_repository.dart",
+      "destination": "lib/features/whats_new/domain/repositories/whats_new_repository.dart",
+      "sha256": "66267ec5f4ec451efcf8faf3ca36f75905e377d87d762a2d8afd43d4bb6c993c"
+    },
+    {
+      "source": "lib/features/whats_new/domain/use_cases/check_whats_new_use_case.dart",
+      "destination": "lib/features/whats_new/domain/use_cases/check_whats_new_use_case.dart",
+      "sha256": "c68fd31873c1ef877568e143a60ad2e02e3cf339e09aee79bae393e12c62e6aa"
+    },
+    {
+      "source": "lib/features/whats_new/presentation/release_notes.dart",
+      "destination": "lib/features/whats_new/presentation/release_notes.dart",
+      "sha256": "7c36fd4dc6a22a6605327468737d9566f1a427806f4b0b99c3c7bde3954cbff7"
+    },
+    {
+      "source": "lib/features/whats_new/presentation/widgets/whats_new_sheet.dart",
+      "destination": "lib/features/whats_new/presentation/widgets/whats_new_sheet.dart",
+      "sha256": "aa67fd79598c3db70da301ebbc54e75166ce66f43494af1ada83a60ca21ade4f"
+    },
+    {
+      "source": "lib/l10n/app_en.arb",
+      "destination": "lib/l10n/app_en.arb",
+      "sha256": "cd46d2df705e2b132eb6d8138177c53300d7df75637ed338839a66109f563339"
+    },
+    {
+      "source": "lib/l10n/app_fr.arb",
+      "destination": "lib/l10n/app_fr.arb",
+      "sha256": "287fa05b104dd42a0eda1cf48d3b4add99369db5d5545b1aa88c56474449a907"
+    },
+    {
+      "source": "lib/l10n/app_localizations.dart",
+      "destination": "lib/l10n/app_localizations.dart",
+      "sha256": "9332abce644c0b8479654719e315c5d0a25899c186c590fad6522d78588a067e"
+    },
+    {
+      "source": "lib/l10n/app_localizations_en.dart",
+      "destination": "lib/l10n/app_localizations_en.dart",
+      "sha256": "22f93bb93596c06c7c3d28562a247c83151895f82456e0e5983a30928b9a8215"
+    },
+    {
+      "source": "lib/l10n/app_localizations_fr.dart",
+      "destination": "lib/l10n/app_localizations_fr.dart",
+      "sha256": "bdb3fc373c2d97b977dd504211ff9e979e3c73bd3ecf00c03b2fc665c1e00bae"
+    },
+    {
+      "source": "lib/main.dart",
+      "destination": "lib/main.dart",
+      "sha256": "b48e3335fa24ae619c1fcc62ee7d84f1fb57e9f58cc12e0e681102ad0e054440"
+    },
+    {
+      "source": "lib/services/audio/audio_service_initializer.dart",
+      "destination": "lib/services/audio/audio_service_initializer.dart",
+      "sha256": "3baa156071d1abf5b94f6c4ef03596430de145d4afcd6f789095a2fe11ae5866"
+    },
+    {
+      "source": "lib/services/audio/audio_session_service.dart",
+      "destination": "lib/services/audio/audio_session_service.dart",
+      "sha256": "f92736d6a6c489b04a45bc5fbf9611dcef481c092d61e4be748b5f9ca198ca09"
+    },
+    {
+      "source": "lib/services/audio/media_like_sync.dart",
+      "destination": "lib/services/audio/media_like_sync.dart",
+      "sha256": "321e7fd94e0b89c2c08cb0ce6304488e0462f06ef9f44a615d1d6f041d8be739"
+    },
+    {
+      "source": "lib/services/audio/playback_resumer.dart",
+      "destination": "lib/services/audio/playback_resumer.dart",
+      "sha256": "13e0688c000cf38e7ac4be0a82da4ee684b0c469899d31586b259b84003568ec"
+    },
+    {
+      "source": "lib/services/history/play_history_recorder.dart",
+      "destination": "lib/services/history/play_history_recorder.dart",
+      "sha256": "b0012b975c184d265b035f10aa747226efa3aa128c980375bb6db4f9c8303e5f"
+    },
+    {
+      "source": "lib/services/metadata/artist_artwork_prefetch_service.dart",
+      "destination": "lib/services/metadata/artist_artwork_prefetch_service.dart",
+      "sha256": "c41a83f40343fc7b8fe7f3c59cdb49578372ac6a092b82ceb48b091872e61a38"
+    },
+    {
+      "source": "lib/services/scanner/artwork_extractor.dart",
+      "destination": "lib/services/scanner/artwork_extractor.dart",
+      "sha256": "8ad629193d4dba92175bae116853c6aef39d7fe9472fb699bb91c965170bf357"
+    },
+    {
+      "source": "lib/services/scanner/media_scanner_service.dart",
+      "destination": "lib/services/scanner/media_scanner_service.dart",
+      "sha256": "e6015e0615ed45a6f2c57c0fa268228bdc8bb31dc1317ef1b2870fb782659b97"
+    },
+    {
+      "source": "lib/shared/widgets/action_sheet.dart",
+      "destination": "lib/shared/widgets/action_sheet.dart",
+      "sha256": "f3113e3993194ea8b61f86923edebf9980dcf2c0fd45fd7f88f9f896b8e4c946"
+    },
+    {
+      "source": "lib/shared/widgets/ambient_background.dart",
+      "destination": "lib/shared/widgets/ambient_background.dart",
+      "sha256": "631bfafa48137661a9aed1ac8925d456fcce6491a3c76ce0cd76a16ce4fd104e"
+    },
+    {
+      "source": "lib/shared/widgets/app_back_button.dart",
+      "destination": "lib/shared/widgets/app_back_button.dart",
+      "sha256": "d1c8ca6ac642c46021452dc6a39fd7c46e965c2f332ed58e89ba3071ef52a85b"
+    },
+    {
+      "source": "lib/shared/widgets/app_badge.dart",
+      "destination": "lib/shared/widgets/app_badge.dart",
+      "sha256": "3f41a8df79c09cf93f5d13a20ceb75e66b1caa19330fb5f48adb61fa7ceaf27b"
+    },
+    {
+      "source": "lib/shared/widgets/app_bottom_nav_bar.dart",
+      "destination": "lib/shared/widgets/app_bottom_nav_bar.dart",
+      "sha256": "6df39d86014494a8a4e79b0b6ad01a864a7cb349f59ec6230d0cd1d5d82d3e29"
+    },
+    {
+      "source": "lib/shared/widgets/app_button.dart",
+      "destination": "lib/shared/widgets/app_button.dart",
+      "sha256": "cead2b67e4f9fa6b238c1dccf467fc21c8d081f3383c0e89004825b628b0b787"
+    },
+    {
+      "source": "lib/shared/widgets/app_dialog.dart",
+      "destination": "lib/shared/widgets/app_dialog.dart",
+      "sha256": "3a94c087412a6838c926cefe090b1419ff3313362e59d2d3ab406cee36b2a7d5"
+    },
+    {
+      "source": "lib/shared/widgets/app_icon_button.dart",
+      "destination": "lib/shared/widgets/app_icon_button.dart",
+      "sha256": "07c2f2cfccede462ca5503a11035f4157ff7e6d65212af5c836a9b98e70ea6db"
+    },
+    {
+      "source": "lib/shared/widgets/app_toast.dart",
+      "destination": "lib/shared/widgets/app_toast.dart",
+      "sha256": "2e13c8206b71d85a2d41003aec38f422a6ba1b031e1b334649e981b505581bfd"
+    },
+    {
+      "source": "lib/shared/widgets/artwork_image.dart",
+      "destination": "lib/shared/widgets/artwork_image.dart",
+      "sha256": "2b1c2c18ca2fde1addac4d2b3e5dbc17ce25d2a7a0b79c6e67c9d377823b4736"
+    },
+    {
+      "source": "lib/shared/widgets/dynamic_background.dart",
+      "destination": "lib/shared/widgets/dynamic_background.dart",
+      "sha256": "85acb34e88c4a4833a9e1174d218f13c4055f0afe26e409cea63edcc04e10d95"
+    },
+    {
+      "source": "lib/shared/widgets/empty_state.dart",
+      "destination": "lib/shared/widgets/empty_state.dart",
+      "sha256": "81a21bd739a0c83eecfd22f4733aa22533fa61d4778d2f3597c1fc501656d66b"
+    },
+    {
+      "source": "lib/shared/widgets/entrance_fader.dart",
+      "destination": "lib/shared/widgets/entrance_fader.dart",
+      "sha256": "ed341f2cf145baccb4ee3e8ff3e4ef446f0561e2c8a27fcfb625f58170738005"
+    },
+    {
+      "source": "lib/shared/widgets/error_view.dart",
+      "destination": "lib/shared/widgets/error_view.dart",
+      "sha256": "a0537b2234db793cdac7b77b02fbac9b2db5e8c6e7520822e57b7eb7c41e5117"
+    },
+    {
+      "source": "lib/shared/widgets/glass_bottom_sheet.dart",
+      "destination": "lib/shared/widgets/glass_bottom_sheet.dart",
+      "sha256": "424f2002e2d5cef4ad1912373894b4c02caab23c08474467ad761284c7280520"
+    },
+    {
+      "source": "lib/shared/widgets/glass_card.dart",
+      "destination": "lib/shared/widgets/glass_card.dart",
+      "sha256": "aab49ff27daa8b0ccbd0c8bbd09cd78dcb4bf73a65181f3403869f4e049b1765"
+    },
+    {
+      "source": "lib/shared/widgets/glass_icon_button.dart",
+      "destination": "lib/shared/widgets/glass_icon_button.dart",
+      "sha256": "55d92576324a4e52b0e19b83a2fa7a4c3a042ee7e4554b91c6e05fd9f09e8a82"
+    },
+    {
+      "source": "lib/shared/widgets/glass_sliver_header.dart",
+      "destination": "lib/shared/widgets/glass_sliver_header.dart",
+      "sha256": "2e9603d3e15db6126e7ee59ae154503f1f214de636cc69f26f32d7077d119d5d"
+    },
+    {
+      "source": "lib/shared/widgets/marquee.dart",
+      "destination": "lib/shared/widgets/marquee.dart",
+      "sha256": "3011d1f16805f2951f967325fa655f6a9d9a8b4111239081b104f98494059858"
+    },
+    {
+      "source": "lib/shared/widgets/mini_equalizer.dart",
+      "destination": "lib/shared/widgets/mini_equalizer.dart",
+      "sha256": "2d71ac2d6a720849b9666ac8fb917ba439abe8e6d61fc79f7d93a889aa5fbef0"
+    },
+    {
+      "source": "lib/shared/widgets/section_header.dart",
+      "destination": "lib/shared/widgets/section_header.dart",
+      "sha256": "0115323ad4b8855b9ad2d7fe203fffb43a379a84d893b75b82ccd9b16bbb634a"
+    },
+    {
+      "source": "lib/shared/widgets/tab_reselect.dart",
+      "destination": "lib/shared/widgets/tab_reselect.dart",
+      "sha256": "751c9eb22e053829805ebf6189321eeeaaf6ded91c56eba2f47fedb4c740039e"
+    },
+    {
+      "source": "lib/shared/widgets/toast_anchor.dart",
+      "destination": "lib/shared/widgets/toast_anchor.dart",
+      "sha256": "4c5ae7a0f40859d8f98c391c1ff5297c654ed27428d3a1dd6858b62e8292374c"
+    },
+    {
+      "source": "notread.md",
+      "destination": "notread.md",
+      "sha256": "0e3abcbb721a1c71034891a002bddf688985f4cf6db53fb5012cd72edd09c21c"
+    },
+    {
+      "source": "pubspec.lock",
+      "destination": "pubspec.lock",
+      "sha256": "ca612db458c7f27930771a544da1314954d0e0d44dd7ce014c2e15fe4ed4e8e3"
+    },
+    {
+      "source": "pubspec.yaml",
+      "destination": "pubspec.yaml",
+      "sha256": "cc789fac9fcd155863f5a2978bf179a7f5b35c4897a7e5922b2841be3d7338d5"
+    },
+    {
+      "source": "screenshots/album-detail.jpeg",
+      "destination": "screenshots/album-detail.jpeg",
+      "sha256": "9f533986dfa4a4385bd1b0c282199ea3d814ae0c27e24a96457310785010587d"
+    },
+    {
+      "source": "screenshots/artist-detail.jpeg",
+      "destination": "screenshots/artist-detail.jpeg",
+      "sha256": "cdf6013c14686f81721eed94fb5c0c8cb1816af22842bfb5ce9761b9ed646740"
+    },
+    {
+      "source": "screenshots/banner.png",
+      "destination": "screenshots/banner.png",
+      "sha256": "fda1be7bedc08ded15ffc45f868fad3ee57e2f8059a3a3dbed2032859fe8c210"
+    },
+    {
+      "source": "screenshots/home.jpeg",
+      "destination": "screenshots/home.jpeg",
+      "sha256": "dbffdb0f1362db35f5dc9ce926682b0def4f2a39ef0fafc5b3ca6e3178f33206"
+    },
+    {
+      "source": "screenshots/library.jpeg",
+      "destination": "screenshots/library.jpeg",
+      "sha256": "aabc4e9f37e0e96d0e8d8078b84e3c6507c1a78fdbd9133066b35f38cc37be25"
+    },
+    {
+      "source": "screenshots/player.jpeg",
+      "destination": "screenshots/player.jpeg",
+      "sha256": "9aae1846c03a82b558f74a080f7b1b5108c0703352e666e6fc7a3eb97df40487"
+    },
+    {
+      "source": "screenshots/playlist.jpeg",
+      "destination": "screenshots/playlist.jpeg",
+      "sha256": "ca3ea726b4dc46405b0f6ac1b4579eb951b8b9536cb2d11b9981288a261e73cb"
+    },
+    {
+      "source": "screenshots/search.jpeg",
+      "destination": "screenshots/search.jpeg",
+      "sha256": "0894cbbb88f8179152beef66dbfe82ecdbe331cef5f602cfed1c841e35566650"
+    },
+    {
+      "source": "screenshots/weekly-recap.jpeg",
+      "destination": "screenshots/weekly-recap.jpeg",
+      "sha256": "c73cbaaca52887d8b796404f408b8193aab4d4576c04be534fd3c6db882503d2"
+    },
+    {
+      "source": "test/fonts/LICENSE.txt",
+      "destination": "test/fonts/LICENSE.txt",
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+    },
+    {
+      "source": "test/fonts/Roboto-Medium.ttf",
+      "destination": "test/fonts/Roboto-Medium.ttf",
+      "sha256": "f205cc511821ea56078a105557fcea6253129404d411c997e1866fbd006abb68"
+    },
+    {
+      "source": "test/fonts/Roboto-Regular.ttf",
+      "destination": "test/fonts/Roboto-Regular.ttf",
+      "sha256": "79e851404657dac2106b3d22ad256d47824a9a5765458edb72c9102a45816d95"
+    },
+    {
+      "source": "test/helpers/fake_player.dart",
+      "destination": "test/helpers/fake_player.dart",
+      "sha256": "4e9659c11da9359fbabe3cc5678d7d57266be6d2a0586c46e47acb1ca69619b6"
+    },
+    {
+      "source": "test/helpers/isar_host.dart",
+      "destination": "test/helpers/isar_host.dart",
+      "sha256": "ece320d50c0713a7e51327a3d93f4e65c967432abaf5dc17f28d31ece635f7ac"
+    },
+    {
+      "source": "test/helpers/roboto.dart",
+      "destination": "test/helpers/roboto.dart",
+      "sha256": "82fc739c2237d8a8d69a94e494380c56dd8161d148f9bb717f00c15f30ac30ad"
+    },
+    {
+      "source": "test/unit/architecture/icon_sources_test.dart",
+      "destination": "test/unit/architecture/icon_sources_test.dart",
+      "sha256": "a8005b61f9757b59096634d1e7bc3465a5f1f4427924d7410c27ea7c0214682d"
+    },
+    {
+      "source": "test/unit/backup/backup_codec_test.dart",
+      "destination": "test/unit/backup/backup_codec_test.dart",
+      "sha256": "758df6f7439b7daf4c4006324bcdfaec4023c6c069d0bebbdfe365ab64843c47"
+    },
+    {
+      "source": "test/unit/backup/backup_cubit_test.dart",
+      "destination": "test/unit/backup/backup_cubit_test.dart",
+      "sha256": "86f58fe2d7c34acbde2ef4af085bb75b77fe4b65fe1b0d0b192b8113f273d26c"
+    },
+    {
+      "source": "test/unit/backup/isar_backup_data_source_test.dart",
+      "destination": "test/unit/backup/isar_backup_data_source_test.dart",
+      "sha256": "ebc1ebce73502c6658e29212858526790b22cd2994526edc8a3afe96ba214892"
+    },
+    {
+      "source": "test/unit/backup/restore_backup_use_case_test.dart",
+      "destination": "test/unit/backup/restore_backup_use_case_test.dart",
+      "sha256": "ddee5b5e0a6a25c3fffffd1ae460df92727cc7d6f79228a94b5851ec5c7c1588"
+    },
+    {
+      "source": "test/unit/backup/track_matcher_test.dart",
+      "destination": "test/unit/backup/track_matcher_test.dart",
+      "sha256": "34a33d96f03d9367a87bcd415820c52f6503648f62504f9691d29f15c6c1fba6"
+    },
+    {
+      "source": "test/unit/core/crash_log_test.dart",
+      "destination": "test/unit/core/crash_log_test.dart",
+      "sha256": "9793ddd6d3a51863d41db13626b4b249d9890f1cdc6d7f56995dee9fc8241783"
+    },
+    {
+      "source": "test/unit/core/error_handler_test.dart",
+      "destination": "test/unit/core/error_handler_test.dart",
+      "sha256": "9d2b43a1b7f6edd1ada42a3729d3afdf23c4c770b143ca6572a2314253f41019"
+    },
+    {
+      "source": "test/unit/core/glass_filter_test.dart",
+      "destination": "test/unit/core/glass_filter_test.dart",
+      "sha256": "4a8dc9d309937ad5f7b3b7cc3b1727df8d71d340346951def84ad736047acf56"
+    },
+    {
+      "source": "test/unit/history/isar_play_history_data_source_test.dart",
+      "destination": "test/unit/history/isar_play_history_data_source_test.dart",
+      "sha256": "60578ef8c3299fc5e2bff7d34890fb866b0b339799cd20f9a135634565da5e3c"
+    },
+    {
+      "source": "test/unit/history/monthly_replay_test.dart",
+      "destination": "test/unit/history/monthly_replay_test.dart",
+      "sha256": "10addb0d52f5b412fea62489d6478128c7d6f2ee4e513cab3c5ea10a06851e6d"
+    },
+    {
+      "source": "test/unit/history/play_counter_test.dart",
+      "destination": "test/unit/history/play_counter_test.dart",
+      "sha256": "f94c935a2ae84ca801faab72533e433442511132a1d7c63a125afce5993636ae"
+    },
+    {
+      "source": "test/unit/history/play_history_recorder_test.dart",
+      "destination": "test/unit/history/play_history_recorder_test.dart",
+      "sha256": "3283caed50eed813f0403743455aef3512618e4179feba705e6fe95000b926d9"
+    },
+    {
+      "source": "test/unit/history/weekly_recap_test.dart",
+      "destination": "test/unit/history/weekly_recap_test.dart",
+      "sha256": "0fc15ce5fb9b16162322a2cab5a31ed487e4ca0430fe3660bd6032d98cbdef70"
+    },
+    {
+      "source": "test/unit/home/home_recently_played_test.dart",
+      "destination": "test/unit/home/home_recently_played_test.dart",
+      "sha256": "0802a6c61841a9aa2d43115e568493a628427811ce29575253ae3dbbce3535fc"
+    },
+    {
+      "source": "test/unit/l10n/notification_channel_test.dart",
+      "destination": "test/unit/l10n/notification_channel_test.dart",
+      "sha256": "a899eb531c7891ac52b704f262386439aca11d27abbcce1a792b1343d7d96df8"
+    },
+    {
+      "source": "test/unit/l10n/plurals_test.dart",
+      "destination": "test/unit/l10n/plurals_test.dart",
+      "sha256": "92b10b3e50cac70830bfe94cdb97345f9e8b90211f81db340c8b3aa8b5d88e8c"
+    },
+    {
+      "source": "test/unit/library/album_merge_test.dart",
+      "destination": "test/unit/library/album_merge_test.dart",
+      "sha256": "17ca6c43108c48f97cebf2d3bcfe2b8b0fb1bd11707a6ed9597df4e5dfb43cc8"
+    },
+    {
+      "source": "test/unit/library/album_order_test.dart",
+      "destination": "test/unit/library/album_order_test.dart",
+      "sha256": "c0be0689081ab74d05277b04259f18fbe3c3be00b447dc84bdd7d0c9ba349c96"
+    },
+    {
+      "source": "test/unit/library/artist_credits_test.dart",
+      "destination": "test/unit/library/artist_credits_test.dart",
+      "sha256": "34dc691d9d041b076262e6f2a6b5187961099052e950c5c9f838d9f132fd94ee"
+    },
+    {
+      "source": "test/unit/library/artist_songs_test.dart",
+      "destination": "test/unit/library/artist_songs_test.dart",
+      "sha256": "ed413c3e10691db135b625934f655a17a41ba96607491302fee17b2a33b60d3a"
+    },
+    {
+      "source": "test/unit/library/audio_format_test.dart",
+      "destination": "test/unit/library/audio_format_test.dart",
+      "sha256": "24fb978f57cc57aa721cc4052ee0efa0eb9b56f5437483c8223bba5d585f75c9"
+    },
+    {
+      "source": "test/unit/library/library_bloc_rescan_test.dart",
+      "destination": "test/unit/library/library_bloc_rescan_test.dart",
+      "sha256": "5dc05cd6429a6e01e44c66acbde76a7e9648838f5d8b239913cf90b3b89f83c3"
+    },
+    {
+      "source": "test/unit/library/library_grouping_test.dart",
+      "destination": "test/unit/library/library_grouping_test.dart",
+      "sha256": "3c7f18cb9bea1e86a7634320923612270691babfc7ca42c6397e1da3893b36bd"
+    },
+    {
+      "source": "test/unit/library/library_view_test.dart",
+      "destination": "test/unit/library/library_view_test.dart",
+      "sha256": "26c080ebda5160e7249439085df99fb7096942a1685049389093ab13429b022c"
+    },
+    {
+      "source": "test/unit/library/similar_artists_cubit_test.dart",
+      "destination": "test/unit/library/similar_artists_cubit_test.dart",
+      "sha256": "262611d97fd50267717b68634230af4762f60ce324cb67579ec517e8ab23b59e"
+    },
+    {
+      "source": "test/unit/library/single_release_test.dart",
+      "destination": "test/unit/library/single_release_test.dart",
+      "sha256": "1f0e3686ec966053945862a85fcf50421ac65e9ea432d7563b99baac39faf907"
+    },
+    {
+      "source": "test/unit/library/track_tags_test.dart",
+      "destination": "test/unit/library/track_tags_test.dart",
+      "sha256": "ca131624cbfc9968d953dadbe9b6e71e0119b7d1387e36ab3e4f600d1d251b7d"
+    },
+    {
+      "source": "test/unit/library/unknown_artist_test.dart",
+      "destination": "test/unit/library/unknown_artist_test.dart",
+      "sha256": "ea4077e9fe66334731d655e032499670639bd12658c7292b6028ae9189bea712"
+    },
+    {
+      "source": "test/unit/metadata/metadata_cubits_photos_off_test.dart",
+      "destination": "test/unit/metadata/metadata_cubits_photos_off_test.dart",
+      "sha256": "678e85ba8467a7d2c79cf55ce9ca784e5b956b3d20e8d509b1e45308d8fb7909"
+    },
+    {
+      "source": "test/unit/metadata/metadata_online_switches_test.dart",
+      "destination": "test/unit/metadata/metadata_online_switches_test.dart",
+      "sha256": "850408e172a52eea176904f7d57f63457cee202f3983bcb2e165a0513ae86f01"
+    },
+    {
+      "source": "test/unit/metadata/metadata_repository_impl_test.dart",
+      "destination": "test/unit/metadata/metadata_repository_impl_test.dart",
+      "sha256": "d84e9c5ab4feea261f73399802ba8a58d29b89e0687d632190f1ba95f37dde1a"
+    },
+    {
+      "source": "test/unit/player/audio_handler_impl_test.dart",
+      "destination": "test/unit/player/audio_handler_impl_test.dart",
+      "sha256": "4e26397b89df6bb0d0999a5a71b17f9aa5a8cb554ac0e011afc62a8aa25593fd"
+    },
+    {
+      "source": "test/unit/player/gain_ramp_test.dart",
+      "destination": "test/unit/player/gain_ramp_test.dart",
+      "sha256": "48b56f7d3615e43ebcafd4ca3a289b99c9f9500747f2f1163453f8137368c305"
+    },
+    {
+      "source": "test/unit/player/just_audio_adapter_test.dart",
+      "destination": "test/unit/player/just_audio_adapter_test.dart",
+      "sha256": "a5528064c4ab95323dcf21c8787300bd0a20abe73ca8d17653fd8ffa5fa20fda"
+    },
+    {
+      "source": "test/unit/player/media_like_sync_test.dart",
+      "destination": "test/unit/player/media_like_sync_test.dart",
+      "sha256": "0f3b98691731ed58d8950538fded5d98e365de43c95ea487123039225e25ca61"
+    },
+    {
+      "source": "test/unit/player/play_shuffled_test.dart",
+      "destination": "test/unit/player/play_shuffled_test.dart",
+      "sha256": "be49bcd5b718c72a6c69f0ecfccab1299239a45f2e6f49bc5368fcd8a84e1a84"
+    },
+    {
+      "source": "test/unit/player/playback_resumer_test.dart",
+      "destination": "test/unit/player/playback_resumer_test.dart",
+      "sha256": "d8a64a9946988f572b18ac282c2fb704993a7c7dc1ed619cbea4cc4628beb107"
+    },
+    {
+      "source": "test/unit/player/playback_session_store_test.dart",
+      "destination": "test/unit/player/playback_session_store_test.dart",
+      "sha256": "b0399a3f83ebb1c8b6bb4932d02cf5e335f4c003f47167d5b3c9283d49535a22"
+    },
+    {
+      "source": "test/unit/player/player_bloc_progress_test.dart",
+      "destination": "test/unit/player/player_bloc_progress_test.dart",
+      "sha256": "848aa0ab71877700bba7d19d00c91e86b6e27b8c30255cb4234864cb6480b14a"
+    },
+    {
+      "source": "test/unit/player/queue_replace_test.dart",
+      "destination": "test/unit/player/queue_replace_test.dart",
+      "sha256": "8c29092858b4db599ab62f032965737a6c6065ea32e8bdb778d890e4e7bbe372"
+    },
+    {
+      "source": "test/unit/player/queue_test.dart",
+      "destination": "test/unit/player/queue_test.dart",
+      "sha256": "44ac8451dcdcec0b7fea0a90c1d35926df0a313d1ae15daca546146f18524b86"
+    },
+    {
+      "source": "test/unit/player/session_restore_test.dart",
+      "destination": "test/unit/player/session_restore_test.dart",
+      "sha256": "2919fe1671efb7c3ad036f7f777f12de940a19b5d76b033551423fb5dfa7dd95"
+    },
+    {
+      "source": "test/unit/player/sleep_timer_cubit_test.dart",
+      "destination": "test/unit/player/sleep_timer_cubit_test.dart",
+      "sha256": "9ccc4a613993424e43d50ef423fd2b56715df31916d6bbd6acc2f17bb697cd41"
+    },
+    {
+      "source": "test/unit/playlist/playlist_bloc_test.dart",
+      "destination": "test/unit/playlist/playlist_bloc_test.dart",
+      "sha256": "232940f1f336b32ca37b66d07916f152024cc36e85f3d8ea01712da19d5329e1"
+    },
+    {
+      "source": "test/unit/scanner/artwork_extractor_test.dart",
+      "destination": "test/unit/scanner/artwork_extractor_test.dart",
+      "sha256": "267b9bbb5378ac75de12c66099b7eb618f189d11e4dcedb8760422289b99325d"
+    },
+    {
+      "source": "test/unit/settings/maintenance_cubit_test.dart",
+      "destination": "test/unit/settings/maintenance_cubit_test.dart",
+      "sha256": "45df0bafbe23d3c368aa2af4da5b8d3c25010f7bfdaa32ffc613bf70dac9f417"
+    },
+    {
+      "source": "test/unit/settings/settings_cubit_test.dart",
+      "destination": "test/unit/settings/settings_cubit_test.dart",
+      "sha256": "c7320b62d73b2eef495380b1b03851ac757d65fa1d9ce17f0861790810bdf4de"
+    },
+    {
+      "source": "test/unit/settings/settings_repository_impl_test.dart",
+      "destination": "test/unit/settings/settings_repository_impl_test.dart",
+      "sha256": "e11dfe25ea86beefe121565909e9323028c4a1a05641a172944f85696e6a5710"
+    },
+    {
+      "source": "test/unit/updates/check_for_update_use_case_test.dart",
+      "destination": "test/unit/updates/check_for_update_use_case_test.dart",
+      "sha256": "47816710b8db4519d1e5d139077d283b1d8869e91a3deeba93215073529471c5"
+    },
+    {
+      "source": "test/unit/updates/update_cubit_test.dart",
+      "destination": "test/unit/updates/update_cubit_test.dart",
+      "sha256": "d10cf1c478df50e7ecb5f4b6fe155142c13de96972f088c34e9f154434ba453c"
+    },
+    {
+      "source": "test/unit/updates/update_fakes.dart",
+      "destination": "test/unit/updates/update_fakes.dart",
+      "sha256": "2a1e4802ca722a88585efdae22e77a2c0473b8fa0c0222c368880b5310b78f62"
+    },
+    {
+      "source": "test/unit/updates/update_repository_impl_test.dart",
+      "destination": "test/unit/updates/update_repository_impl_test.dart",
+      "sha256": "17a47d2aa9f7057575e95cdc482f01c2bbe9f1211b8ef2a64983035f0be4eaef"
+    },
+    {
+      "source": "test/unit/updates/version_test.dart",
+      "destination": "test/unit/updates/version_test.dart",
+      "sha256": "a270472bc4bdd4efca8c5fa860c188bb65d82d295cb7917811b34e32dbb249b8"
+    },
+    {
+      "source": "test/unit/whats_new/check_whats_new_test.dart",
+      "destination": "test/unit/whats_new/check_whats_new_test.dart",
+      "sha256": "c74eb0439afc40e1ed150cd107a685f8143bcd5d8e6f16e768f37e1ec85e97f4"
+    },
+    {
+      "source": "test/widget/app_shell_location_test.dart",
+      "destination": "test/widget/app_shell_location_test.dart",
+      "sha256": "c4cdba0b9d707599ece5dbe886d8fcc554cb9a0f052c2103155c0b92973111e6"
+    },
+    {
+      "source": "test/widget/history/weekly_recap_widgets_test.dart",
+      "destination": "test/widget/history/weekly_recap_widgets_test.dart",
+      "sha256": "7e9ee1c6a607b2615c7ed419e73a420006eb53452085d10f55c674975a778b68"
+    },
+    {
+      "source": "test/widget/home/home_layout_test.dart",
+      "destination": "test/widget/home/home_layout_test.dart",
+      "sha256": "b649ef6fca8a2eb272c2e0e9f27a10bb9541414111bd6d0ae2927d8eb7d6d730"
+    },
+    {
+      "source": "test/widget/metadata/online_about_card_test.dart",
+      "destination": "test/widget/metadata/online_about_card_test.dart",
+      "sha256": "efafd5386b2dab23aed8593fc8237fc75b6c53f0887a71687eb5337e6dee63d5"
+    },
+    {
+      "source": "test/widget/player/artwork_carousel_test.dart",
+      "destination": "test/widget/player/artwork_carousel_test.dart",
+      "sha256": "6fbabf7ba0086266a80f50389ae2e0ada71bcdd37ba284fa036bff891fa89395"
+    },
+    {
+      "source": "test/widget/player/full_player_layout_test.dart",
+      "destination": "test/widget/player/full_player_layout_test.dart",
+      "sha256": "95c0bd14702df3d6fbc31ec738d4720abc0f3170a2f2c7b0b4d393c3e9dadf12"
+    },
+    {
+      "source": "test/widget/player/now_playing_hero_test.dart",
+      "destination": "test/widget/player/now_playing_hero_test.dart",
+      "sha256": "ee158de8958a15f50e60cc7da177fec0be8f440c055f9ac42aca685db8c76622"
+    },
+    {
+      "source": "test/widget/player/play_shuffle_buttons_test.dart",
+      "destination": "test/widget/player/play_shuffle_buttons_test.dart",
+      "sha256": "43ef4c4fb11ea176b4296de78bd4a157c4b03622acb0d61f5c1497fd656e9b50"
+    },
+    {
+      "source": "test/widget/player/player_controls_semantics_test.dart",
+      "destination": "test/widget/player/player_controls_semantics_test.dart",
+      "sha256": "b6d2fd998a5c054690cb80954f826abf590b22f53c2b3bbb2ac21823b8da4a58"
+    },
+    {
+      "source": "test/widget/player/player_notice_toast_test.dart",
+      "destination": "test/widget/player/player_notice_toast_test.dart",
+      "sha256": "a92e5fd6c2d98eb548d293ba1a24b0262bcaa3c5eaa22ef6e3da76b26e1ba2d4"
+    },
+    {
+      "source": "test/widget/player/progress_ring_test.dart",
+      "destination": "test/widget/player/progress_ring_test.dart",
+      "sha256": "5a4b2da98e91c7b77dfa8827a79df045cec2490d5e1f7141d852296f3483e81e"
+    },
+    {
+      "source": "test/widget/player/queue_sheet_test.dart",
+      "destination": "test/widget/player/queue_sheet_test.dart",
+      "sha256": "6301e814b84cb8f1960de1d9ae4876679a4621dcb9dbf46677cd473c4da92488"
+    },
+    {
+      "source": "test/widget/player/track_title_switcher_test.dart",
+      "destination": "test/widget/player/track_title_switcher_test.dart",
+      "sha256": "a2b796d6ce9d137657689b331040e5d8ed93ef615527302da1495df67d8f4164"
+    },
+    {
+      "source": "test/widget/shared/action_sheet_test.dart",
+      "destination": "test/widget/shared/action_sheet_test.dart",
+      "sha256": "02c20d9ed97261703b258a0ba85c490060d5ce97c5c568f62cdca2c0b501ae1b"
+    },
+    {
+      "source": "test/widget/shared/app_back_button_test.dart",
+      "destination": "test/widget/shared/app_back_button_test.dart",
+      "sha256": "b930c2841f738fe5b77896e9b2ed96b239e3566f5764d8695c596b31c4cf7409"
+    },
+    {
+      "source": "test/widget/shared/app_button_test.dart",
+      "destination": "test/widget/shared/app_button_test.dart",
+      "sha256": "dcf03e14bea85ffd3b3b59ca92b5f1983d5c8389baf331c1d6ff8e28482a6cf0"
+    },
+    {
+      "source": "test/widget/shared/app_dialog_test.dart",
+      "destination": "test/widget/shared/app_dialog_test.dart",
+      "sha256": "30bde018bfb29db38791380605ea77288282b460b36026f0c7b46fe62506e3e7"
+    },
+    {
+      "source": "test/widget/shared/app_icon_button_test.dart",
+      "destination": "test/widget/shared/app_icon_button_test.dart",
+      "sha256": "71004df739167fafcdd6489a2b3547290d31dbe10de2a3a783087116c18d8fba"
+    },
+    {
+      "source": "test/widget/shared/app_toast_test.dart",
+      "destination": "test/widget/shared/app_toast_test.dart",
+      "sha256": "fe9ed3d86b288b98a757903c32be7533ba6e8c8901733dd20a67b8ce9a7a0884"
+    },
+    {
+      "source": "test/widget/shared/artist_name_test.dart",
+      "destination": "test/widget/shared/artist_name_test.dart",
+      "sha256": "26d872f43ad6000c2aefe017e7d2a50161dafdc10a9bd6e94ff5c548f957c626"
+    },
+    {
+      "source": "test/widget/shared/artwork_image_test.dart",
+      "destination": "test/widget/shared/artwork_image_test.dart",
+      "sha256": "a62b090580463af49b98d5e2ff9a70aa851726fc534b2992a7d19ed303a3cada"
+    },
+    {
+      "source": "test/widget/shared/dynamic_background_test.dart",
+      "destination": "test/widget/shared/dynamic_background_test.dart",
+      "sha256": "b835b1d67e992025990148d390bad87c7026567e539431e91648f127fcecbe0b"
+    },
+    {
+      "source": "test/widget/shared/glass_card_test.dart",
+      "destination": "test/widget/shared/glass_card_test.dart",
+      "sha256": "73fa4924125cf14b8784ed3582d86662c0468f643a05ca592ada398ec3289fd8"
+    },
+    {
+      "source": "test/widget/shared/glass_sliver_header_test.dart",
+      "destination": "test/widget/shared/glass_sliver_header_test.dart",
+      "sha256": "330eeca596e5b820a5ccaa5562f7c8a6ba2d1a92bf83f64ee257abea60197681"
+    },
+    {
+      "source": "test/widget/shared/glass_theme_test.dart",
+      "destination": "test/widget/shared/glass_theme_test.dart",
+      "sha256": "93a20cae209c9a1ed13a5a7a8b51238763b39715e6fda0085946ed936afd9e43"
+    },
+    {
+      "source": "test/widget/shared/marquee_test.dart",
+      "destination": "test/widget/shared/marquee_test.dart",
+      "sha256": "94dc75ef36360270de8aa83b4135d59af51706fdcfb711a0f70ea7a7398a894e"
+    },
+    {
+      "source": "test/widget/shared/tab_reselect_test.dart",
+      "destination": "test/widget/shared/tab_reselect_test.dart",
+      "sha256": "52fca8265102ba7a20d6da1b12213e141f9b8bdb811880603016777f49708fec"
+    },
+    {
+      "source": "test/widget/whats_new/whats_new_sheet_test.dart",
+      "destination": "test/widget/whats_new/whats_new_sheet_test.dart",
+      "sha256": "f1cab9ba7829fc6c8a21f4dcf2cf36e1fd6a4fef5e6286726c60116f8c289a99"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/CHANGELOG.md",
+      "destination": "third_party/on_audio_query_plus_android/CHANGELOG.md",
+      "sha256": "3599a60c899ec5c566716b743f8d724f485f031d0b7e06058b18b0ed367c7915"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/LICENSE",
+      "destination": "third_party/on_audio_query_plus_android/LICENSE",
+      "sha256": "87dcd6ddf0ffbbe85849c035d97f50d21258dc6a8f658d12a67faaa539576f51"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/README.md",
+      "destination": "third_party/on_audio_query_plus_android/README.md",
+      "sha256": "814fa885338b0280d45d136cf48a9a04efc60ee39bdb02b677ff63fd545bedf2"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/TROONA_PATCH.md",
+      "destination": "third_party/on_audio_query_plus_android/TROONA_PATCH.md",
+      "sha256": "6ab972b7ed1a4543b1d64d27a317e55304fb2422abc8abcabbb281c22d7dab6f"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/build.gradle",
+      "destination": "third_party/on_audio_query_plus_android/android/build.gradle",
+      "sha256": "eee2df54b3a52dbf668275c10df29bc626dc58b9d2aff5892430ea9f51554820"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/gradle.properties",
+      "destination": "third_party/on_audio_query_plus_android/android/gradle.properties",
+      "sha256": "62745d1a516fd5472d232d52956c6618aa3b4664335faa0d9688d89e20884ce2"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/gradle/wrapper/gradle-wrapper.properties",
+      "destination": "third_party/on_audio_query_plus_android/android/gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "dbdaa0d46b7467f48874e97e5447141c86e1a34197a5fec1d59987119e6670a9"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/gradlew.bat",
+      "destination": "third_party/on_audio_query_plus_android/android/gradlew.bat",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/settings.gradle",
+      "destination": "third_party/on_audio_query_plus_android/android/settings.gradle",
+      "sha256": "6740a955d38893c1e9df9401e115f1ea4625764d58ff8ea6a2648b058b8ff825"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/AndroidManifest.xml",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/AndroidManifest.xml",
+      "sha256": "8d2963c118350434793471929bc58424e77921e004ff55416e5c8fae1e505c71"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/OnAudioQueryPlugin.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/OnAudioQueryPlugin.kt",
+      "sha256": "3d3dfb325d06258f9aab32ba06d59f6fb2d8c803b465a280976c76262dfe7921"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/PluginProvider.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/PluginProvider.kt",
+      "sha256": "afdc3bf83840e6efed93fdab6f20f86923b8c9494e09e3b4951c29616b4fc4ee"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/consts/Method.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/consts/Method.kt",
+      "sha256": "ce52ba83fcc92eea0d801ecc2a4b82006241ebe0a808108434a4d94db41ace9b"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/MethodController.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/MethodController.kt",
+      "sha256": "dbf6738f563d50fab398cb9045e2ca75ea8e1232f041dfb84d2b728d89d621c4"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/PermissionController.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/PermissionController.kt",
+      "sha256": "a93f5ebb651dcd635ce443cde709b5ff8bb27b09c8224d5df2f9a8b7b6cffa44"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/PlaylistController.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/controllers/PlaylistController.kt",
+      "sha256": "91c11da26e0cb7639f6897889549ca84dc7c73f7b7709686cf4b448d1af6fcf7"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/interfaces/PermissionManagerInterface.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/interfaces/PermissionManagerInterface.kt",
+      "sha256": "ccbb520c7b8a2b02bc4e57f52c044fde4578ae428594142e479256cd93742e79"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AlbumQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AlbumQuery.kt",
+      "sha256": "debd0da60cecd6a92c9ccaa1bba61eeb5ac6884f4b704b5e0461a4bd85d49f24"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AllPathQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AllPathQuery.kt",
+      "sha256": "1f68cef204d70d68d6bbc521fdcd0b60d94037bcf3a73c530ec2c967f48b81b2"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/ArtistQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/ArtistQuery.kt",
+      "sha256": "3dfba455e65dc76f3192a86c5bcd3b18ac46529fcbe1ed7bbc090b8a3cf8101f"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/ArtworkQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/ArtworkQuery.kt",
+      "sha256": "ae4dafda32eac0e512f952e4429d1beb4117dfe7a0705b3cd685d4ca791b25bf"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AudioFromQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AudioFromQuery.kt",
+      "sha256": "7a2ebbf5f3a5ced15dfcbb5f5062355e0918bb10d64f5cc0b7d4d8828c46c9ef"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AudioQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/AudioQuery.kt",
+      "sha256": "b57af9ac9281c49f6110aa68c088cc566d4c2aebcd746541a3f50acad98a486f"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/GenreQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/GenreQuery.kt",
+      "sha256": "d1ba756a2525ddaf89718e319060866221b62472a2b6ade37f95df189dfd9e56"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/PlaylistQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/PlaylistQuery.kt",
+      "sha256": "793b9a66d791bb17130eb6871ae6ce4263cf242981f7fd5869742f1fc2e68f97"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/WithFiltersQuery.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/WithFiltersQuery.kt",
+      "sha256": "b43c3e90b2d3f50550185c602ebbd31ded6010937579335096b141963d56587a"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/helper/QueryHelper.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/queries/helper/QueryHelper.kt",
+      "sha256": "4c14de90d9db84cd89ec6b9d5da84c5bd6a2f0c245e42fb88587cb0d7188d152"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/ArtworkType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/ArtworkType.kt",
+      "sha256": "f9f150884e3f789896149ab9809b0bc141c1492bb53305aaa3b58717e95024d1"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/AudiosFromType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/AudiosFromType.kt",
+      "sha256": "f1f52e228cc05450e314075282ac5b94c6be3bd0de38abbf3ea49fab8de19b99"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/UriType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/UriType.kt",
+      "sha256": "190bdc7b74a9c96491cdfadb5894b8fefa26617deec146af260d47a5f28707f6"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/WithFiltersType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/WithFiltersType.kt",
+      "sha256": "04b188bf0480f0959a08dc8d26a239e8200354556b6af40c315e8e70d6ec4bd2"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/AlbumSortType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/AlbumSortType.kt",
+      "sha256": "a78f3cbed2a6b75d5cdd5444fff11065c99bc30d3909fab7770b568f94838138"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/ArtistSortType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/ArtistSortType.kt",
+      "sha256": "32d0110aac4ceb1c5fdd42172a75a8c4cd7b0dc5be23aca887d6bc7b1fa66044"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/GenreSortType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/GenreSortType.kt",
+      "sha256": "379203180f427779074cb53584f5bfa75b7fc790e6237c25becb767da2cff236"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/PlaylistSortType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/PlaylistSortType.kt",
+      "sha256": "5a99ee881538f4147e2cd9481f4ed621c41e8d2b1519c554410d92d40c66a274"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/SongSortType.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/types/sorttypes/SongSortType.kt",
+      "sha256": "d843319c8b2f5adbf5353a1d7dd2683848af3f94fb4fc8d781c06f40d351f70c"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/utils/CursorProjection.kt",
+      "destination": "third_party/on_audio_query_plus_android/android/src/main/kotlin/com/lucasjosino/on_audio_query/utils/CursorProjection.kt",
+      "sha256": "17bedb6448fa6e856282f4403a0452d78db22262f36e56c102e9e84e215a86a9"
+    },
+    {
+      "source": "third_party/on_audio_query_plus_android/pubspec.yaml",
+      "destination": "third_party/on_audio_query_plus_android/pubspec.yaml",
+      "sha256": "43678d53ee09d4da4888a27851b3d67d9f2baeee706ba023193263b2764305a7"
+    },
+    {
+      "source": "tool/make_banner.py",
+      "destination": "tool/make_banner.py",
+      "sha256": "07444af3da51e5d3d0d1866a57d1ff95016854154d2199198e6a24307565a412"
+    }
+  ]
+}

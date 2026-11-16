@@ -1,0 +1,197 @@
+import 'package:flutter/material.dart';
+import 'package:troona/core/theme/primitives/color_primitives.dart';
+
+@immutable
+final class AppColors extends ThemeExtension<AppColors> {
+  // ── Backgrounds ──────────────────────────────────────────
+  final Color bgPrimary; // page background
+  final Color bgSecondary; // raised surfaces (cards, sheets)
+  final Color bgTertiary; // surfaces raised further
+  final Color bgElevated; // alerts, floating menus
+
+  // ── Labels ───────────────────────────────────────────────
+  final Color labelPrimary;
+  final Color labelSecondary;
+  final Color labelTertiary;
+  final Color labelQuaternary;
+
+  // ── Separators ──────────────────────────────────────────
+  final Color separator;
+  final Color separatorOpaque;
+
+  // ── Accent ───────────────────────────────────────────────
+  final Color accent; // lilac
+  final Color accentForeground; // text on the accent colour
+  final Color accentGlow; // glow under the active tab
+
+  // ── Progress ─────────────────────────────────────────────
+  final Color progressStart; // start of the arc (icy blue)
+  final Color progressEnd; // head of the arc (white)
+
+  // ── Glass ────────────────────────────────────────────────
+  final Color glassFill; // glass fill
+  final Color glassBorder; // bright top border
+  final Color glassHighlight; // diagonal sheen
+
+  // ── Vibrancy ─────────────────────────────────────────────
+  final Color vibrancyLabel;
+  final Color vibrancySecondary;
+
+  const AppColors({
+    required this.bgPrimary,
+    required this.bgSecondary,
+    required this.bgTertiary,
+    required this.bgElevated,
+    required this.labelPrimary,
+    required this.labelSecondary,
+    required this.labelTertiary,
+    required this.labelQuaternary,
+    required this.separator,
+    required this.separatorOpaque,
+    required this.accent,
+    required this.accentForeground,
+    required this.accentGlow,
+    required this.progressStart,
+    required this.progressEnd,
+    required this.glassFill,
+    required this.glassBorder,
+    required this.glassHighlight,
+    required this.vibrancyLabel,
+    required this.vibrancySecondary,
+  });
+
+  // ── Static instances ──────────────────────────────────
+
+  static const light = AppColors(
+    bgPrimary: ColorPrimitives.bgPrimaryLight,
+    bgSecondary: ColorPrimitives.bgSecondaryLight,
+    bgTertiary: ColorPrimitives.bgTertiaryLight,
+    bgElevated: ColorPrimitives.bgElevatedLight,
+    labelPrimary: ColorPrimitives.labelPrimaryLight,
+    labelSecondary: ColorPrimitives.labelSecondaryLight,
+    labelTertiary: ColorPrimitives.labelTertiaryLight,
+    labelQuaternary: ColorPrimitives.labelQuaternaryLight,
+    separator: ColorPrimitives.separatorLight,
+    separatorOpaque: ColorPrimitives.separatorOpaqueLight,
+    accent: ColorPrimitives.accent,
+    accentForeground: ColorPrimitives.accentForeground,
+    accentGlow: ColorPrimitives.accentGlow,
+    progressStart: ColorPrimitives.progressStart,
+    progressEnd: ColorPrimitives.progressEnd,
+    glassFill: ColorPrimitives.glassFillLight,
+    glassBorder: ColorPrimitives.glassBorderLight,
+    glassHighlight: ColorPrimitives.glassHighlightLight,
+    vibrancyLabel: ColorPrimitives.vibrancyLabelLight,
+    vibrancySecondary: ColorPrimitives.vibrancySecondaryLight,
+  );
+
+  static const dark = AppColors(
+    bgPrimary: ColorPrimitives.bgPrimaryDark,
+    bgSecondary: ColorPrimitives.bgSecondaryDark,
+    bgTertiary: ColorPrimitives.bgTertiaryDark,
+    bgElevated: ColorPrimitives.bgElevatedDark,
+    labelPrimary: ColorPrimitives.labelPrimaryDark,
+    labelSecondary: ColorPrimitives.labelSecondaryDark,
+    labelTertiary: ColorPrimitives.labelTertiaryDark,
+    labelQuaternary: ColorPrimitives.labelQuaternaryDark,
+    separator: ColorPrimitives.separatorDark,
+    separatorOpaque: ColorPrimitives.separatorOpaqueDark,
+    accent: ColorPrimitives.accent,
+    accentForeground: ColorPrimitives.accentForeground,
+    accentGlow: ColorPrimitives.accentGlow,
+    progressStart: ColorPrimitives.progressStart,
+    progressEnd: ColorPrimitives.progressEnd,
+    glassFill: ColorPrimitives.glassFillDark,
+    glassBorder: ColorPrimitives.glassBorderDark,
+    glassHighlight: ColorPrimitives.glassHighlightDark,
+    vibrancyLabel: ColorPrimitives.vibrancyLabelDark,
+    vibrancySecondary: ColorPrimitives.vibrancySecondaryDark,
+  );
+
+  // ── ThemeExtension (lerp during transitions) ──────
+
+  @override
+  AppColors copyWith({
+    Color? bgPrimary,
+    Color? bgSecondary,
+    Color? bgTertiary,
+    Color? bgElevated,
+    Color? labelPrimary,
+    Color? labelSecondary,
+    Color? labelTertiary,
+    Color? labelQuaternary,
+    Color? separator,
+    Color? separatorOpaque,
+    Color? accent,
+    Color? accentForeground,
+    Color? accentGlow,
+    Color? progressStart,
+    Color? progressEnd,
+    Color? glassFill,
+    Color? glassBorder,
+    Color? glassHighlight,
+    Color? vibrancyLabel,
+    Color? vibrancySecondary,
+  }) => AppColors(
+    bgPrimary: bgPrimary ?? this.bgPrimary,
+    bgSecondary: bgSecondary ?? this.bgSecondary,
+    bgTertiary: bgTertiary ?? this.bgTertiary,
+    bgElevated: bgElevated ?? this.bgElevated,
+    labelPrimary: labelPrimary ?? this.labelPrimary,
+    labelSecondary: labelSecondary ?? this.labelSecondary,
+    labelTertiary: labelTertiary ?? this.labelTertiary,
+    labelQuaternary: labelQuaternary ?? this.labelQuaternary,
+    separator: separator ?? this.separator,
+    separatorOpaque: separatorOpaque ?? this.separatorOpaque,
+    accent: accent ?? this.accent,
+    accentForeground: accentForeground ?? this.accentForeground,
+    accentGlow: accentGlow ?? this.accentGlow,
+    progressStart: progressStart ?? this.progressStart,
+    progressEnd: progressEnd ?? this.progressEnd,
+    glassFill: glassFill ?? this.glassFill,
+    glassBorder: glassBorder ?? this.glassBorder,
+    glassHighlight: glassHighlight ?? this.glassHighlight,
+    vibrancyLabel: vibrancyLabel ?? this.vibrancyLabel,
+    vibrancySecondary: vibrancySecondary ?? this.vibrancySecondary,
+  );
+
+  @override
+  AppColors lerp(AppColors? other, double t) {
+    if (other == null) return this;
+    return AppColors(
+      bgPrimary: Color.lerp(bgPrimary, other.bgPrimary, t)!,
+      bgSecondary: Color.lerp(bgSecondary, other.bgSecondary, t)!,
+      bgTertiary: Color.lerp(bgTertiary, other.bgTertiary, t)!,
+      bgElevated: Color.lerp(bgElevated, other.bgElevated, t)!,
+      labelPrimary: Color.lerp(labelPrimary, other.labelPrimary, t)!,
+      labelSecondary: Color.lerp(labelSecondary, other.labelSecondary, t)!,
+      labelTertiary: Color.lerp(labelTertiary, other.labelTertiary, t)!,
+      labelQuaternary: Color.lerp(labelQuaternary, other.labelQuaternary, t)!,
+      separator: Color.lerp(separator, other.separator, t)!,
+      separatorOpaque: Color.lerp(separatorOpaque, other.separatorOpaque, t)!,
+      accent: Color.lerp(accent, other.accent, t)!,
+      accentForeground: Color.lerp(
+        accentForeground,
+        other.accentForeground,
+        t,
+      )!,
+      accentGlow: Color.lerp(accentGlow, other.accentGlow, t)!,
+      progressStart: Color.lerp(progressStart, other.progressStart, t)!,
+      progressEnd: Color.lerp(progressEnd, other.progressEnd, t)!,
+      glassFill: Color.lerp(glassFill, other.glassFill, t)!,
+      glassBorder: Color.lerp(glassBorder, other.glassBorder, t)!,
+      glassHighlight: Color.lerp(glassHighlight, other.glassHighlight, t)!,
+      vibrancyLabel: Color.lerp(vibrancyLabel, other.vibrancyLabel, t)!,
+      vibrancySecondary: Color.lerp(
+        vibrancySecondary,
+        other.vibrancySecondary,
+        t,
+      )!,
+    );
+  }
+}
+
+// Context extension: clean access from widgets
+extension AppColorsX on BuildContext {
+  AppColors get colors => Theme.of(this).extension<AppColors>()!;
+}

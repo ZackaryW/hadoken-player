@@ -1,0 +1,467 @@
+import 'package:flutter/material.dart';
+import 'package:troona/core/theme/components/blur_budget.dart';
+import 'package:troona/core/theme/components/glass_filter.dart';
+import 'package:troona/features/settings/domain/entities/app_settings.dart'
+    as troona_settings;
+
+/// Immutable configuration object for a single glassmorphism surface.
+///
+/// All blur/fill/border values are calibrated against iOS 17/18 UIKit
+/// material constants ([UIBlurEffect], [UIVibrancyEffect]).
+///
+/// **Rendering contract** (enforced at the call site, e.g. [GlassCard]):
+/// - When [blurSigma] == 0 skip [BackdropFilter] entirely (fast path).
+/// - Always wrap [BackdropFilter] in a [RepaintBoundary].
+/// - Never place inside an [AnimatedBuilder] driven by audio position.
+@immutable
+final class GlassConfig {
+  /// Gaussian blur radius passed to [ImageFilter.blur].
+  ///
+  /// Values are in logical pixels.  Approximate iOS equivalents:
+  /// - 14 px → UIBlurEffectStyleLight / Dark (regular material)
+  /// - 24 px → UIBlurEffectStyleSystemUltraThinMaterial (mini-player bar)
+  /// - 26 px → full-screen now-playing overlay
+  ///
+  /// Set to 0 to use the flat-tint fast path (no [BackdropFilter] cost).
+  final double blurSigma;
+
+  /// Background fill colour drawn behind the blur layer.
+  ///
+  /// Dark mode targets 6–12 % white alpha to match iOS `.ultraThinMaterial`
+  /// and `.thinMaterial`.  Light mode targets 55–70 % white alpha.
+  final Color fill;
+
+  /// Top-edge highlight stroke that simulates a light-source reflection.
+  ///
+  /// Corresponds to the bright separator line visible at the top of iOS
+  /// sheets and cards.  Typically 9–13 % white alpha on both themes.
+  final Color border;
+
+  /// Subtle diagonal sheen rendered as a second, lower-opacity overlay.
+  ///
+  /// Approximates the luminosity vibrancy pass iOS applies over materials.
+  /// Keep below 5 % alpha to avoid washing out dark content.
+  final Color highlight;
+
+  /// Stroke width of the [border] line in logical pixels.
+  ///
+  /// 0.5 renders as exactly 1 physical pixel on 2× displays and is the
+  /// standard iOS separator thickness.
+  final double borderWidth;
+
+  final BorderRadius borderRadius;
+  final EdgeInsets padding;
+
+  /// Saturation boost behind the glass ([GlassFilter]). Surfaces that carry
+  /// text (bars, header, sheets) use 1, so covers and icons behind them do
+  /// not show as stains; decorative glass over artwork keeps the boost.
+  final double saturation;
+
+  const GlassConfig({
+    required this.blurSigma,
+    required this.fill,
+    required this.border,
+    required this.highlight,
+    this.borderWidth = 0.5,
+    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.padding = const EdgeInsets.all(16),
+    this.saturation = GlassFilter.saturation,
+  });
+
+  GlassConfig copyWith({
+    double? blurSigma,
+    Color? fill,
+    Color? border,
+    Color? highlight,
+    double? borderWidth,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    double? saturation,
+  }) {
+    return GlassConfig(
+      blurSigma: blurSigma ?? this.blurSigma,
+      fill: fill ?? this.fill,
+      border: border ?? this.border,
+      highlight: highlight ?? this.highlight,
+      borderWidth: borderWidth ?? this.borderWidth,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      saturation: saturation ?? this.saturation,
+    );
+  }
+}
+
+/// Typedef so consumers use a single [GlassQuality] symbol without a manual
+/// alias; the enum is defined once in [AppSettings] (single source of truth).
+typedef GlassQuality = troona_settings.GlassQuality;
+
+/// Resolves the correct [GlassConfig] for a given surface type, brightness,
+/// and [GlassQuality] preset.
+///
+/// Call the named constructors ([card], [miniPlayer], [nowPlaying], [sheet])
+/// inside a [BuildContext]: they read [MediaQuery] and [Theme] automatically.
+///
+/// ---
+/// ### Quality tiers
+///
+/// | Tier  | Blur            | Purpose                                  |
+/// |-------|-----------------|------------------------------------------|
+/// | high  | 14–26 px        | Default on mid/high-end devices          |
+/// | low   | 8–14 px         | Reduced blur + boosted fill on low-end   |
+/// | off   | 0 px            | Flat tint, no [BackdropFilter] cost       |
+///
+/// ### Auto-detection ([GlassTier.detect], at start-up)
+///
+/// Android with under 3 GB of RAM gets [GlassQuality.off]; under 6 GB, or
+/// below Android 10, [GlassQuality.low]; otherwise [GlassQuality.high].
+/// iOS gets [GlassQuality.high], and "remove animations" [GlassQuality.off].
+/// The user's glass quality setting overrides it ([overrideQuality]).
+///
+/// ### iOS reference values
+///
+/// Dark-mode fills target Apple's `.ultraThinMaterial` range (6–12 % white).
+/// Light-mode fills target `.regularMaterial` / `.thinMaterial` (55–70 %).
+/// Blur sigmas are in logical pixels; multiply by [devicePixelRatio] for the
+/// equivalent UIKit blur radius.
+abstract final class GlassTheme {
+  /// Quality override set by [overrideQuality] (from user settings).
+  static GlassQuality? _override;
+
+  /// Tier detected at startup by [GlassTier.detect].
+  static GlassQuality _detectedTier = GlassQuality.high;
+
+  /// Called once from [configureDependencies] with the hardware-detected tier.
+  static void setDetectedTier(GlassQuality tier) => _detectedTier = tier;
+
+  /// Overrides the auto-detected quality for all surfaces.
+  ///
+  /// Pass `null` to re-enable auto-detection (i.e. user chose [GlassQuality.auto]).
+  /// Typically called from [SettingsCubit.setGlassQuality].
+  static void overrideQuality(GlassQuality? quality) => _override = quality;
+
+  /// Resolves the effective [GlassQuality] for [ctx].
+  ///
+  /// Priority: explicit [q] argument > [_override] > [_detectedTier].
+  /// [GlassQuality.auto] is never returned; it always falls through to detection.
+  static GlassQuality _resolveQuality(BuildContext ctx, [GlassQuality? q]) {
+    if (q != null && q != GlassQuality.auto) return q;
+    if (_override != null && _override != GlassQuality.auto) return _override!;
+    return _detectedTier;
+  }
+
+  /// Resolves the effective [GlassQuality] for [ctx].
+  static GlassQuality resolveQuality(BuildContext ctx, [GlassQuality? q]) =>
+      _resolveQuality(ctx, q);
+
+  /// Quality for a short-lived surface over glass that already blurs (a
+  /// modal sheet above the tab bar), opened from [ctx]: a third blur only
+  /// where the device is high-tier, opaque otherwise, and always opaque
+  /// below a [BlurBudgetSpent]. See the blur budget in CLAUDE.md.
+  static GlassQuality aboveGlass(BuildContext ctx) =>
+      !BlurBudgetSpent.isSpent(ctx) && _resolveQuality(ctx) == GlassQuality.high
+      ? GlassQuality.high
+      : GlassQuality.off;
+
+  // ── Public surface accessors ─────────────────────────────────────────────
+
+  /// Config for standard content cards (albums, playlists, info panels).
+  static GlassConfig card(BuildContext ctx, {GlassQuality? quality}) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
+    final q = _resolveQuality(ctx, quality);
+    return switch ((isDark, q)) {
+      (_, GlassQuality.off) => isDark ? _cardOffDark : _cardOffLight,
+      (true, GlassQuality.low) => _cardLowDark,
+      (false, GlassQuality.low) => _cardLowLight,
+      (true, _) => _cardDark,
+      (false, _) => _cardLight,
+    };
+  }
+
+  /// Config for chrome that carries text and controls: the tab bar (with
+  /// the mini player inside it) and the collapsed page header. A light dark
+  /// tint and a mild saturation: covers behind stay rich without showing as
+  /// stains.
+  static GlassConfig bar(BuildContext ctx, {GlassQuality? quality}) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
+    final q = _resolveQuality(ctx, quality);
+    return switch ((isDark, q)) {
+      (_, GlassQuality.off) => isDark ? _cardOffDark : _cardOffLight,
+      (true, GlassQuality.low) => _barLowDark,
+      (false, GlassQuality.low) => _cardLowLight,
+      (true, _) => _barDark,
+      (false, _) => _cardLight,
+    };
+  }
+
+  /// Config for the persistent mini-player bar (bottom of the shell).
+  ///
+  /// Uses heavier blur than [card] to match the iOS "Now Playing" bar
+  /// appearance (`.systemUltraThinMaterial` territory).
+  static GlassConfig miniPlayer(BuildContext ctx, {GlassQuality? quality}) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
+    final q = _resolveQuality(ctx, quality);
+    return switch ((isDark, q)) {
+      (_, GlassQuality.off) => isDark ? _cardOffDark : _cardOffLight,
+      (true, GlassQuality.low) => _miniPlayerLowDark,
+      (false, GlassQuality.low) => _miniPlayerLowLight,
+      (true, _) => _miniPlayerDark,
+      (false, _) => _miniPlayerLight,
+    };
+  }
+
+  /// Config for the full-screen now-playing overlay.
+  ///
+  /// [borderRadius] is [BorderRadius.zero]: the overlay spans edge-to-edge.
+  /// [padding] is [EdgeInsets.zero]: the page handles its own safe-area insets.
+  static GlassConfig nowPlaying(BuildContext ctx, {GlassQuality? quality}) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
+    final q = _resolveQuality(ctx, quality);
+    return switch ((isDark, q)) {
+      (_, GlassQuality.off) => isDark ? _cardOffDark : _cardOffLight,
+      (true, GlassQuality.low) => _nowPlayingLowDark,
+      (false, GlassQuality.low) => _nowPlayingLowLight,
+      (true, _) => _nowPlayingDark,
+      (false, _) => _nowPlayingLight,
+    };
+  }
+
+  /// Config for bottom sheets (queue sheet, context menu, etc.).
+  ///
+  /// Top corners are rounded (20 px); bottom corners are square to bleed
+  /// to the screen edge.  Top padding (8 px) reserves space for the drag handle.
+  static GlassConfig sheet(BuildContext ctx, {GlassQuality? quality}) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
+    final q = _resolveQuality(ctx, quality);
+    return switch ((isDark, q)) {
+      (_, GlassQuality.off) => isDark ? _sheetOffDark : _sheetOffLight,
+      (true, GlassQuality.low) => _sheetLowDark,
+      (false, GlassQuality.low) => _sheetLowLight,
+      (true, _) => _sheetDark,
+      (false, _) => _sheetLight,
+    };
+  }
+
+  // ── High quality: Light theme ───────────────────────────────────────────
+  //
+  // Targets iOS 17/18 `.thinMaterial` in light mode:
+  //   fill   ~55 % white  (0x8C = 140/255 ≈ 55 %)
+  //   border ~9 % white   (top-edge luminosity highlight)
+  //   blur   14 px logical
+
+  static const _cardLight = GlassConfig(
+    blurSigma: 14,
+    fill: Color(0x8CFFFFFF), // 55 %: iOS thinMaterial light
+    border: Color(0x16FFFFFF), // 9 %: top-edge luminosity highlight
+    highlight: Color(0x0DFFFFFF), // 5 %: diagonal sheen
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
+  static const _miniPlayerLight = GlassConfig(
+    blurSigma: 24, // heavier blur: matches iOS "Now Playing" bar
+    fill: Color(0xA6FFFFFF), // 65 %: regularMaterial light
+    border: Color(0x21FFFFFF), // 13 %
+    highlight: Color(0x0FFFFFFF), // 6 %
+    borderRadius: BorderRadius.all(Radius.circular(16)),
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  );
+
+  static const _nowPlayingLight = GlassConfig(
+    blurSigma: 26,
+    fill: Color(0x73FFFFFF), // 45 %: slightly transparent for artwork to show
+    border: Color(0x21FFFFFF), // 13 %
+    highlight: Color(0x0DFFFFFF), // 5 %
+    borderRadius: BorderRadius.zero, // full-screen: no rounded corners
+    padding: EdgeInsets.zero,
+  );
+
+  static const _sheetLight = GlassConfig(
+    blurSigma: 24,
+    fill: Color(0xA6FFFFFF), // 65 %
+    border: Color(0x1EFFFFFF), // 12 %
+    highlight: Color(0x0DFFFFFF), // 5 %
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0), // 8 px drag-handle clearance
+  );
+
+  // ── High quality: Dark theme ────────────────────────────────────────────
+  //
+  // Targets iOS 17/18 `.ultraThinMaterial` in dark mode:
+  //   fill   ~8 % white   (0x14 = 20/255 ≈ 8 %)
+  //   border ~12 % white  (top-edge highlight is more visible on dark surfaces)
+  //   blur   14 px logical
+
+  static const _cardDark = GlassConfig(
+    blurSigma: 20,
+    fill: Color(0x0AFFFFFF), // 4 %: Much darker for "Deep Glass" look
+    border: Color(0x22FFFFFF), // 13 %: Sharper edge highlight
+    highlight: Color(0x0DFFFFFF), // 5 %
+    borderRadius: BorderRadius.all(Radius.circular(24)),
+  );
+
+  static const _miniPlayerDark = GlassConfig(
+    blurSigma: 28, // Heavy blur for the pill
+    fill: Color(0x08FFFFFF), // 3 %
+    border: Color(0x28FFFFFF), // 16 %: Brighter edge to define the pill
+    highlight: Color(0x0FFFFFFF), // 6 %
+    borderRadius: BorderRadius.all(Radius.circular(40)), // Pill shape
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  );
+
+  static const _nowPlayingDark = GlassConfig(
+    blurSigma: 26,
+    fill: Color(0x10FFFFFF), // 6 %: very thin to let artwork breathe
+    border: Color(0x16FFFFFF), // 9 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.zero, // full-screen: no rounded corners
+    padding: EdgeInsets.zero,
+  );
+
+  // Between the thin glass (stains) and a thick material (too dim): the
+  // blur spreads small shapes, the tint tempers what the boost revives.
+  static const _barDark = GlassConfig(
+    blurSigma: 30,
+    fill: Color(0x260C0E14), // 15 % tertiary background
+    border: Color(0x22FFFFFF), // 13 %
+    highlight: Color(0x0DFFFFFF), // 5 %
+    borderRadius: BorderRadius.all(Radius.circular(24)),
+    saturation: 1.25,
+  );
+
+  static const _barLowDark = GlassConfig(
+    blurSigma: 8,
+    fill: Color(0x1EFFFFFF), // 12 %
+    border: Color(0x12FFFFFF), // 7 %
+    highlight: Color(0x08FFFFFF), // 3 %
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+    saturation: 1,
+  );
+
+  // Same glass as [_barDark].
+  static const _sheetDark = GlassConfig(
+    blurSigma: 30,
+    fill: Color(0x260C0E14), // 15 % tertiary background
+    border: Color(0x16FFFFFF), // 9 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+    saturation: 1.25,
+  );
+
+  // ── Low quality: Light theme ────────────────────────────────────────────
+  //
+  // Blur halved vs. high; fill boosted to compensate for reduced translucency.
+
+  static const _cardLowLight = GlassConfig(
+    blurSigma: 8,
+    fill: Color(0xA0FFFFFF), // 63 %: boosted to compensate for less blur
+    border: Color(0x11FFFFFF), // 7 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
+  static const _miniPlayerLowLight = GlassConfig(
+    blurSigma: 12,
+    fill: Color(0xB0FFFFFF), // 69 %
+    border: Color(0x18FFFFFF), // 10 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.all(Radius.circular(16)),
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  );
+
+  static const _nowPlayingLowLight = GlassConfig(
+    blurSigma: 14,
+    fill: Color(0x82FFFFFF), // 51 %
+    border: Color(0x16FFFFFF), // 9 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.zero,
+    padding: EdgeInsets.zero,
+  );
+
+  static const _sheetLowLight = GlassConfig(
+    blurSigma: 14,
+    fill: Color(0xB5FFFFFF), // 71 %
+    border: Color(0x16FFFFFF), // 9 %
+    highlight: Color(0x0AFFFFFF), // 4 %
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+  );
+
+  // ── Low quality: Dark theme ─────────────────────────────────────────────
+
+  static const _cardLowDark = GlassConfig(
+    blurSigma: 8,
+    fill: Color(0x1EFFFFFF), // 12 %: boosted vs. high quality's 4 %
+    border: Color(0x12FFFFFF), // 7 %
+    highlight: Color(0x08FFFFFF), // 3 %
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
+  static const _miniPlayerLowDark = GlassConfig(
+    blurSigma: 12,
+    fill: Color(0x24FFFFFF), // 14 %
+    border: Color(0x12FFFFFF), // 7 %
+    highlight: Color(0x08FFFFFF), // 3 %
+    borderRadius: BorderRadius.all(Radius.circular(16)),
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  );
+
+  static const _nowPlayingLowDark = GlassConfig(
+    blurSigma: 14,
+    fill: Color(0x16FFFFFF), // 9 %
+    border: Color(0x10FFFFFF), // 6 %
+    highlight: Color(0x08FFFFFF), // 3 %
+    borderRadius: BorderRadius.zero,
+    padding: EdgeInsets.zero,
+  );
+
+  static const _sheetLowDark = GlassConfig(
+    blurSigma: 14,
+    fill: Color(0x21FFFFFF), // 13 %
+    border: Color(0x12FFFFFF), // 7 %
+    highlight: Color(0x08FFFFFF), // 3 %
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+    saturation: 1,
+  );
+
+  // ── Off: flat tint, no BackdropFilter ───────────────────────────────────
+  //
+  // [blurSigma] == 0 triggers the fast path in GlassCard (no compositing layer).
+  // Fill colours match iOS system background tokens:
+  //   light → systemGroupedBackground  (#F2F2F7)
+  //   dark  → secondarySystemBackground (#1C1C1E)
+
+  static const _cardOffLight = GlassConfig(
+    blurSigma: 0,
+    fill: Color(0xE6F2F2F7), // 90 % systemGroupedBackground
+    border: Colors.transparent,
+    highlight: Colors.transparent,
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
+  static const _cardOffDark = GlassConfig(
+    blurSigma: 0,
+    fill: Color(0xE61C1C1E), // 90 % secondarySystemBackground dark
+    border: Colors.transparent,
+    highlight: Colors.transparent,
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  );
+
+  static const _sheetOffLight = GlassConfig(
+    blurSigma: 0,
+    fill: Color(0xFFF5F5F7), // systemBackground light (opaque)
+    border: Colors.transparent,
+    highlight: Colors.transparent,
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+  );
+
+  static const _sheetOffDark = GlassConfig(
+    blurSigma: 0,
+    fill: Color(0xFF1C1C1E), // secondarySystemBackground dark (opaque)
+    border: Colors.transparent,
+    highlight: Colors.transparent,
+    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+  );
+}

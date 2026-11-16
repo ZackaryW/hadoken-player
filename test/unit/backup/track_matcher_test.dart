@@ -1,0 +1,227 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:troona/features/backup/domain/entities/backup.dart';
+import 'package:troona/features/backup/domain/track_matcher.dart';
+import 'package:troona/features/library/domain/entities/track.dart';
+
+Track _track(
+  String id, {
+  String title = 'Song',
+  String artist = 'Artist',
+  String album = 'Album',
+  int durationMs = 200000,
+  String fileName = 'song.mp3',
+  int size = 1000,
+}) => Track(
+  id: id,
+  title: title,
+  artist: artist,
+  artistId: 1,
+  album: album,
+  albumId: 1,
+  path: '/music/$fileName',
+  uri: 'content://$id',
+  size: size,
+  durationMs: durationMs,
+  fileName: fileName,
+);
+
+BackupTrack _saved({
+  String title = 'Song',
+  String artist = 'Artist',
+  String album = 'Album',
+  int durationMs = 200000,
+  String fileName = 'song.mp3',
+  int size = 1000,
+}) => BackupTrack(
+  title: title,
+  artist: artist,
+  album: album,
+  durationMs: durationMs,
+  fileName: fileName,
+  size: size,
+);
+
+void main() {
+  test('a copied file is found by its name and size', () {
+    final matcher = TrackMatcher([
+      _track('1', title: 'Retagged', fileName: 'a.flac', size: 42),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'a.flac', size: 42)), '1');
+  });
+
+  test('a file of another size falls back to its tags', () {
+    final matcher = TrackMatcher([_track('1', fileName: 'a.mp3', size: 7)]);
+
+    expect(matcher.match(_saved(fileName: 'a.flac', size: 42)), '1');
+  });
+
+  test('tags ignore case and spacing', () {
+    final matcher = TrackMatcher([
+      _track('1', title: 'the  song ', artist: 'ARTIST', fileName: 'x'),
+    ]);
+
+    expect(matcher.match(_saved(title: 'The Song', fileName: 'y')), '1');
+  });
+
+  test('a renamed album is found by title and artist', () {
+    final matcher = TrackMatcher([
+      _track('1', album: 'Deluxe Edition', fileName: 'x'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'y')), '1');
+  });
+
+  test('the album decides between two versions of a title', () {
+    final matcher = TrackMatcher([
+      _track('live', album: 'Live', fileName: 'x'),
+      _track('studio', fileName: 'y'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'z')), 'studio');
+  });
+
+  test('a duration beyond the tolerance is another song', () {
+    final matcher = TrackMatcher([
+      _track('1', durationMs: 200000 + 2001, fileName: 'x'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'y')), isNull);
+  });
+
+  test('a duration within the tolerance matches', () {
+    final matcher = TrackMatcher([
+      _track('1', durationMs: 200000 - 2000, fileName: 'x'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'y')), '1');
+  });
+
+  test('the closest duration wins', () {
+    final matcher = TrackMatcher([
+      _track('far', durationMs: 201500, fileName: 'x'),
+      _track('near', durationMs: 200400, fileName: 'y'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'z')), 'near');
+  });
+
+  test('a tie matches nothing', () {
+    final matcher = TrackMatcher([
+      _track('1', durationMs: 201000, fileName: 'x'),
+      _track('2', durationMs: 199000, fileName: 'y'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'z')), isNull);
+  });
+
+  test('a stricter step wins over a closer duration', () {
+    final matcher = TrackMatcher([
+      _track('copy', durationMs: 203000, fileName: 'a.mp3', size: 5),
+      _track('tagged', fileName: 'b.mp3'),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'a.mp3', size: 5)), 'copy');
+  });
+
+  test('an unknown song is not found', () {
+    final matcher = TrackMatcher([_track('1')]);
+
+    expect(
+      matcher.match(_saved(title: 'Other', fileName: 'other.mp3')),
+      isNull,
+    );
+  });
+
+  test('the same file in two folders takes the first copy', () {
+    final matcher = TrackMatcher([
+      _track('1', fileName: 'a.mp3', size: 5),
+      _track('2', fileName: 'a.mp3', size: 5),
+    ]);
+
+    expect(matcher.match(_saved(fileName: 'a.mp3', size: 5)), '1');
+  });
+
+  test('an unknown artist from an older backup matches the library\'s', () {
+    // Earlier versions saved `<unknown>`; the library now says ''.
+    final matcher = TrackMatcher([
+      _track('1', title: 'Intro', artist: '', fileName: 'intro.m4a'),
+    ]);
+
+    expect(matcher.match(_saved(title: 'Intro', artist: '<unknown>')), '1');
+  });
+
+  test('a song named from its file is found from an older backup', () {
+    // Saved as Android named it; the library now reads the file name.
+    final matcher = TrackMatcher([
+      _track('1', title: 'Last Last', artist: 'Burna Boy', fileName: 'x.m4a'),
+    ]);
+
+    expect(
+      matcher.match(
+        _saved(
+          title: 'Burna Boy - Last Last (Official Video)',
+          artist: '<unknown>',
+        ),
+      ),
+      '1',
+    );
+  });
+
+  test('a song named from its file: the album decides, then the title', () {
+    final saved = _saved(
+      title: 'Burna Boy - Last Last',
+      artist: '<unknown>',
+      album: 'Download',
+    );
+    // Two equal candidates: only the album tells them apart.
+    final twoAlbums = TrackMatcher([
+      _track(
+        '1',
+        title: 'Last Last',
+        artist: 'Burna Boy',
+        album: 'Other',
+        fileName: 'a',
+      ),
+      _track(
+        '2',
+        title: 'Last Last',
+        artist: 'Burna Boy',
+        album: 'Download',
+        fileName: 'b',
+      ),
+    ]);
+    expect(twoAlbums.match(saved), '2');
+
+    // The album was renamed: title and artist still find it.
+    final renamed = TrackMatcher([
+      _track(
+        '1',
+        title: 'Last Last',
+        artist: 'Burna Boy',
+        album: 'Music',
+        fileName: 'a',
+      ),
+    ]);
+    expect(renamed.match(saved), '1');
+  });
+
+  test('a title alone does not match an unknown artist', () {
+    final matcher = TrackMatcher([
+      _track(
+        '1',
+        title: 'Intro',
+        artist: '<unknown>',
+        album: 'A',
+        fileName: 'x',
+      ),
+    ]);
+
+    expect(
+      matcher.match(
+        _saved(title: 'Intro', artist: '<unknown>', album: 'B', fileName: 'y'),
+      ),
+      isNull,
+    );
+  });
+}
