@@ -31,6 +31,9 @@ import 'package:troona/features/settings/presentation/pages/privacy_page.dart';
 import 'package:troona/features/settings/presentation/pages/settings_page.dart';
 import 'package:troona/shared/widgets/ambient_background.dart';
 import 'package:troona/shared/widgets/tab_reselect.dart';
+import 'package:troona/features/profiles/presentation/profiles_page.dart';
+import 'package:troona/features/input_bindings/presentation/combo_pad_page.dart';
+import 'package:troona/features/player_actions/profile_controls.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -43,6 +46,8 @@ abstract class AppRoute {
   static const permission = '/permission';
   static const settings = 'settings';
   static const privacy = 'privacy';
+  static const profiles = 'profiles';
+  static const comboPad = 'combo-pad';
   static const weeklyRecap = 'recap';
 
   static const albumDetail = 'album_detail';
@@ -156,6 +161,25 @@ final appRouter = GoRouter(
                     ),
                   ),
                   routes: [
+                    GoRoute(
+                      path: AppRoute.profiles,
+                      name: AppRoute.profiles,
+                      builder: (context, _) => _overTab(
+                        ProfilesPage(
+                          controls: getIt<ProfileControls>(),
+                          onOpenPad: () => context.pushNamed(AppRoute.comboPad),
+                        ),
+                      ),
+                      routes: [
+                        GoRoute(
+                          path: AppRoute.comboPad,
+                          name: AppRoute.comboPad,
+                          builder: (_, _) => _overTab(
+                            ComboPadPage(controls: getIt<ProfileControls>()),
+                          ),
+                        ),
+                      ],
+                    ),
                     GoRoute(
                       path: AppRoute.privacy,
                       name: AppRoute.privacy,

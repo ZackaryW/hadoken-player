@@ -12,6 +12,10 @@ import 'package:lucide_icons_flutter/lucide_icons_300.dart';
 /// Lucide is the base, at a 300 stroke weight: thinner than its default
 /// 400, closer to SF Symbols. Eva gives the filled glyphs Lucide lacks.
 abstract final class AppIcons {
+  static const IconData profiles = LucideIcons300.gamepad2;
+  static const IconData comboForward = LucideIcons300.arrowRight;
+  static const IconData comboPause = LucideIcons300.pause;
+  static const IconData comboBackward = LucideIcons300.arrowLeft;
   // ── Playback ──────────────────────────────────────────────────────────────
   static const IconData play = LucideIcons300.play;
   static const IconData pause = LucideIcons300.pause;

@@ -96,6 +96,18 @@ class _SettingsList extends StatelessWidget {
     return SliverList.list(
       children: [
         SettingsSection(
+          title: 'HADOKEN',
+          children: [
+            SettingsTile.navigation(
+              icon: AppIcons.profiles,
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Player profiles and combos',
+              subtitle: 'P1–P3 · tap and hold bindings',
+              onTap: () => context.pushNamed(AppRoute.profiles),
+            ),
+          ],
+        ),
+        SettingsSection(
           title: l10n.settingsPlayback,
           children: [
             SettingsTile.switchTile(

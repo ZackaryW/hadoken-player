@@ -93,6 +93,11 @@ import 'package:troona/features/settings/presentation/cubit/settings_cubit.dart'
 import 'package:troona/services/audio/audio_service_initializer.dart';
 import 'package:troona/services/audio/audio_session_service.dart';
 import 'package:troona/services/audio/media_like_sync.dart';
+import 'package:troona/features/profiles/data/preferences_profile_store.dart';
+import 'package:troona/features/profiles/domain/profile_repository.dart';
+import 'package:troona/features/player_actions/data/playback_commands_adapter.dart';
+import 'package:troona/features/player_actions/domain/action_dispatcher.dart';
+import 'package:troona/features/player_actions/profile_controls.dart';
 import 'package:troona/services/audio/playback_resumer.dart';
 import 'package:troona/services/history/play_history_recorder.dart';
 import 'package:troona/services/metadata/artist_artwork_prefetch_service.dart';
@@ -223,6 +228,17 @@ Future<void> configureDependencies() async {
     lastSession: lastSession.future,
   );
   getIt.registerSingleton<AudioServicePort>(audioPort);
+  final profiles = await ProfileRepository.open(PreferencesProfileStore());
+  final actions = PlayerActionDispatcher(
+    playback: PlaybackCommandsAdapter(audioPort),
+    catalog: () => profiles.catalog,
+  );
+  getIt.registerSingleton<ProfileRepository>(profiles);
+  getIt.registerSingleton<PlayerActionDispatcher>(actions);
+  getIt.registerSingleton<ProfileControls>(
+    ProfileControls(profiles: profiles, dispatcher: actions),
+  );
+
   // Configure the OS audio session (focus, becoming noisy) before any track
   // loads to avoid focus races.
   final audioSessionService = AudioSessionService(audioPort, initialSettings);
