@@ -175,7 +175,7 @@ class MixAudioAdapter extends LoopAudioAdapter
 
   @override
   Future<void> stop() async {
-    _playIntent.add(false);
+    _setPlayIntent(false);
     await _mixer.cancel();
     await super.stop();
   }

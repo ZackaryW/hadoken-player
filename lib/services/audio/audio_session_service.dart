@@ -4,6 +4,8 @@ import 'package:audio_session/audio_session.dart';
 import 'package:troona/core/utils/app_logger.dart';
 import 'package:troona/features/player/domain/ports/audio_service_port.dart';
 import 'package:troona/features/player/domain/ports/skill_audio_effects_port.dart';
+import 'package:troona/features/player/domain/ports/playback_intent_port.dart';
+import 'package:troona/features/player/domain/entities/playback_state.dart';
 import 'package:troona/features/settings/domain/entities/app_settings.dart';
 
 /// Centralises audio session configuration and interruption handling.
@@ -28,6 +30,15 @@ final class AudioSessionService {
   double _currentVolume = 1.0;
   bool _isDucked = false;
   bool _isInitialized = false;
+  Future<void> _interruptionTail = Future.value();
+  bool _pauseInterruptionActive = false;
+  bool _resumePending = false;
+  int? _resumeRevision;
+  int _routeRevision = 0;
+
+  int? get _intentRevision => _audio is PlaybackIntentPort
+      ? (_audio as PlaybackIntentPort).playbackIntentRevision
+      : null;
 
   /// Configure the shared audio session and register interruption handlers.
   Future<void> init() async {
@@ -41,14 +52,26 @@ final class AudioSessionService {
     // Pause when headphones are unplugged / audio route changes to speaker.
     // At once: a fade-out would play on the speaker.
     _noisySub = _session.becomingNoisyEventStream.listen((_) async {
+      _routeRevision++;
+      _resumePending = false;
       await _audio.pause(fade: Duration.zero);
       appLogger.i('AudioSessionService: becoming noisy → pause');
     });
 
     // Handle audio focus / interruptions (GPS prompts, phone calls, etc.).
-    _interruptionSub = _session.interruptionEventStream.listen(
-      _handleInterruption,
-    );
+    _interruptionSub = _session.interruptionEventStream.listen((event) {
+      _interruptionTail = _interruptionTail
+          .then((_) => _handleInterruption(event))
+          .catchError((Object error, StackTrace stack) {
+            _resumePending = false;
+            _pauseInterruptionActive = false;
+            appLogger.e(
+              'Audio interruption failed',
+              error: error,
+              stackTrace: stack,
+            );
+          });
+    });
   }
 
   Future<void> _handleInterruption(AudioInterruptionEvent event) async {
@@ -79,9 +102,24 @@ final class AudioSessionService {
           break;
         case AudioInterruptionType.pause:
         case AudioInterruptionType.unknown:
+          if (_pauseInterruptionActive) break;
+          _pauseInterruptionActive = true;
+          _resumePending = false;
           if (_settings.stopOnCallEnabled) {
             // At once: the call or the app taking over is already sounding.
-            await _audio.pause(fade: Duration.zero);
+            final wasPlaying = _audio.currentStatus == PlaybackStatus.playing;
+            final route = _routeRevision;
+            final pause = _audio.pause(fade: Duration.zero);
+            final revision = _intentRevision;
+            final result = await pause;
+            _resumePending =
+                event.type == AudioInterruptionType.pause &&
+                wasPlaying &&
+                result.isRight() &&
+                route == _routeRevision &&
+                revision == _intentRevision &&
+                _audio.currentStatus == PlaybackStatus.paused;
+            _resumeRevision = revision;
             appLogger.i('AudioSessionService: pause interruption');
           }
           break;
@@ -102,7 +140,16 @@ final class AudioSessionService {
           }
           break;
         case AudioInterruptionType.pause:
-          if (_settings.resumeAfterCallEnabled && _shouldResume(event)) {
+          final resume =
+              _pauseInterruptionActive &&
+              _resumePending &&
+              _resumeRevision == _intentRevision &&
+              _audio.currentStatus == PlaybackStatus.paused &&
+              _settings.resumeAfterCallEnabled &&
+              _shouldResume(event);
+          _pauseInterruptionActive = false;
+          _resumePending = false;
+          if (resume) {
             await _audio.resume();
             appLogger.i('AudioSessionService: resume after interruption');
           } else {
@@ -113,13 +160,18 @@ final class AudioSessionService {
           break;
         case AudioInterruptionType.unknown:
           // Do nothing: explicit user action will restart playback.
+          _pauseInterruptionActive = false;
+          _resumePending = false;
           break;
       }
     }
   }
 
   Future<void> dispose() async {
+    _isInitialized = false;
+    _resumePending = false;
     await _interruptionSub?.cancel();
+    await _interruptionTail;
     await _noisySub?.cancel();
     await _volumeSub?.cancel();
   }

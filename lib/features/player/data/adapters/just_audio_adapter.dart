@@ -22,6 +22,7 @@ import 'skill_mixer.dart';
 import 'noise_source.dart';
 import '../../domain/listening_clock.dart';
 import '../../domain/ports/skill_playback_port.dart';
+import '../../domain/ports/playback_intent_port.dart';
 
 part 'loop_audio_adapter.dart';
 part 'mix_audio_adapter.dart';
@@ -52,14 +53,26 @@ part 'listening_audio_adapter.dart';
 /// track change by the user fades out briefly, then in. Auto-advance stays
 /// gapless. The fade is a gain applied on top of the user's volume, so it
 /// never shows on the volume stream or in the saved session.
-class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
+class JustAudioAdapter
+    implements AudioServicePort, PlaybackSessionLifecycle, PlaybackIntentPort {
+  int _intentRevision = 0;
+  @override
+  int get playbackIntentRevision => _intentRevision;
+  void _setPlayIntent(bool playing) {
+    _intentRevision++;
+    _playIntent.add(playing);
+  }
+
   final AudioPlayer _player;
   final _sessionGenerations = BehaviorSubject<int>.seeded(0);
   @override
   int get sessionGeneration => _sessionGenerations.value;
   @override
   Stream<int> get sessionGenerations => _sessionGenerations.stream;
-  void _replaceSession() => _sessionGenerations.add(sessionGeneration + 1);
+  void _replaceSession() {
+    _intentRevision++;
+    _sessionGenerations.add(sessionGeneration + 1);
+  }
 
   /// Fade at play, resume and pause, and fade-in after a track change.
   static const fadeDuration = AudioServicePort.pauseFade;
@@ -132,7 +145,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   }
 
   void _onQueueCompleted() {
-    _playIntent.add(false);
+    _setPlayIntent(false);
     _fade.stop();
     unawaited(_player.pause());
   }
@@ -244,7 +257,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   }) async {
     try {
       final request = ++_pauseRequest;
-      _playIntent.add(false);
+      _setPlayIntent(false);
       if (fade <= Duration.zero) {
         _fade.stop();
       } else if (_player.playing) {
@@ -478,7 +491,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   /// Starts playback, or takes it back from a pause still fading out, and
   /// fades in. Starting from silence: the gain is zeroed first.
   Future<void> _play() async {
-    _playIntent.add(true);
+    _setPlayIntent(true);
     if (!_player.playing) {
       await _fade.jump(0);
       _playInBackground();
@@ -658,7 +671,7 @@ class JustAudioAdapter implements AudioServicePort, PlaybackSessionLifecycle {
   @override
   Future<void> stop() {
     _replaceSession();
-    _playIntent.add(false);
+    _setPlayIntent(false);
     _fade.stop();
     return _player.stop();
   }

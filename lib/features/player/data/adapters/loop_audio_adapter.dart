@@ -74,6 +74,13 @@ class LoopAudioAdapter extends JustAudioAdapter
     }
   });
 
+  Future<Either<Failure, Unit>> _transportCommand(
+    Future<void> Function() operation,
+  ) {
+    _intentRevision++;
+    return _queueCommand(operation);
+  }
+
   @override
   Track? get currentTrack => _stoppedAtEnd ? null : _currentQueue?.currentTrack;
   @override
@@ -239,7 +246,7 @@ class LoopAudioAdapter extends JustAudioAdapter
         _visibleQueue(model, live.isEmpty ? 0 : index, shuffled, repeat),
       );
       if (_stoppedAtEnd) {
-        _playIntent.add(false);
+        _setPlayIntent(false);
         await _player.stop();
       } else if (start || _playIntent.value) {
         if (start) {
@@ -261,7 +268,7 @@ class LoopAudioAdapter extends JustAudioAdapter
           );
           if (_playIntent.value) _playInBackground();
         } catch (_) {
-          _playIntent.add(false);
+          _setPlayIntent(false);
           await _player.stop();
         }
       }
@@ -375,7 +382,7 @@ class LoopAudioAdapter extends JustAudioAdapter
     List<Track> tracks, {
     int startIndex = 0,
     bool? shuffle,
-  }) => _queueCommand(() async {
+  }) => _transportCommand(() async {
     if (tracks.isEmpty || startIndex < 0 || startIndex >= tracks.length) {
       throw ArgumentError('Queue is empty or index is invalid.');
     }
@@ -397,7 +404,7 @@ class LoopAudioAdapter extends JustAudioAdapter
       'playback-${sessionGeneration + 1}',
       _orderedLike(queue.playbackTracks, originals),
     );
-    if (!play) _playIntent.add(false);
+    if (!play) _setPlayIntent(false);
     try {
       await _render(
         model,
@@ -427,7 +434,7 @@ class LoopAudioAdapter extends JustAudioAdapter
     required bool play,
     required double volume,
     required double speed,
-  }) => _queueCommand(() async {
+  }) => _transportCommand(() async {
     await _startSession(queue, position, play);
     await setVolume(volume.clamp(0, 1));
     await setSpeed(speed.clamp(0.5, 2));
@@ -462,7 +469,7 @@ class LoopAudioAdapter extends JustAudioAdapter
   }
 
   @override
-  Future<Either<Failure, Unit>> skipToNext() => _queueCommand(() async {
+  Future<Either<Failure, Unit>> skipToNext() => _transportCommand(() async {
     final q = _currentQueue;
     if (q == null || q.isEmpty) return;
     if (q.currentIndex + 1 < q.length) {
@@ -472,7 +479,7 @@ class LoopAudioAdapter extends JustAudioAdapter
     }
   });
   @override
-  Future<Either<Failure, Unit>> skipToPrevious() => _queueCommand(() async {
+  Future<Either<Failure, Unit>> skipToPrevious() => _transportCommand(() async {
     final q = _currentQueue;
     if (q == null || q.isEmpty) return;
     if (q.currentIndex > 0) {
@@ -483,7 +490,7 @@ class LoopAudioAdapter extends JustAudioAdapter
   });
   @override
   Future<Either<Failure, Unit>> skipToIndex(int index) =>
-      _queueCommand(() async {
+      _transportCommand(() async {
         if (_currentQueue == null ||
             index < 0 ||
             index >= _currentQueue!.length) {
@@ -758,14 +765,18 @@ class LoopAudioAdapter extends JustAudioAdapter
     );
   });
   @override
-  Future<void> stop() => _orderedQueue(() async {
-    _planTimer?.cancel();
-    _loops = null;
-    _setEnded(true);
-    await super.stop();
-  });
+  Future<void> stop() {
+    _setPlayIntent(false);
+    return _orderedQueue(() async {
+      _planTimer?.cancel();
+      _loops = null;
+      _setEnded(true);
+      await super.stop();
+    });
+  }
+
   @override
-  Future<Either<Failure, Unit>> resume() => _queueCommand(() async {
+  Future<Either<Failure, Unit>> resume() => _transportCommand(() async {
     if (_currentQueue == null || _currentQueue!.isEmpty) return;
     if (_loops == null) {
       await _startSession(_currentQueue!, _player.position, true);
