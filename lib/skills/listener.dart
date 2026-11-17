@@ -28,8 +28,7 @@ final class SkillListener {
 
   bool matches(SkillRuntimeEvent event, SkillContext context) {
     if (event.trigger != trigger) return false;
-    if (event is SkillComboObserved &&
-        armedOnly != (event.listenerKey != 'declared')) {
+    if (event is SkillComboObserved && armedOnly != event.armed) {
       return false;
     }
     final actor = context.actor;

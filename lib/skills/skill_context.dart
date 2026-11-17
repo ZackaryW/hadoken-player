@@ -109,11 +109,13 @@ final class SkillPlaybackObserved extends SkillRuntimeEvent {
 
 final class SkillComboObserved extends SkillRuntimeEvent {
   final String listenerKey;
+  final bool armed;
   final SkillTarget target;
   final List<SkillStrokeObservation> observations;
   SkillComboObserved(
     super.id, {
     required this.listenerKey,
+    this.armed = true,
     required this.target,
     required Iterable<SkillStrokeObservation> observations,
   }) : observations = List.unmodifiable(observations) {

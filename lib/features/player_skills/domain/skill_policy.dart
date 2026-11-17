@@ -358,6 +358,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
         event: SkillComboObserved(
           request.requestId,
           listenerKey: 'declared',
+          armed: false,
           target: _target(request),
           observations: observations,
         ),

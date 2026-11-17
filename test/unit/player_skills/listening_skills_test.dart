@@ -107,6 +107,27 @@ void main() {
     once: once,
   );
 
+  test(
+    'armed listener names cannot collide with declaration routing',
+    () async {
+      final skill = ScriptedSkill(
+        'watch',
+        react: (event, context) => event is SkillManualActivation
+            ? SkillReaction(requests: [listen('arm', 'declared')])
+            : SkillReaction.none,
+      );
+      await start([skill]);
+      await activate(ProfileId.p1, skill);
+      await dispatcher.dispatch(skip());
+      final observations = skill.runtime.events
+          .whereType<SkillComboObserved>()
+          .toList();
+      expect(observations, hasLength(1));
+      expect(observations.single.listenerKey, 'declared');
+      expect(observations.single.armed, isTrue);
+    },
+  );
+
   for (final levels in [
     (80, 60, true),
     (60, 60, false),
