@@ -135,6 +135,64 @@ void main() {
   });
 
   test(
+    'completed caches are bounded and eviction preserves live effects',
+    () async {
+      var calls = 0;
+      var cleanups = 0;
+      coordinator.adapters[SkillCapability.queueEdit] = TestAdapter((
+        request,
+        origin,
+        context,
+      ) async {
+        calls++;
+        final live = request.effectId == 'live';
+        return AppliedCapability(
+          CapabilityResult(
+            effectId: request.effectId,
+            status: CapabilityStatus.applied,
+            handle: live
+                ? EffectHandle(
+                    id: 'live-handle',
+                    origin: origin,
+                    deadline: const Duration(seconds: 10),
+                  )
+                : null,
+          ),
+          cleanup: live
+              ? () async {
+                  cleanups++;
+                }
+              : null,
+        );
+      });
+      final skill = ReactionSkill(ReactionRuntime((id) => [edit(id)]));
+      await invoke(skill, 'live');
+      SkillInvocationOutcome? last;
+      for (var i = 0; i < 4100; i++) {
+        last = await invoke(skill, 'r$i');
+      }
+      expect(coordinator.pendingInvocationCount, 0);
+      expect(
+        coordinator.completedInvocationCount,
+        SkillCoordinator.completedInvocationLimit,
+      );
+      expect(
+        coordinator.retainedEffectResultCount,
+        SkillCoordinator.effectResultLimit,
+      );
+      expect(await invoke(skill, 'r4099'), same(last));
+      expect(calls, 4101);
+      expect(ledger.contains('live-handle'), isTrue);
+      expect(cleanups, 0);
+      await ledger.revoke('live-handle');
+      expect(cleanups, 1);
+      coordinator.forgetSession('s');
+      expect(coordinator.completedInvocationCount, 0);
+      expect(coordinator.retainedEffectResultCount, 0);
+    },
+  );
+
+  test(
     'same ordered queue, duplicate invocations and effects, exactly one notification',
     () async {
       final order = <String>[];

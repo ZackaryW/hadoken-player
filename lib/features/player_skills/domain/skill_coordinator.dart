@@ -49,8 +49,21 @@ final class SkillCoordinator {
   final bool Function(SkillOrigin)? originIsActive;
   final _invocations =
       <(String, String, String, String), Future<SkillInvocationOutcome>>{};
+  final _completed =
+      <(String, String, String, String), SkillInvocationOutcome>{};
   final _results = <(String, String, String, String), CapabilityResult>{};
+  static const completedInvocationLimit = 256;
+  static const effectResultLimit = 4096;
+  int _activeInvocations = 0;
+  int get pendingInvocationCount => _invocations.length;
+  int get completedInvocationCount => _completed.length;
+  int get retainedEffectResultCount => _results.length;
   bool _notifying = false;
+
+  void forgetSession(String sessionId) {
+    _completed.removeWhere((key, _) => key.$1 == sessionId);
+    _results.removeWhere((key, _) => key.$1 == sessionId);
+  }
 
   SkillCoordinator({
     required this.runOrdered,
@@ -116,21 +129,67 @@ final class SkillCoordinator {
       );
     }
     final key = _invocationKey(origin);
-    return _invocations.putIfAbsent(
-      key,
-      () => _invoke(
+    final pending = _invocations[key];
+    if (pending != null) return pending;
+    final completed = _completed[key];
+    if (completed != null) return Future.value(completed);
+    final result =
+        _invoke(
+          definition,
+          runtime,
+          event,
+          origin,
+          context,
+          budget ?? SkillExecutionBudget(),
+          allowPlayback,
+        ).then(
+          (outcome) {
+            _invocations.remove(key);
+            _completed[key] = outcome;
+            while (_completed.length > completedInvocationLimit) {
+              _completed.remove(_completed.keys.first);
+            }
+            return outcome;
+          },
+          onError: (Object error, StackTrace stack) {
+            _invocations.remove(key);
+            Error.throwWithStackTrace(error, stack);
+          },
+        );
+    _invocations[key] = result;
+    return result;
+  }
+
+  Future<SkillInvocationOutcome> _invoke(
+    SkillDefinition definition,
+    SkillRuntime runtime,
+    SkillRuntimeEvent event,
+    SkillOrigin origin,
+    SkillContext context,
+    SkillExecutionBudget budget,
+    bool allowPlayback,
+  ) async {
+    _activeInvocations++;
+    try {
+      return await _react(
         definition,
         runtime,
         event,
         origin,
         context,
-        budget ?? SkillExecutionBudget(),
+        budget,
         allowPlayback,
-      ),
-    );
+      );
+    } finally {
+      if (--_activeInvocations == 0) {
+        while (_results.length > effectResultLimit) {
+          _results.remove(_results.keys.first);
+        }
+      }
+    }
   }
 
-  Future<SkillInvocationOutcome> _invoke(
+  Future<SkillInvocationOutcome> _react(
     SkillDefinition definition,
     SkillRuntime runtime,
     SkillRuntimeEvent event,

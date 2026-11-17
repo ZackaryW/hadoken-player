@@ -69,6 +69,7 @@ abstract interface class ExecutablePlayerAbilityPolicy
     ProfileCatalog Function() catalog,
   );
   Future<List<CapabilityResult>> observeInput(PlayerActionRequest request);
+  void completeRequest(String requestId);
 }
 
 final class AllowAllAbilities implements PlayerAbilityPolicy {
@@ -88,6 +89,10 @@ final class PlayerActionDispatcher {
   final ProfileCatalog Function() catalog;
   final _outcomes = StreamController<PlayerActionOutcome>.broadcast(sync: true);
   final _requests = <String, Future<PlayerActionOutcome>>{};
+  final _completed = <String, PlayerActionOutcome>{};
+  static const completedRequestLimit = 256;
+  int get pendingRequestCount => _requests.length;
+  int get completedRequestCount => _completed.length;
   Future<void> _tail = Future.value();
   bool _policyFailed = false;
 
@@ -115,6 +120,8 @@ final class PlayerActionDispatcher {
   Future<PlayerActionOutcome> dispatch(PlayerActionRequest request) {
     final previous = _requests[request.requestId];
     if (previous != null) return previous;
+    final completed = _completed[request.requestId];
+    if (completed != null) return Future.value(completed);
     final arrival = catalog();
     final revision = request.catalogRevision ?? arrival.revision;
     bool validNow() {
@@ -184,6 +191,11 @@ final class PlayerActionDispatcher {
           ActionStatus.failure,
           'The playback action failed.',
         );
+      } finally {
+        final policy = abilities;
+        if (policy is ExecutablePlayerAbilityPolicy) {
+          policy.completeRequest(request.requestId);
+        }
       }
       if (observedEffects.isNotEmpty) {
         result = CommandResult(
@@ -196,9 +208,22 @@ final class PlayerActionDispatcher {
       _outcomes.add(outcome);
       return outcome;
     });
-    _requests[request.requestId] =
-        result; // Includes denied/no-op/failure results.
-    return result;
+    final tracked = result.then(
+      (outcome) {
+        _requests.remove(request.requestId);
+        _completed[request.requestId] = outcome;
+        while (_completed.length > completedRequestLimit) {
+          _completed.remove(_completed.keys.first);
+        }
+        return outcome;
+      },
+      onError: (Object error, StackTrace stack) {
+        _requests.remove(request.requestId);
+        Error.throwWithStackTrace(error, stack);
+      },
+    );
+    _requests[request.requestId] = tracked;
+    return tracked;
   }
 
   /// Skill assignment mutations use the same queue as check/playback/success.
@@ -211,6 +236,8 @@ final class PlayerActionDispatcher {
 
   Future<void> dispose() async {
     await _tail;
+    _requests.clear();
+    _completed.clear();
     await _outcomes.close();
   }
 }

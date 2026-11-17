@@ -56,6 +56,15 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
   StreamSubscription<int>? _sessionChanges;
   String _session = 'playback-0';
   final _requestSessions = <String, String>{};
+  int get pendingExecutionCount =>
+      {..._budgets.keys, ..._requestSessions.keys}.length;
+
+  @override
+  void completeRequest(String requestId) {
+    _budgets.remove(requestId);
+    _requestSessions.remove(requestId);
+  }
+
   bool _lifecycleFailed = false;
   final _runtimeOwners = <SkillId, ProfileId>{};
   int _lifecycleSequence = 0;
@@ -443,6 +452,7 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
             _runtimes[definition.id] = definition.createRuntime();
           }
           _runtimeOwners.clear();
+          coordinator.forgetSession(previous);
           _changes.add(null);
         }).catchError((Object _) {
           _lifecycleFailed = true;
@@ -856,6 +866,8 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
     await _sessionChanges?.cancel();
     await _effectChanges?.cancel();
     await effects.dispose();
+    _budgets.clear();
+    _requestSessions.clear();
     await _changes.close();
   }
 }

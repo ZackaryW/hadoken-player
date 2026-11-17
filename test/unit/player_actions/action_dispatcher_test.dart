@@ -75,6 +75,39 @@ void main() {
   tearDown(() => dispatcher.dispose());
 
   test(
+    'completed retention is bounded without evicting pending requests',
+    () async {
+      player.gate = Completer<void>();
+      final first = dispatcher.dispatch(request('oldest', a));
+      final pending = [
+        for (var i = 0; i < 300; i++) dispatcher.dispatch(request('r$i', a)),
+      ];
+      expect(dispatcher.pendingRequestCount, 301);
+      expect(dispatcher.dispatch(request('oldest', a)), same(first));
+      player.gate!.complete();
+      await first;
+      final outcomes = await Future.wait(pending);
+      expect(dispatcher.pendingRequestCount, 0);
+      expect(
+        dispatcher.completedRequestCount,
+        PlayerActionDispatcher.completedRequestLimit,
+      );
+      final calls = events.length;
+      expect(
+        await dispatcher.dispatch(request('r299', a)),
+        same(outcomes.last),
+      );
+      expect(events.length, calls);
+      await dispatcher.dispatch(request('oldest', a));
+      expect(events.length, calls + 3);
+      expect(
+        dispatcher.completedRequestCount,
+        PlayerActionDispatcher.completedRequestLimit,
+      );
+    },
+  );
+
+  test(
     'deduplicates in-flight and completed delivery, publishing only once',
     () async {
       final outcomes = <PlayerActionOutcome>[];
