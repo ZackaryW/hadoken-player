@@ -334,7 +334,13 @@ final class SkillPolicy implements ExecutablePlayerAbilityPolicy {
     );
     for (final definition in definitions) {
       final owner = assignments.catalog.ownerOf(definition.id);
-      if (owner == null || !definition.listeners.any((l) => l.combo == combo)) {
+      if (owner == null ||
+          !definition.listeners.any(
+            (l) =>
+                l.trigger == SkillTrigger.comboObserved &&
+                !l.armedOnly &&
+                (l.combo == null || l.combo == combo),
+          )) {
         continue;
       }
       final outcome = await coordinator.invokeWithinOrder(

@@ -7,12 +7,16 @@ final class SkillListener {
   final PlayerScope scope;
   final bool initiallyActive;
   final SkillCombo? combo;
+
+  /// Capability callbacks require an armed listener; declarations do not.
+  final bool armedOnly;
   SkillListener(
     String key,
     this.trigger, {
     this.scope = PlayerScope.owner,
     this.initiallyActive = true,
     this.combo,
+    this.armedOnly = false,
   }) : key = requireIdentity(key) {
     if (scope == PlayerScope.explicit) {
       throw ArgumentError('Use a dynamic listener for explicit player sets.');
@@ -24,6 +28,10 @@ final class SkillListener {
 
   bool matches(SkillRuntimeEvent event, SkillContext context) {
     if (event.trigger != trigger) return false;
+    if (event is SkillComboObserved &&
+        armedOnly != (event.listenerKey != 'declared')) {
+      return false;
+    }
     final actor = context.actor;
     if (actor != null &&
         !PlayerSelector(

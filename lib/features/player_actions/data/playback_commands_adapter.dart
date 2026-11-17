@@ -3,6 +3,7 @@ import 'package:troona/core/error/failures.dart';
 import '../../player/domain/entities/playback_state.dart';
 import '../../player/domain/entities/queue.dart';
 import '../../player/domain/entities/repeat_mode.dart';
+import '../../player/domain/ports/loop_queue_port.dart';
 import '../../player/domain/ports/audio_service_port.dart';
 import '../../profiles/domain/profile_catalog.dart';
 import '../domain/action_dispatcher.dart';
@@ -58,7 +59,15 @@ final class PlaybackCommandsAdapter implements PlaybackCommands {
 
   Future<CommandResult> _skip(int direction) async {
     final before = audio.currentQueue;
-    if (before == null || before.length < 2) return _unchanged;
+    final loops = audio is LoopQueuePort ? audio as LoopQueuePort : null;
+    final beforeLoop = loops?.currentLoop;
+    if (before == null || before.isEmpty) return _unchanged;
+    final nextLoop =
+        direction > 0 &&
+        before.currentIndex == before.length - 1 &&
+        before.repeatMode == RepeatMode.all &&
+        beforeLoop != null;
+    if (before.length < 2 && !nextLoop) return _unchanged;
     var target = before.currentIndex + direction;
     if (target < 0 || target >= before.length) {
       if (before.repeatMode != RepeatMode.all) return _unchanged;
@@ -76,7 +85,11 @@ final class PlaybackCommandsAdapter implements PlaybackCommands {
     var outcome = _unchanged;
     try {
       if (audio.currentStatus == PlaybackStatus.playing ||
-          !sameOccurrence(before, audio.currentQueue)) {
+          !sameOccurrence(before, audio.currentQueue) ||
+          (beforeLoop != null &&
+              (loops?.currentLoop?.sessionId != beforeLoop.sessionId ||
+                  loops?.currentLoop?.ordinal != beforeLoop.ordinal ||
+                  loops?.currentLoop?.revision != beforeLoop.revision))) {
         outcome = const CommandResult(
           ActionStatus.noOp,
           'The queue advanced or changed before the combo skip.',
@@ -86,9 +99,25 @@ final class PlaybackCommandsAdapter implements PlaybackCommands {
             ? await audio.skipToNext()
             : await audio.skipToPrevious();
         final after = audio.currentQueue;
+        final afterLoop = loops?.currentLoop;
+        final enteredNextLoop =
+            nextLoop &&
+            afterLoop != null &&
+            afterLoop.sessionId == beforeLoop.sessionId &&
+            afterLoop.ordinal == beforeLoop.ordinal + 1 &&
+            afterLoop.occurrences.isNotEmpty &&
+            after?.currentIndex == 0 &&
+            audio.currentTrack?.id ==
+                afterLoop.occurrences.first.song.libraryId;
         if (result.isLeft()) {
           outcome = _failed;
-        } else if (sameOrder(before, after) && after!.currentIndex == target) {
+        } else if (enteredNextLoop ||
+            (!nextLoop &&
+                sameOrder(before, after) &&
+                after!.currentIndex == target &&
+                (beforeLoop == null ||
+                    (afterLoop?.sessionId == beforeLoop.sessionId &&
+                        afterLoop?.ordinal == beforeLoop.ordinal)))) {
           outcome = CommandResult(
             ActionStatus.success,
             direction > 0

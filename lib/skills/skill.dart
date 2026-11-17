@@ -63,6 +63,7 @@ abstract class SkillDefinition {
       SkillListener(
         trigger.name,
         trigger,
+        armedOnly: trigger == SkillTrigger.comboObserved,
         scope: trigger == SkillTrigger.comboObserved
             ? PlayerScope.all
             : PlayerScope.owner,
